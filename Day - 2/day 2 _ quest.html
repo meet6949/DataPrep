@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Data Quest — CSV, JSON/SQL, APIs & Data Cleaning!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — LIGHT GAMIFIED
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #f0f4ff;
+  --bg2:       #e8edf8;
+  --bg3:       #dde4f5;
+  --card:      #ffffff;
+  --card2:     #f5f7ff;
+  --border:    rgba(99,102,241,0.12);
+  --border2:   rgba(99,102,241,0.25);
+
+  --neon-blue:   #2563eb;
+  --neon-cyan:   #0891b2;
+  --neon-purple: #7c3aed;
+  --neon-pink:   #db2777;
+  --neon-green:  #16a34a;
+  --neon-yellow: #b45309;
+  --neon-orange: #c2410c;
+  --neon-red:    #dc2626;
+
+  --text:  #1e1b4b;
+  --muted: #4b5563;
+  --dim:   #9ca3af;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-blue:   0 4px 16px rgba(37,99,235,0.18), 0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple: 0 4px 16px rgba(124,58,237,0.18), 0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:   0 4px 16px rgba(8,145,178,0.18),  0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:  0 4px 16px rgba(22,163,74,0.18),  0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow: 0 4px 16px rgba(180,83,9,0.18),   0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:   0 4px 16px rgba(219,39,119,0.18), 0 1px 4px rgba(219,39,119,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.container-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative; z-index: 1;
+}
+
+/* ═══ XP BAR ═══ */
+.xp-strip {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(240,244,255,0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  padding: 0.65rem 0;
+}
+.xp-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.xp-label {
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+}
+.xp-bar-wrap {
+  flex: 1; min-width: 120px;
+  background: rgba(37,99,235,0.1);
+  border-radius: 50px; height: 10px;
+  border: 1px solid var(--border2); overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+  border-radius: 50px;
+  transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 10px rgba(37,99,235,0.35);
+  position: relative;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0;} 50%{opacity:1;} }
+.xp-score {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.9rem; color: var(--neon-yellow); white-space: nowrap;
+}
+.xp-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.xp-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 0.2rem 0.65rem; border-radius: 50px;
+  border: 1px solid; white-space: nowrap;
+  transition: 0.3s; opacity: 0.35;
+}
+.xp-badge.earned { opacity: 1; animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes badgePop { 0%{transform:scale(0);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+.xp-badge.b1 { border-color: var(--neon-blue);   color: var(--neon-blue);   }
+.xp-badge.b2 { border-color: var(--neon-cyan);   color: var(--neon-cyan);   }
+.xp-badge.b3 { border-color: var(--neon-purple); color: var(--neon-purple); }
+.xp-badge.b4 { border-color: var(--neon-green);  color: var(--neon-green);  }
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 6rem 0 5rem;
+  background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(8,145,178,0.07) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-orbit {
+  position: absolute; top: 50%; right: 8%;
+  transform: translateY(-50%);
+  width: 420px; height: 420px;
+  pointer-events: none;
+}
+.orbit-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-ring:nth-child(1) { width: 150px; height: 150px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 250px; height: 250px; animation: spin 20s linear infinite reverse; border-color: rgba(168,85,247,0.2); }
+.orbit-ring:nth-child(3) { width: 350px; height: 350px; animation: spin 30s linear infinite; border-color: rgba(6,182,212,0.15); }
+.orbit-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 50%; top: -4px; left: 50%; transform: translateX(-50%);
+}
+.orbit-ring:nth-child(1) .orbit-dot { background: var(--neon-blue); box-shadow: var(--glow-blue); }
+.orbit-ring:nth-child(2) .orbit-dot { background: var(--neon-purple); box-shadow: var(--glow-purple); }
+.orbit-ring:nth-child(3) .orbit-dot { background: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+.orbit-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3rem; animation: float 4s ease-in-out infinite;
+}
+@keyframes spin { from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);} }
+@keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0);}50%{transform:translate(-50%,-50%) translateY(-12px);} }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px; padding: 0.3rem 1rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--neon-blue);
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-blue); box-shadow: var(--glow-blue);
+  animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+
+.hero h1 {
+  font-family: var(--font-head);
+  font-weight: 800; font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1; letter-spacing: -1.5px;
+  margin-bottom: 1.5rem;
+}
+.hero h1 .line1 { display: block; color: #1e1b4b; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 40%, var(--neon-purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 560px; margin-bottom: 2rem; line-height: 1.75; }
+.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-stat-item { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.8rem; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 0.8rem 2rem; border-radius: 50px; border: none;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  transition: 0.3s; animation: pulse-btn 2s infinite;
+}
+@keyframes pulse-btn { 0%,100%{box-shadow:0 4px 20px rgba(37,99,235,0.28);}50%{box-shadow:0 4px 32px rgba(37,99,235,0.45);} }
+.hero-cta:hover { transform: translateY(-2px) scale(1.03); color: white; }
+
+/* ═══ QUEST MAP ═══ */
+.quest-map {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2rem; margin: 3rem 0;
+  position: relative; box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+}
+.quest-map::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.03));
+  pointer-events: none;
+}
+.quest-map-title {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.1rem; color: var(--neon-yellow);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+}
+.quest-map-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(234,179,8,0.3), transparent); }
+.quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
+.quest-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  text-decoration: none; color: var(--muted);
+  font-weight: 600; font-size: 0.88rem; transition: 0.25s;
+}
+.quest-item:hover {
+  background: rgba(37,99,235,0.07); border-color: rgba(37,99,235,0.3);
+  color: var(--neon-blue); transform: translateX(4px);
+}
+.quest-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+}
+
+/* ═══ LEVEL CARD ═══ */
+.level-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 2.5rem; margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.level-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 24px 24px 0 0;
+}
+.level-card.lvl-blue::before   { background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); }
+.level-card.lvl-purple::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); }
+.level-card.lvl-cyan::before   { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); }
+.level-card.lvl-green::before  { background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan)); }
+.level-card.lvl-yellow::before { background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange)); }
+.level-card.lvl-pink::before   { background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple)); }
+.level-card:hover { box-shadow: 0 8px 32px rgba(37,99,235,0.12); }
+.level-card .corner-deco {
+  position: absolute; top: 1.2rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.25;
+}
+.lv-header { display: flex; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.8rem; }
+.lv-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; position: relative;
+}
+.lv-icon-wrap::after {
+  content: '';
+  position: absolute; inset: -3px; border-radius: 18px;
+  border: 1px solid; opacity: 0.4;
+}
+.ico-blue   { background: rgba(37,99,235,0.12);   color: var(--neon-blue);   } .ico-blue::after   { border-color: var(--neon-blue);   }
+.ico-purple { background: rgba(124,58,237,0.12);  color: var(--neon-purple); } .ico-purple::after { border-color: var(--neon-purple); }
+.ico-cyan   { background: rgba(8,145,178,0.12);   color: var(--neon-cyan);   } .ico-cyan::after   { border-color: var(--neon-cyan);   }
+.ico-green  { background: rgba(22,163,74,0.12);   color: var(--neon-green);  } .ico-green::after  { border-color: var(--neon-green);  }
+.ico-yellow { background: rgba(180,83,9,0.12);    color: var(--neon-yellow); } .ico-yellow::after { border-color: var(--neon-yellow); }
+.ico-pink   { background: rgba(219,39,119,0.12);  color: var(--neon-pink);   } .ico-pink::after   { border-color: var(--neon-pink);   }
+.ico-orange { background: rgba(194,65,12,0.12);   color: var(--neon-orange); } .ico-orange::after { border-color: var(--neon-orange); }
+.lv-meta { flex: 1; }
+.lv-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 0.35rem; }
+.lv-title { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; line-height: 1.2; color: var(--text); }
+.lv-xp {
+  margin-top: 0.4rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.25);
+  border-radius: 50px; padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700; color: var(--neon-yellow);
+}
+
+/* ═══ CALLOUT ═══ */
+.callout {
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0; border: 1px solid;
+  position: relative; overflow: hidden;
+}
+.callout::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.callout .ct { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.cb-blue   { background: rgba(37,99,235,0.06);  border-color: rgba(37,99,235,0.2);  } .cb-blue::before   { background: var(--neon-blue);   } .cb-blue   .ct { color: var(--neon-blue);   }
+.cb-purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); } .cb-purple::before { background: var(--neon-purple); } .cb-purple .ct { color: var(--neon-purple); }
+.cb-cyan   { background: rgba(8,145,178,0.06);  border-color: rgba(8,145,178,0.2);  } .cb-cyan::before   { background: var(--neon-cyan);   } .cb-cyan   .ct { color: var(--neon-cyan);   }
+.cb-green  { background: rgba(22,163,74,0.06);  border-color: rgba(22,163,74,0.2);  } .cb-green::before  { background: var(--neon-green);  } .cb-green  .ct { color: var(--neon-green);  }
+.cb-yellow { background: rgba(180,83,9,0.06);   border-color: rgba(180,83,9,0.2);   } .cb-yellow::before { background: var(--neon-yellow); } .cb-yellow .ct { color: var(--neon-yellow); }
+.cb-pink   { background: rgba(219,39,119,0.06); border-color: rgba(219,39,119,0.2); } .cb-pink::before   { background: var(--neon-pink);   } .cb-pink   .ct { color: var(--neon-pink);   }
+.cb-orange { background: rgba(194,65,12,0.06);  border-color: rgba(194,65,12,0.2);  } .cb-orange::before { background: var(--neon-orange); } .cb-orange .ct { color: var(--neon-orange); }
+
+/* ═══ STEP TIMELINE ═══ */
+.step-timeline { position: relative; padding-left: 2.5rem; }
+.step-timeline::before {
+  content: '';
+  position: absolute; left: 14px; top: 4px; bottom: 4px; width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-cyan));
+  opacity: 0.45; border-radius: 2px;
+}
+.step-item { position: relative; margin-bottom: 1.2rem; }
+.step-item::before {
+  content: attr(data-step);
+  position: absolute; left: -2.5rem; top: 0.15rem;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--card2); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.75rem;
+  color: var(--neon-blue);
+}
+.step-label { font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 0.3rem; }
+.step-body  { font-size: 0.9rem; color: var(--muted); }
+
+/* ═══ CODE BLOCK ═══ */
+.code-wrap {
+  background: #f8f9fc; border: 1px solid var(--border2);
+  border-radius: 14px; overflow: hidden; margin: 1.2rem 0;
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(37,99,235,0.06); padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+  color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase;
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 10px; height: 10px; border-radius: 50%; }
+.code-dot:nth-child(1){ background:#dc2626; }
+.code-dot:nth-child(2){ background:#b45309; }
+.code-dot:nth-child(3){ background:#16a34a; }
+.code-wrap pre { margin: 0; padding: 1.2rem 1.4rem; overflow-x: auto; background: transparent; }
+.code-wrap pre code { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; }
+.code-output {
+  background: rgba(22,163,74,0.06); border-top: 1px solid rgba(22,163,74,0.2);
+  padding: 0.7rem 1.2rem;
+  font-family: var(--font-mono); font-size: 0.82rem; color: #14532d;
+}
+
+/* ═══ EXAMPLE CARD ═══ */
+.ex-card {
+  border-radius: 14px; margin: 1.2rem 0;
+  border: 1px solid var(--border2); overflow: hidden;
+}
+.ex-head {
+  padding: 0.7rem 1.1rem;
+  font-weight: 700; font-size: 0.88rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.ex-body { padding: 1.1rem; }
+.ex-real { border-color: rgba(37,99,235,0.3); }
+.ex-real .ex-head { background: rgba(37,99,235,0.07); color: var(--neon-blue); }
+.ex-tech { border-color: rgba(124,58,237,0.3); }
+.ex-tech .ex-head { background: rgba(124,58,237,0.07); color: var(--neon-purple); }
+.ex-warn { border-color: rgba(220,38,38,0.3); }
+.ex-warn .ex-head { background: rgba(220,38,38,0.07); color: var(--neon-red); }
+.ex-tip  { border-color: rgba(22,163,74,0.3); }
+.ex-tip  .ex-head { background: rgba(22,163,74,0.07); color: var(--neon-green); }
+
+/* ═══ TABLE ═══ */
+.gtbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.gtbl thead tr { background: rgba(37,99,235,0.07); }
+.gtbl th { padding: 0.75rem 1rem; font-family: var(--font-head); font-weight: 700; text-align: left; color: var(--text); border-bottom: 1.5px solid var(--border2); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.gtbl td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+.gtbl tr:last-child td { border-bottom: none; }
+.gtbl tr:hover td { background: rgba(37,99,235,0.03); }
+
+/* ═══ DIM CARD (comparison cards) ═══ */
+.dim-card {
+  background: var(--card2); border: 1.5px solid;
+  border-radius: 16px; padding: 1.4rem;
+  height: 100%;
+}
+.dim-rank { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.dim-name { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; margin-bottom: 0.3rem; }
+.dim-code { font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.75; }
+.dim-desc { font-size: 0.87rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.6; }
+.dim-example {
+  font-size: 0.82rem; padding: 0.6rem 0.9rem;
+  border: 1px solid; border-radius: 10px;
+  background: rgba(255,255,255,0.6); line-height: 1.8;
+}
+
+/* ═══ QUIZ ═══ */
+.quiz-box {
+  background: var(--card2); border: 1.5px solid var(--border2);
+  border-radius: 18px; padding: 1.6rem; margin-top: 2rem;
+}
+.quiz-q { font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; color: var(--text); margin-bottom: 1.1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+.quiz-opt {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  background: #ffffff; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; padding: 0.8rem 1rem;
+  cursor: pointer; font-size: 0.92rem; font-weight: 500; color: #374151;
+  transition: all 0.18s ease; user-select: none;
+}
+.quiz-opt:not(.answered-opt):hover {
+  background: #f3f4f6; border-color: #9ca3af; color: #111827; transform: translateX(3px);
+}
+.quiz-opt.correct { background: #f0fdf4; border-color: #16a34a; color: #14532d; font-weight: 700; }
+.quiz-opt.correct .opt-letter { background: #16a34a; color: #fff; }
+.quiz-opt.wrong   { background: #fef2f2; border-color: #dc2626; color: #991b1b; opacity: 0.8; }
+.quiz-opt.wrong   .opt-letter { background: #dc2626; color: #fff; }
+.quiz-opt.dimmed  { opacity: 0.45; pointer-events: none; }
+.quiz-opt .opt-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #f3f4f6; color: #6b7280;
+  border: 1.5px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  flex-shrink: 0; transition: background 0.2s, color 0.2s;
+}
+.quiz-explain {
+  display: none; font-size: 0.84rem; font-weight: 500;
+  margin-top: -0.35rem; margin-bottom: 0.35rem;
+  padding: 0.5rem 0.85rem 0.5rem 1rem;
+  border-radius: 0 0 10px 10px; line-height: 1.55;
+  border-left: 3px solid transparent;
+}
+.quiz-explain.show-correct { display: block; background: rgba(22,163,74,0.07); color: #166534; border-left-color: #16a34a; }
+.quiz-explain.show-wrong   { display: block; background: rgba(220,38,38,0.06); color: #991b1b; border-left-color: #dc2626; }
+.quiz-explain.show-reveal  { display: block; background: rgba(37,99,235,0.06); color: #1e40af; border-left-color: #2563eb; }
+.quiz-feedback {
+  display: none; margin-top: 1rem; padding: 0.85rem 1.1rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+  align-items: center; gap: 0.6rem;
+}
+.quiz-feedback.show { display: flex; animation: fadeIn 0.35s; }
+.quiz-feedback.win  { background: linear-gradient(135deg, #f0fdf4, #dcfce7); color: #14532d; border: 1px solid rgba(22,163,74,0.3); }
+.quiz-feedback.lose { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #991b1b; border: 1px solid rgba(220,38,38,0.2); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;} }
+
+/* ═══ STAT PILLS ═══ */
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border-radius: 50px; padding: 0.3rem 0.9rem;
+  font-weight: 700; font-size: 0.8rem; border: 1px solid;
+}
+.sp-blue   { background: rgba(37,99,235,0.08);  border-color: rgba(37,99,235,0.3);  color: var(--neon-blue);   }
+.sp-green  { background: rgba(22,163,74,0.08);  border-color: rgba(22,163,74,0.3);  color: var(--neon-green);  }
+.sp-yellow { background: rgba(180,83,9,0.08);   border-color: rgba(180,83,9,0.3);   color: var(--neon-yellow); }
+.sp-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--neon-purple); }
+.sp-cyan   { background: rgba(8,145,178,0.08);  border-color: rgba(8,145,178,0.3);  color: var(--neon-cyan);   }
+.sp-pink   { background: rgba(219,39,119,0.08); border-color: rgba(219,39,119,0.3); color: var(--neon-pink);   }
+.sp-orange { background: rgba(194,65,12,0.08);  border-color: rgba(194,65,12,0.3);  color: var(--neon-orange); }
+
+/* ═══ MERMAID WRAP ═══ */
+.mermaid-wrap {
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+/* ═══ DIVIDER ═══ */
+.glow-div {
+  height: 2px; border-radius: 2px; margin: 2rem 0; opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-cyan), transparent);
+}
+
+/* ═══ HIGHLIGHT TEXT ═══ */
+.hl      { background: rgba(180,83,9,0.1); color: #92400e; padding: 0 5px; border-radius: 4px; }
+.hl-blue { background: rgba(37,99,235,0.1); color: var(--neon-blue); padding: 0 5px; border-radius: 4px; }
+.inline-code { font-family: var(--font-mono); font-size: 0.85em; background: rgba(99,102,241,0.1); color: var(--neon-purple); padding: 1px 6px; border-radius: 5px; }
+
+/* ═══ FOOTER ═══ */
+.gfooter {
+  background: #e8edf8; border-top: 1px solid var(--border);
+  padding: 3rem 0; margin-top: 4rem; text-align: center;
+}
+.gfooter-logo {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-orbit { display: none; }
+  .level-card { padding: 1.5rem; }
+  .xp-badges { display: none; }
+}
+
+/* ═══ TOAST ═══ */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.gtoast {
+  background: #ffffff; border: 1px solid var(--border2);
+  border-radius: 14px; padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  backdrop-filter: blur(12px); font-weight: 700; font-size: 0.88rem;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: auto; min-width: 260px;
+  box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.gtoast.show { transform: none; }
+.gtoast-icon { font-size: 1.4rem; }
+
+/* ═══ MODAL ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15,23,42,0.55); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: #ffffff; border-radius: 28px; padding: 2.5rem 2.5rem 2rem;
+  max-width: 520px; width: 100%; position: relative; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(37,99,235,0.18), 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0;
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+.modal-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: #f3f4f6; border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem; color: #6b7280;
+  display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.modal-close:hover { background: #e5e7eb; color: #374151; }
+.modal-trophy { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+.modal-title { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; text-align: center; color: var(--text); margin-bottom: 0.4rem; }
+.modal-subtitle { color: var(--muted); text-align: center; font-size: 0.92rem; margin-bottom: 1.5rem; }
+.score-ring-wrap { display: flex; justify-content: center; margin-bottom: 1.2rem; }
+.score-ring { position: relative; width: 120px; height: 120px; }
+.score-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+.ring-bg  { fill: none; stroke: #e5e7eb; stroke-width: 10; }
+.ring-fill { fill: none; stroke: #2563eb; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-num  { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; color: var(--text); line-height: 1; }
+.ring-label { font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.grade-card { border-radius: 14px; padding: 0.85rem 1.2rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem; border: 1.5px solid; }
+.grade-s { background: #fef9c3; border-color: #b45309; }
+.grade-a { background: #f0fdf4; border-color: #16a34a; }
+.grade-b { background: #eff6ff; border-color: #2563eb; }
+.grade-c { background: #f5f3ff; border-color: #7c3aed; }
+.grade-d { background: #fef2f2; border-color: #dc2626; }
+.grade-letter { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; }
+.grade-msg    { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+.modal-xp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8f9ff; border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 12px; padding: 0.75rem 1.1rem; margin-bottom: 1.4rem;
+}
+.modal-xp-row .mxp-label { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+.modal-xp-row .mxp-val   {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-btns { display: flex; gap: 0.75rem; }
+.modal-btn-retry {
+  flex: 1; padding: 0.8rem 1rem;
+  background: #f3f4f6; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #374151; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.modal-btn-retry:hover { background: #e5e7eb; border-color: #d1d5db; color: #111827; }
+.modal-btn-continue {
+  flex: 2; padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  border: none; border-radius: 12px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #ffffff; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.modal-btn-continue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,0.4); }
+#confettiCanvas { position: fixed; inset: 0; z-index: 10001; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ XP STRIP ═══════════════════ -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 220 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">📂 CSV Ninja</span>
+        <span class="xp-badge b2" id="badge2">🗄️ Data Wrangler</span>
+        <span class="xp-badge b3" id="badge3">🌐 API Hunter</span>
+        <span class="xp-badge b4" id="badge4">🧹 Clean Coder</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-brands fa-python me-1"></i> Python Data Quest</div>
+        <h1>
+          <span class="line1">Master Python for</span>
+          <span class="line2">Real-World Data Work</span>
+        </h1>
+        <p class="hero-sub">
+          4 boss levels. CSV se lekar APIs tak. Real India examples. Code jo actually kaam karta hai. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, aur Python Data Skills mein pro ban jao!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">220</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Knowledge</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">🐍</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- ═══════════════════ QUEST MAP ═══════════════════ -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1" class="quest-item"><span class="quest-num" style="background:rgba(59,130,246,0.15);color:var(--neon-blue);">L1</span> Working with CSV Files</a>
+    <a href="#s2" class="quest-item"><span class="quest-num" style="background:rgba(59,130,246,0.15);color:var(--neon-blue);">L1</span> CSV — Read, Write & Filter</a>
+    <a href="#s3" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Working with JSON & SQL</a>
+    <a href="#s4" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> JSON Parsing & SQL Queries</a>
+    <a href="#s5" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> Fetching Data From an API</a>
+    <a href="#s6" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> API Auth, Pagination & Error Handling</a>
+    <a href="#s7" class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Understanding Your Data</a>
+    <a href="#s8" class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Data Cleaning Deep Dive</a>
+    <a href="#s9" class="quest-item"><span class="quest-num" style="background:rgba(219,39,119,0.15);color:var(--neon-pink);">🏆</span> Final Summary & Roadmap</a>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1: CSV FILES
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-file-csv"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">Working with CSV Files</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> CSV kya hota hai?</div>
+    <strong>CSV (Comma-Separated Values)</strong> = ek simple text file jisme data <span class="hl">rows aur columns</span> mein hota hai — commas se alag kiya hua.<br><br>
+    Real-world analogy: Excel spreadsheet ko plain text mein save karo — wahi CSV hai!<br>
+    <strong>90% real-world datasets CSV format mein milte hain</strong> — Kaggle, government data, company exports — sab CSV!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Golden Rule</div>
+    CSV pehle pandas mein load karo, phir explore karo — <strong>kabhi bhi raw file manually mat edit karo!</strong> Ek galat comma poora dataset corrupt kar sakta hai.
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-cyan h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check"></i> CSV kab use karein?</div>
+        ✅ Simple tabular data (rows + columns)<br>
+        ✅ Data share karna hai kisi bhi tool se<br>
+        ✅ Small to medium datasets (&lt; 1 GB)<br>
+        ✅ Machine learning training data
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-xmark"></i> CSV kab use na karein?</div>
+        ❌ Nested/hierarchical data (JSON better)<br>
+        ❌ Very large datasets (&gt; 1 GB) — Parquet use karo<br>
+        ❌ Multiple related tables — SQL better<br>
+        ❌ Binary data (images, audio)
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-brands fa-python me-2" style="color:var(--neon-blue)"></i>Python mein CSV — Basics se Advanced</h5>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-1"></i> CSV File Padhna — pandas ke saath</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+
+# Basic CSV load
+df = pd.read_csv('sales_data.csv')
+
+# Useful parameters
+df = pd.read_csv(
+    'sales_data.csv',
+    encoding='utf-8',        # Hindi text ke liye
+    sep=',',                 # Separator (default comma)
+    header=0,                # Row 0 = column names
+    index_col=None,          # Koi bhi index column nahi
+    nrows=1000,              # Sirf pehli 1000 rows (bade files ke liye)
+    parse_dates=['date'],    # Date column auto-parse
+)
+
+# Pehli 5 rows dekho
+print(df.head())
+
+# Quick info
+print(df.shape)    # (rows, columns)
+print(df.dtypes)   # Each column ka datatype</code></pre>
+        <div class="code-output">📊 Ek IPL match data CSV mein: 1000 rows × 18 columns — load time &lt; 1 second!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-2"></i> CSV Filter, Select & Export</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+
+df = pd.read_csv('ecommerce_orders.csv')
+
+# ─── Column select karo ───
+print(df[['customer_name', 'city', 'amount']])
+
+# ─── Filter karo (Mumbai ke orders > ₹1000) ───
+mumbai_orders = df[(df['city'] == 'Mumbai') & (df['amount'] > 1000)]
+print(f"Mumbai premium orders: {len(mumbai_orders)}")
+
+# ─── Ek naya column add karo ───
+df['discount_price'] = df['amount'] * 0.9    # 10% discount
+
+# ─── Sort karo ───
+df_sorted = df.sort_values('amount', ascending=False)
+
+# ─── Export karo ───
+df_sorted.to_csv('processed_orders.csv', index=False)
+# index=False — extra row number column save mat karo
+
+# ─── Specific columns hi export karo ───
+df[['order_id','city','amount']].to_csv('summary.csv', index=False)</code></pre>
+        <div class="code-output">💡 Pro tip: index=False har CSV export mein zaroor likho — warna extra column aa jaati hai!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tip">
+    <div class="ex-head"><i class="fa-solid fa-3"></i> Multiple CSV Files — ek saath process karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+import glob
+
+# Sab monthly CSV files ek saath load karo
+files = glob.glob('monthly_sales_*.csv')
+# ['monthly_sales_jan.csv', 'monthly_sales_feb.csv', ...]
+
+all_dfs = [pd.read_csv(f) for f in files]
+combined = pd.concat(all_dfs, ignore_index=True)
+
+print(f"Total records: {len(combined)}")
+combined.to_csv('full_year_sales.csv', index=False)</code></pre>
+        <div class="code-output">🏢 Zomato jaisi companies har city ka CSV separately store karti hain — phir glob se combine!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 CSV export karte waqt <span class="inline-code">index=False</span> kyun likhte hain?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. index=False se file size nahi badti — balki ek extra unwanted column hataata hai."><span class="opt-letter">A</span>File size kam hoti hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! Bina index=False ke, pandas ek extra column (0,1,2,3...) CSV mein daal deta hai jo data nahi hoti. index=False se ye ruk jaata hai."><span class="opt-letter">B</span>Extra row-number column save hone se rokta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. index=False ka file encoding se koi sambandh nahi. Ye sirf extra index column ko file mein likhne se rokta hai."><span class="opt-letter">C</span>Encoding error fix hoti hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. CSV load speed ka index=False se koi relation nahi. Ye sirf export ke samay kaam aata hai."><span class="opt-letter">D</span>Load speed badhti hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 1B: CSV Advanced ── -->
+<div class="level-card lvl-blue fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-table-columns"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">CSV — Chunking, Groupby & Real Use Cases</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(59,130,246,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue);">📖</div>
+        <div class="dim-name" style="color:var(--neon-blue);">read_csv()</div>
+        <div class="dim-code" style="color:var(--neon-blue);">pd.read_csv('file.csv')</div>
+        <div class="dim-desc">CSV ko DataFrame mein load karo. header, sep, encoding, nrows — sab customize hota hai.</div>
+        <div class="dim-example" style="border-color:rgba(59,130,246,0.2); color:var(--muted);">
+          📦 Flipkart orders<br>🏦 HDFC transactions<br>🌾 Farmer crop records
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(8,145,178,0.3);">
+        <div class="dim-rank" style="color:var(--neon-cyan);">🔢</div>
+        <div class="dim-name" style="color:var(--neon-cyan);">groupby()</div>
+        <div class="dim-code" style="color:var(--neon-cyan);">df.groupby('city').sum()</div>
+        <div class="dim-desc">Data ko group karke aggregate karo — city-wise, month-wise, category-wise total, mean, count.</div>
+        <div class="dim-example" style="border-color:rgba(8,145,178,0.2); color:var(--muted);">
+          📊 City-wise sales<br>📅 Month-wise revenue<br>🏷️ Category-wise avg
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(124,58,237,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">🔀</div>
+        <div class="dim-name" style="color:var(--neon-purple);">chunksize</div>
+        <div class="dim-code" style="color:var(--neon-purple);">pd.read_csv(chunksize=10000)</div>
+        <div class="dim-desc">Bade CSV files (100MB+) ko chunks mein process karo — RAM overflow nahi hogi!</div>
+        <div class="dim-example" style="border-color:rgba(124,58,237,0.2); color:var(--muted);">
+          🏥 Hospital records<br>📱 App usage logs<br>🛒 Crore orders
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-green mt-4">
+    <div class="ct"><i class="fa-solid fa-code"></i> GroupBy Real Example — City-wise IPL Ticket Sales</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">🐍 Python</span>
+        <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+      </div>
+      <pre><code class="language-python">import pandas as pd
+
+df = pd.read_csv('ipl_ticket_sales.csv')
+
+# City-wise total revenue
+city_revenue = df.groupby('city')['ticket_price'].sum().sort_values(ascending=False)
+print(city_revenue)
+# Mumbai     12,50,000
+# Bengaluru   9,80,000
+# Delhi       8,30,000
+
+# Multiple aggregations ek saath
+summary = df.groupby('city').agg(
+    total_tickets=('ticket_id', 'count'),
+    avg_price=('ticket_price', 'mean'),
+    max_price=('ticket_price', 'max')
+).reset_index()
+
+print(summary.head())</code></pre>
+      <div class="code-output">⚡ groupby() + agg() = Data Science ka Swiss Army Knife! Ek line mein kaafi insights!</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2: JSON & SQL
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s3">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-database"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">Working with JSON & SQL</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> JSON vs SQL — Kab kya use karein?</div>
+    <strong>JSON (JavaScript Object Notation)</strong> = nested/hierarchical data ke liye — APIs, configs, NoSQL databases.<br>
+    <strong>SQL (Structured Query Language)</strong> = relational tables ke liye — customer + orders + products linked data.<br><br>
+    Real analogy: <span class="hl">JSON = Telegram message (free format)</span> | <span class="hl-blue">SQL = Bank ledger (strict rows & relations)</span>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-md-6">
+      <div class="callout cb-yellow h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-code"></i> JSON Format — Kaisa dikhta hai?</div>
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python"># Swiggy order ka JSON
+{
+  "order_id": "SWG001",
+  "customer": {
+    "name": "Rahul Shah",
+    "city": "Surat"
+  },
+  "items": [
+    {"name": "Paneer Butter Masala", "price": 280},
+    {"name": "Naan", "price": 40}
+  ],
+  "total": 320,
+  "status": "delivered"
+}</code></pre>
+        </div>
+        Nested structure — CSV mein ye represent nahi hota!
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-table"></i> SQL Format — Kaisa dikhta hai?</div>
+        <div class="table-responsive mt-2">
+          <table class="gtbl">
+            <thead><tr><th>order_id</th><th>customer_id</th><th>total</th></tr></thead>
+            <tbody>
+              <tr><td>SWG001</td><td>C101</td><td>320</td></tr>
+              <tr><td>SWG002</td><td>C102</td><td>150</td></tr>
+            </tbody>
+          </table>
+        </div>
+        Flat table — relations JOIN se handle hoti hain!
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-code me-2" style="color:var(--neon-cyan)"></i>Python mein JSON — Read, Parse & Flatten</h5>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-file-code"></i> JSON File Read & Parse karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import json
+import pandas as pd
+
+# ─── JSON file read karo ───
+with open('swiggy_orders.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)      # Python dict/list ban jaata hai
+
+# ─── JSON string parse karo ───
+json_string = '{"name": "Rahul", "city": "Surat"}'
+parsed = json.loads(json_string)   # loads = "load string"
+print(parsed['name'])    # Rahul
+
+# ─── Nested JSON ko flat DataFrame mein convert karo ───
+# Agar data list of dicts hai:
+df = pd.DataFrame(data)
+
+# Deeply nested ke liye:
+from pandas import json_normalize
+df = json_normalize(
+    data,
+    record_path=['items'],          # Nested list column
+    meta=['order_id', 'customer']   # Parent fields jo chahiye
+)
+
+# ─── DataFrame wapas JSON mein save karo ───
+df.to_json('output.json', orient='records', indent=2)</code></pre>
+        <div class="code-output">🔑 json.load() = file se | json.loads() = string se — ye confusion aata hai beginners ko! 's' = string!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 <span class="inline-code">json.load()</span> aur <span class="inline-code">json.loads()</span> mein kya fark hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Dono ka output Python dict/list hota hai. Fark sirf input source mein hai — file vs string."><span class="opt-letter">A</span>load() dict deta hai, loads() list deta hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi! load() bade aur loads() chhote ke liye nahi hota. Ye speed ke baare mein nahi hai."><span class="opt-letter">B</span>load() bade JSON ke liye, loads() chhote ke liye</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! load() ek file object se padhta hai (open() ke saath), jabki loads() ek JSON string se parse karta hai. 's' = string — yaad rakho!"><span class="opt-letter">C</span>load() file object se, loads() string se padhta hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Galat. Dono ek hi json module mein hain. Alag modules ki zaroorat nahi."><span class="opt-letter">D</span>load() standard library, loads() third-party library hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 2B: SQL ── -->
+<div class="level-card lvl-cyan fade-up" id="s4">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-server"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Skill Unlock</div>
+      <div class="lv-title">Python mein SQL — sqlite3 & pandas</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Python + SQL — Kyu Zaroori?</div>
+    Real data science projects mein data <strong>databases mein hota hai</strong> — CSV mein nahi!<br>
+    Python se directly SQL queries chala sakte ho bina kisi external tool ke.<br>
+    <span class="stat-pill sp-blue">sqlite3</span> = built-in, no install needed &nbsp; <span class="stat-pill sp-cyan">SQLAlchemy</span> = MySQL/PostgreSQL ke liye
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-database"></i> SQLite Database — Create, Insert & Query</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import sqlite3
+import pandas as pd
+
+# ─── Database connect karo (ya banao) ───
+conn = sqlite3.connect('shopkeeper.db')
+cursor = conn.cursor()
+
+# ─── Table banao ───
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sales (
+        id INTEGER PRIMARY KEY,
+        product TEXT,
+        city TEXT,
+        amount REAL,
+        date TEXT
+    )
+''')
+
+# ─── Data insert karo ───
+cursor.execute("INSERT INTO sales VALUES (1, 'Dahi', 'Surat', 45.0, '2024-01-15')")
+cursor.execute("INSERT INTO sales VALUES (2, 'Bread', 'Mumbai', 35.0, '2024-01-15')")
+conn.commit()
+
+# ─── Query karo & pandas DataFrame mein laao ───
+df = pd.read_sql_query("SELECT * FROM sales WHERE amount > 40", conn)
+print(df)
+
+# ─── pandas DataFrame ko SQL table mein save karo ───
+df_new = pd.read_csv('monthly_sales.csv')
+df_new.to_sql('monthly_sales', conn, if_exists='replace', index=False)
+
+conn.close()</code></pre>
+        <div class="code-output">🏆 pd.read_sql_query() = SQL ka power + pandas ka flexibility — data science ka best combo!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow mt-3">
+    <div class="ct"><i class="fa-solid fa-scale-balanced"></i> JSON vs SQL vs CSV — Quick Comparison</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Feature</th><th style="color:#67e8f9">CSV</th><th style="color:#93c5fd">JSON</th><th style="color:#a5b4fc">SQL</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Structure</strong></td><td>Flat rows/columns</td><td>Nested/Hierarchical</td><td>Relational tables</td></tr>
+          <tr><td><strong>Best For</strong></td><td>Simple tabular data</td><td>APIs, configs</td><td>Large relational data</td></tr>
+          <tr><td><strong>Python Tool</strong></td><td>pandas read_csv</td><td>json module</td><td>sqlite3 / SQLAlchemy</td></tr>
+          <tr><td><strong>Filtering</strong></td><td>df[(condition)]</td><td>List comprehension</td><td>WHERE clause</td></tr>
+          <tr><td><strong>Real Example</strong></td><td>Kaggle datasets</td><td>Swiggy order API</td><td>Bank transactions DB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3: API DATA FETCHING
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s5">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">Fetching Data From an API</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> API kya hoti hai?</div>
+    <strong>API (Application Programming Interface)</strong> = ek waiter jaisa — tum order dete ho (request), waiter kitchen (server) se laata hai (response).<br><br>
+    Data Science mein APIs se <span class="hl">live, real-time data</span> milta hai — stock prices, weather, cricket scores, social media, government data — sab APIs se aata hai!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> REST API ke Rules</div>
+    <strong>Endpoint</strong> = URL jahan request jaati hai &nbsp;|&nbsp; <strong>HTTP Method</strong>: GET (data lao), POST (data bhejo)<br>
+    <strong>Status Codes</strong>: <span class="stat-pill sp-green">200 OK</span> <span class="stat-pill sp-yellow">404 Not Found</span> <span class="stat-pill sp-orange">429 Rate Limited</span> <span class="stat-pill sp-pink">500 Server Error</span>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-code me-2" style="color:var(--neon-purple)"></i>requests library — Python mein API calls</h5>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-1"></i> Basic GET Request — Weather API</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import requests
+import pandas as pd
+
+# ─── Simple API Call ───
+url = "https://api.open-meteo.com/v1/forecast"
+params = {
+    "latitude": 21.1702,     # Surat ki latitude
+    "longitude": 72.8311,    # Surat ki longitude
+    "current_weather": True,
+    "hourly": "temperature_2m"
+}
+
+response = requests.get(url, params=params)
+
+# ─── Status check karo ───
+print(response.status_code)   # 200 = success!
+
+# ─── JSON response parse karo ───
+data = response.json()
+current = data['current_weather']
+print(f"Temperature: {current['temperature']}°C")
+print(f"Wind Speed: {current['windspeed']} km/h")
+
+# ─── Hourly data DataFrame mein laao ───
+hourly = data['hourly']
+df = pd.DataFrame(hourly)
+print(df.head())</code></pre>
+        <div class="code-output">🌤️ Yahi technique IMD, AQICN (air quality) data fetch karne ke liye use hoti hai — free APIs!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-2"></i> API with Authentication — API Key</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import requests
+import os
+
+# ─── API Key kabhi code mein hardcode mat karo! ───
+# Environment variable mein store karo
+API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+
+url = "https://api.openweathermap.org/data/2.5/weather"
+params = {
+    "q": "Mumbai,IN",
+    "appid": API_KEY,       # Key parameter mein
+    "units": "metric"
+}
+
+# Ya Header mein bheji jaati hai (Bearer token)
+headers = {"Authorization": f"Bearer {API_KEY}"}
+response = requests.get(url, params=params, headers=headers)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"City: {data['name']}")
+    print(f"Temp: {data['main']['temp']}°C")
+    print(f"Weather: {data['weather'][0]['description']}")
+elif response.status_code == 401:
+    print("API Key galat hai!")
+elif response.status_code == 429:
+    print("Rate limit exceed! Thoda wait karo.")</code></pre>
+        <div class="code-output">🔐 Security Golden Rule: API keys .env file mein raho — kabhi GitHub pe push mat karo! python-dotenv library use karo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="a" data-xp="25">
+    <div class="quiz-q">🤔 API response mein status code <span class="inline-code">429</span> ka kya matlab hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Sahi jawab! 429 = Too Many Requests — tumne thode samay mein bahut zyada API calls kiye. Solution: rate limiting add karo ya API ka paid plan lo."><span class="opt-letter">A</span>Too Many Requests — rate limit exceed hua</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Galat. Server error ka code 500 hota hai (Internal Server Error). 429 ka matlab rate limiting hai."><span class="opt-letter">B</span>Server-side error hua hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Authentication error ka code 401 (Unauthorized) ya 403 (Forbidden) hota hai. 429 rate limiting ke liye hai."><span class="opt-letter">C</span>Authentication fail hua</div>
+      <div class="quiz-opt" data-ans="d" data-explain="404 ka matlab hai endpoint nahi mila. 429 ka matlab hai zyada requests ki wajah se temporarily block kiya gaya."><span class="opt-letter">D</span>API endpoint exist nahi karta</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 3B: Pagination & Error Handling ── -->
+<div class="level-card lvl-purple fade-up" id="s6">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-arrows-rotate"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Skill Unlock</div>
+      <div class="lv-title">Pagination, Rate Limiting & Error Handling</div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> APIs — Real Problems</div>
+    Production mein APIs kabhi perfect nahi hoti — network fail hoti hai, rate limits aate hain, pages hote hain.<br>
+    <strong>Beginner API call = crash on error | Pro API call = graceful handling every time!</strong>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-layer-group"></i> Pagination — Sab Pages fetch karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import requests
+import time
+
+def fetch_all_pages(base_url, api_key, max_pages=10):
+    all_records = []
+    page = 1
+
+    while page <= max_pages:
+        response = requests.get(base_url, params={
+            "api_key": api_key,
+            "page": page,
+            "per_page": 100
+        })
+
+        if response.status_code == 200:
+            data = response.json()
+            records = data.get('results', [])
+
+            if not records:        # Koi data nahi bcha?
+                break              # Sab pages done!
+
+            all_records.extend(records)
+            print(f"Page {page}: {len(records)} records fetched")
+            page += 1
+            time.sleep(0.5)        # Rate limiting se bachne ke liye!
+
+        elif response.status_code == 429:
+            print("Rate limited! 60 seconds wait...")
+            time.sleep(60)         # Retry after wait
+
+        else:
+            print(f"Error {response.status_code} — stopping")
+            break
+
+    return all_records
+
+# Usage
+records = fetch_all_pages("https://api.example.com/products", api_key="ABC123")
+print(f"Total fetched: {len(records)}")</code></pre>
+        <div class="code-output">🔄 time.sleep() bahut zaroori hai — bina iske production API banned kar deti hai tumhara IP!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 4: DATA UNDERSTANDING & CLEANING
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s7">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">Understanding Your Data</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Data samjhna kyun zaroori hai?</div>
+    <strong>"Model banane se pehle data samjho!"</strong> — ye Data Science ka #1 rule hai.<br><br>
+    Data scientists apna <span class="hl">60–70% time EDA (Exploratory Data Analysis) mein</span> lagate hain — coding mein sirf 30%!<br>
+    Bina data samjhe banaya model = blindfolded driving!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-binoculars me-2" style="color:var(--neon-green)"></i>EDA Toolkit — Pehle ye commands chalao</h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">🔍 Shape & Basic Info</div>
+      <div class="step-body">
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python">df.shape         # (rows, columns)
+df.info()        # Datatypes + memory usage + null counts
+df.dtypes        # Each column ka type
+df.columns       # Column names list</code></pre>
+        </div>
+        Sabse pehle — dataset kitna bada hai aur structure kya hai?
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">📊 Statistical Summary</div>
+      <div class="step-body">
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python">df.describe()           # Numerical: mean, std, min, max, quartiles
+df.describe(include='all')  # Categorical bhi include karo
+df['price'].value_counts()  # Frequency count</code></pre>
+        </div>
+        Mean, median, outliers — yahan se pata chalta hai!
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">❓ Missing Values Check</div>
+      <div class="step-body">
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python">df.isnull().sum()           # Har column mein kitne null hain
+df.isnull().sum() / len(df) * 100   # Percentage mein
+df.isnull().any(axis=1)    # Rows jinmein koi bhi null ho</code></pre>
+        </div>
+        15% se zyada nulls? Us column ka plan banao!
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">🔢 Duplicates Check</div>
+      <div class="step-body">
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python">df.duplicated().sum()       # Kitni duplicate rows hain?
+df[df.duplicated()]        # Unhe dekho
+df.drop_duplicates(inplace=True)  # Remove karo</code></pre>
+        </div>
+        Duplicates = model overfit ho sakta hai!
+      </div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-label">📈 Correlation & Distribution</div>
+      <div class="step-body">
+        <div class="code-wrap" style="margin-top:0.5rem;">
+          <pre><code class="language-python">import matplotlib.pyplot as plt
+import seaborn as sns
+
+df.corr()                   # Correlation matrix
+sns.heatmap(df.corr(), annot=True)  # Visual heatmap
+df['price'].hist()          # Distribution histogram
+sns.boxplot(x='city', y='price', data=df)  # Outliers</code></pre>
+        </div>
+        Features ek dusre se kitne related hain — ye jaanna crucial hai!
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="d" data-xp="25">
+    <div class="quiz-q">🤔 <span class="inline-code">df.describe()</span> function kya output deta hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. df.info() datatypes aur memory usage deta hai. df.describe() statistical summary deta hai."><span class="opt-letter">A</span>Column names aur datatypes</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. Missing values ke liye df.isnull().sum() use karo. df.describe() statistics ke liye hai."><span class="opt-letter">B</span>Missing values ki count</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Duplicate rows df.duplicated() se milti hain. describe() statistical analysis ke liye hai."><span class="opt-letter">C</span>Duplicate rows ka list</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Perfect! df.describe() numerical columns ke liye count, mean, std, min, 25%, 50%, 75%, max deta hai — ek hi function mein poori statistical summary!"><span class="opt-letter">D</span>Count, mean, std, min, quartiles aur max</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 4B: DATA CLEANING ── -->
+<div class="level-card lvl-green fade-up" id="s8">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-broom"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Skill Unlock</div>
+      <div class="lv-title">Data Cleaning — Complete Process</div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Garbage In = Garbage Out!</div>
+    Dirty data = galat model = wrong decisions = business loss!<br>
+    <strong>Data cleaning sabse important step hai — 40–60% project time yahan lagta hai!</strong><br>
+    Real stat: Netflix, Swiggy, Ola — sab companies data cleaning teams rakhti hain!
+  </div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-1"></i> Missing Values Handle karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+df = pd.read_csv('customer_data.csv')
+
+# ─── Strategy 1: Drop karo (jab bahut kam data missing ho) ───
+df.dropna(subset=['customer_id'], inplace=True)   # Key column null nahi hona chahiye
+
+# ─── Strategy 2: Fill with mean/median (numerical) ───
+df['age'].fillna(df['age'].median(), inplace=True)       # Age ke liye median better hai
+df['salary'].fillna(df['salary'].mean(), inplace=True)
+
+# ─── Strategy 3: Fill with mode (categorical) ───
+df['city'].fillna(df['city'].mode()[0], inplace=True)    # Most common city
+
+# ─── Strategy 4: Forward Fill (time series) ───
+df['stock_price'].fillna(method='ffill', inplace=True)   # Previous value se fill karo
+
+# ─── Strategy 5: Custom value ───
+df['rating'].fillna(0, inplace=True)   # Missing rating = 0
+
+print(df.isnull().sum())   # Check: sab zeros hone chahiye!</code></pre>
+        <div class="code-output">⚡ Pro Tip: Medical data mein missing value = patient ne jawab nahi diya — zero se fill mat karo! Context samjho!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-2"></i> Outlier Detection & Treatment</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+
+df = pd.read_csv('housing_prices.csv')
+
+# ─── Method 1: IQR (Interquartile Range) ───
+Q1 = df['price'].quantile(0.25)
+Q3 = df['price'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+# Outliers hata do
+df_clean = df[(df['price'] >= lower) & (df['price'] <= upper)]
+print(f"Removed {len(df) - len(df_clean)} outliers")
+
+# ─── Method 2: Cap karo (hataane ki jagah limit karo) ───
+df['price'] = df['price'].clip(lower=lower, upper=upper)
+
+# ─── Method 3: Z-Score ───
+from scipy import stats
+z_scores = stats.zscore(df['price'])
+df_clean = df[abs(z_scores) < 3]  # 3 standard deviations ke andar</code></pre>
+        <div class="code-output">📌 Mumbai property prices mein ek ₹50 crore villa = outlier jo average distort kar dega — remove ya cap karo!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tip">
+    <div class="ex-head"><i class="fa-solid fa-3"></i> Data Type Fixes & String Cleaning</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+
+df = pd.read_csv('messy_data.csv')
+
+# ─── String columns clean karo ───
+df['city'] = df['city'].str.strip()      # Leading/trailing spaces hataao
+df['city'] = df['city'].str.lower()      # Lowercase — 'Mumbai' == 'mumbai'
+df['city'] = df['city'].str.replace('  ', ' ')  # Double spaces fix
+
+# ─── Phone numbers normalize karo ───
+df['phone'] = df['phone'].str.replace(r'\D', '', regex=True)  # Non-digits hatao
+df['phone'] = df['phone'].str[-10:]      # Last 10 digits rakho
+
+# ─── Date column fix karo ───
+df['order_date'] = pd.to_datetime(df['order_date'], errors='coerce')
+df['year']  = df['order_date'].dt.year
+df['month'] = df['order_date'].dt.month
+
+# ─── Numerical columns fix karo ───
+df['price'] = df['price'].str.replace('₹', '').str.replace(',', '')
+df['price'] = pd.to_numeric(df['price'], errors='coerce')
+
+# ─── Categorical encoding ───
+df['gender'] = df['gender'].map({'Male': 1, 'Female': 0, 'M': 1, 'F': 0})
+
+print(df.dtypes)   # Verify: sab theek hain?</code></pre>
+        <div class="code-output">💡 Real data mein 'mumbai', 'Mumbai', 'MUMBAI', 'Mumbaii' sab milte hain — str.lower() + strip() zaroor karo!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple mt-3">
+    <div class="ct"><i class="fa-solid fa-clipboard-check"></i> Data Cleaning Checklist</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Problem</th><th>Detection</th><th>Fix</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Missing Values</strong></td><td><span class="inline-code">isnull().sum()</span></td><td>drop / fill (mean/mode/ffill)</td><td><span class="stat-pill sp-pink">High</span></td></tr>
+          <tr><td><strong>Duplicates</strong></td><td><span class="inline-code">duplicated().sum()</span></td><td><span class="inline-code">drop_duplicates()</span></td><td><span class="stat-pill sp-orange">High</span></td></tr>
+          <tr><td><strong>Outliers</strong></td><td>boxplot / IQR</td><td>clip / remove / transform</td><td><span class="stat-pill sp-yellow">Medium</span></td></tr>
+          <tr><td><strong>Wrong Datatypes</strong></td><td><span class="inline-code">df.dtypes</span></td><td><span class="inline-code">pd.to_numeric / to_datetime</span></td><td><span class="stat-pill sp-pink">High</span></td></tr>
+          <tr><td><strong>Inconsistent Strings</strong></td><td><span class="inline-code">value_counts()</span></td><td><span class="inline-code">str.lower().strip()</span></td><td><span class="stat-pill sp-yellow">Medium</span></td></tr>
+          <tr><td><strong>Wrong Ranges</strong></td><td><span class="inline-code">describe()</span></td><td>Domain knowledge + fix</td><td><span class="stat-pill sp-cyan">Medium</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     FINAL: SUMMARY + ROADMAP
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s9" style="background:linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.04), #ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary & Your Roadmap</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Tools</th><th>Real Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>CSV Files</strong></td><td>Tabular data read/write</td><td>pd.read_csv, groupby, to_csv</td><td>Kaggle, govt datasets</td></tr>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>CSV Advanced</strong></td><td>Filter, group, chunk</td><td>groupby().agg(), chunksize</td><td>IPL sales, Flipkart orders</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>JSON</strong></td><td>Nested hierarchical data</td><td>json.load/loads, json_normalize</td><td>Swiggy API, configs</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>SQL</strong></td><td>Relational database queries</td><td>sqlite3, pd.read_sql_query</td><td>Bank DB, hospital records</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>API Basics</strong></td><td>Live data fetch karna</td><td>requests.get(), .json()</td><td>Weather, stocks, cricket</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>API Advanced</strong></td><td>Pagination + error handling</td><td>time.sleep(), retry logic</td><td>Large data collection</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>EDA</strong></td><td>Data samjho pehle</td><td>describe(), isnull(), corr()</td><td>Har DS project mein</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Data Cleaning</strong></td><td>Dirty data fix karo</td><td>fillna, clip, str methods</td><td>60% of all DS work!</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph TD
+    CSV["📂 CSV Files"] --> EDA["🔍 EDA & Understanding"]
+    JSON["🗃️ JSON Data"] --> EDA
+    SQL["🗄️ SQL Database"] --> EDA
+    API["🌐 API Data"] --> EDA
+    EDA --> CLEAN["🧹 Data Cleaning"]
+    CLEAN --> FE["⚙️ Feature Engineering"]
+    FE --> ML["🤖 ML Modeling"]
+    ML --> DEPLOY["🚀 Deploy"]
+    style CSV fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:12
+    style JSON fill:#cffafe,stroke:#0891b2,color:#164e63,rx:12
+    style SQL fill:#cffafe,stroke:#0891b2,color:#164e63,rx:12
+    style API fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:12
+    style EDA fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    style CLEAN fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    style FE fill:#fef9c3,stroke:#b45309,color:#713f12,rx:12
+    style ML fill:#fce7f3,stroke:#db2777,color:#831843,rx:12
+    style DEPLOY fill:#fef9c3,stroke:#b45309,color:#713f12,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Libraries — Zaroor Seekho</div>
+        <strong style="color:var(--neon-blue)">pandas</strong> — CSV, JSON, SQL sab ka king<br>
+        <strong style="color:var(--neon-cyan)">requests</strong> — HTTP API calls<br>
+        <strong style="color:var(--neon-green)">sqlite3</strong> — Built-in SQL (no install!)<br>
+        <strong style="color:var(--neon-purple)">SQLAlchemy</strong> — Production databases<br>
+        <strong style="color:var(--neon-yellow)">matplotlib / seaborn</strong> — EDA visualization
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein?</div>
+        🔧 <strong>Feature Engineering</strong> — naye features banana<br>
+        📊 <strong>Advanced EDA</strong> — pandas-profiling, sweetviz<br>
+        🗂️ <strong>Parquet / Feather</strong> — large data formats<br>
+        🔄 <strong>ETL Pipelines</strong> — airflow, prefect<br>
+        🤖 <strong>scikit-learn</strong> — ML pe data laga do!
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>CSV</strong> = Data ka sabse common form — master karo<br>
+    → <strong>JSON/SQL</strong> = Real-world data aise hi aata hai — samjho<br>
+    → <strong>APIs</strong> = Live data ki duniya — explore karo<br>
+    → <strong>Data Cleaning</strong> = Model ki neev — galat neev = girta hua building<br><br>
+    <strong style="color:var(--neon-pink)">In 4 skills ko master kar liya toh tum professionally data collect, store, fetch aur clean kar sakte ho — Data Science ki neev ready hai! 🚀🐍</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-brands fa-python me-2"></i>Python Data Quest</div>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.5rem;">CSV · JSON/SQL · API Data Fetching · Data Cleaning | Gamified Tutorial</p>
+    <p style="color:var(--dim); font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking Python Data learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════ MODAL ═══════════════════ -->
+<canvas id="confettiCanvas"></canvas>
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare quizzes complete kar liye!</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/4</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-retry" id="modalRetry"><i class="fa-solid fa-rotate-right"></i> Retry All</button>
+      <button class="modal-btn-continue" id="modalContinue"><i class="fa-solid fa-trophy"></i> Awesome, Continue!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ FINAL MODAL ═══ */
+function showFinalModal() {
+  const total = quizTotal, correct = quizCorrect;
+  const pct = total > 0 ? correct / total : 0;
+  const quizXP = correct * 25;
+  const grades = [
+    { min: 1.0,  cls: 'grade-s', letter: 'S 🌟', msg: 'Zabardast! Sab 4/4 correct! Python Data Ninja! 🐍' },
+    { min: 0.75, cls: 'grade-a', letter: 'A 🎯', msg: 'Bahut badhiya! Almost perfect performance!' },
+    { min: 0.5,  cls: 'grade-b', letter: 'B 📘', msg: 'Accha kiya! Kuch topics dobara review karo.' },
+    { min: 0.25, cls: 'grade-c', letter: 'C 💪', msg: 'Theek hai! Concepts ko aur practice karo.' },
+    { min: 0.0,  cls: 'grade-d', letter: 'D 📚', msg: 'Aur mehnat karo! Tutorial dobara padho.' },
+  ];
+  const g = grades.find(gr => pct >= gr.min);
+  document.getElementById('ringNum').textContent = correct + '/' + total;
+  document.getElementById('modalXpVal').textContent = quizXP + ' XP';
+  const gradeCard = document.getElementById('gradeCard');
+  gradeCard.className = 'grade-card ' + g.cls;
+  document.getElementById('gradeLetter').textContent = g.letter;
+  document.getElementById('gradeMsg').textContent = g.msg;
+  if (pct === 1.0) {
+    document.getElementById('modalTrophy').textContent = '🏆';
+    document.getElementById('modalTitle').textContent = '🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent = 'Wah! Saare ' + total + '/' + total + ' sahi! Tum Python Data Ninja ho!';
+  } else if (pct >= 0.5) {
+    document.getElementById('modalTrophy').textContent = '🎯';
+    document.getElementById('modalTitle').textContent = 'Quest Complete!';
+    document.getElementById('modalSubtitle').textContent = correct + ' out of ' + total + ' correct. Kafi accha kiya!';
+  } else {
+    document.getElementById('modalTrophy').textContent = '📚';
+    document.getElementById('modalTitle').textContent = 'Keep Trying!';
+    document.getElementById('modalSubtitle').textContent = 'Tutorial dobara padho aur retry karo!';
+  }
+  const circumference = 327, offset = circumference * (1 - pct);
+  const ringColors = {'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626'};
+  const ringEl = document.getElementById('ringFill');
+  ringEl.style.stroke = ringColors[g.cls] || '#2563eb';
+  ringEl.style.transition = 'none'; ringEl.style.strokeDashoffset = '327';
+  setTimeout(() => { ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)'; ringEl.style.strokeDashoffset = offset; }, 80);
+  document.getElementById('finalModal').classList.add('open');
+  if (pct >= 0.5) launchConfetti(pct);
+}
+
+function launchConfetti(pct) {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const count = Math.floor(80 + pct * 140);
+  const colors = ['#2563eb','#7c3aed','#db2777','#16a34a','#b45309','#0891b2','#f59e0b'];
+  const pieces = Array.from({length: count}, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * -canvas.height * 0.6,
+    w: Math.random() * 10 + 5, h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx: (Math.random() - 0.5) * 4, vy: Math.random() * 4 + 2,
+    rot: Math.random() * 360, vrot: (Math.random() - 0.5) * 9, alpha: 1,
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    pieces.forEach(p => {
+      if (p.y > canvas.height + 20) return; alive = true;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if (p.y > canvas.height * 0.65) p.alpha -= 0.02;
+      p.alpha = Math.max(0, p.alpha);
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+    });
+    frame++; if (alive && frame < 260) requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
+  })();
+}
+
+function initQuizzes() {
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(opt => { const n = opt.cloneNode(true); opt.parentNode.replaceChild(n, opt); });
+    const correct = box.dataset.correct, qxp = parseInt(box.dataset.xp) || 25;
+    let answered = false;
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return; answered = true;
+        const isCorrect = opt.dataset.ans === correct;
+        const fb = box.querySelector('.quiz-feedback');
+        box.querySelectorAll('.quiz-opt').forEach(o => {
+          o.classList.add('answered-opt');
+          const exDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+          if (o.dataset.ans === correct) { o.classList.add('correct'); if (exDiv) exDiv.classList.add('show-correct'); }
+          else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (exDiv) exDiv.classList.add('show-wrong'); }
+          else { o.classList.add('dimmed'); }
+        });
+        if (isCorrect) {
+          quizCorrect++;
+          fb.className = 'quiz-feedback show win';
+          fb.innerHTML = '<span style="font-size:1.3rem">🎉</span>&nbsp; Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+          addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+        } else {
+          fb.className = 'quiz-feedback show lose';
+          fb.innerHTML = '<span style="font-size:1.3rem">💡</span>&nbsp; Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+          showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+        }
+        const doneCount = Array.from(document.querySelectorAll('.quiz-box')).filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+        if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+      });
+    });
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, theme: 'base',
+  themeVariables: {
+    primaryColor: '#dbeafe', primaryTextColor: '#1e3a8a',
+    primaryBorderColor: '#2563eb', lineColor: '#94a3b8',
+    secondaryColor: '#d1fae5', tertiaryColor: '#ede9fe',
+    fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 24 }
+});
+
+/* ═══ XP SYSTEM ═══ */
+let xp = 0;
+let scrollXpEarned = 0;
+const XP_MAX = 220;  // 4×30 scroll XP + 4×25 quiz XP = 220
+const earnedBadges = new Set();
+
+function addXP(amount, badgeId) {
+  if (badgeId) scrollXpEarned = Math.min(scrollXpEarned + amount, 120);
+  xp = Math.min(xp + amount, XP_MAX);
+  document.getElementById('xpFill').style.width = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  if (badgeId && !earnedBadges.has(badgeId)) {
+    earnedBadges.add(badgeId);
+    const el = document.getElementById(badgeId);
+    if (el) el.classList.add('earned');
+  }
+  if (xp >= XP_MAX) showToast('🏆', 'QUEST COMPLETE! 🎊', 'Python Data Ninja ban gaye tum! 220/220 XP!', '#b45309');
+}
+
+function showToast(icon, title, msg, color) {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'gtoast';
+  t.innerHTML = `<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══ QUIZ SYSTEM ═══ */
+let quizTotal = 0, quizCorrect = 0;
+
+document.querySelectorAll('.quiz-box').forEach(box => {
+  quizTotal++;
+  const correct = box.dataset.correct;
+  const qxp = parseInt(box.dataset.xp) || 25;
+  let answered = false;
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    const explain = opt.dataset.explain || '';
+    if (explain) {
+      const div = document.createElement('div');
+      div.className = 'quiz-explain'; div.dataset.forAns = opt.dataset.ans; div.textContent = explain;
+      opt.parentNode.insertBefore(div, opt.nextSibling);
+    }
+  });
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return; answered = true;
+      const ans = opt.dataset.ans;
+      const fb = box.querySelector('.quiz-feedback');
+      const isCorrect = ans === correct;
+      box.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.add('answered-opt');
+        const explainDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+        if (o.dataset.ans === correct) { o.classList.add('correct'); if (explainDiv) explainDiv.classList.add('show-correct'); }
+        else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (explainDiv) explainDiv.classList.add('show-wrong'); }
+        else { o.classList.add('dimmed'); if (o.dataset.ans === correct && explainDiv) explainDiv.classList.add('show-reveal'); }
+      });
+      if (isCorrect) {
+        quizCorrect++;
+        fb.className = 'quiz-feedback show win';
+        fb.innerHTML = '<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+        addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+      } else {
+        fb.className = 'quiz-feedback show lose';
+        fb.innerHTML = '<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+        showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+      }
+      const totalAnswered = document.querySelectorAll('.quiz-box').length;
+      const doneCount = Array.from(document.querySelectorAll('.quiz-box')).filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+      if (doneCount === totalAnswered) setTimeout(showFinalModal, 1200);
+    });
+  });
+});
+
+/* ═══ SCROLL OBSERVER — fade-up ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+/* ═══ SCROLL XP ═══ */
+const sectionXP = {
+  's1': { xp: 30, badge: 'badge1', msg: '📂 CSV Ninja badge unlocked!' },
+  's3': { xp: 30, badge: 'badge2', msg: '🗄️ Data Wrangler badge unlocked!' },
+  's5': { xp: 30, badge: 'badge3', msg: '🌐 API Hunter badge unlocked!' },
+  's7': { xp: 30, badge: 'badge4', msg: '🧹 Clean Coder badge unlocked!' },
+};
+const xpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (sectionXP[id] && !earnedBadges.has(sectionXP[id].badge)) {
+        const { xp: sx, badge, msg } = sectionXP[id];
+        addXP(sx, badge); showToast('🏅', 'Badge Unlocked!', msg, '#7c3aed');
+      }
+      xpObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+['s1','s3','s5','s7'].forEach(id => { const el = document.getElementById(id); if (el) xpObserver.observe(el); });
+
+/* ═══ SMOOTH SCROLL ═══ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* ═══ MODAL BUTTONS ═══ */
+function closeModal() { document.getElementById('finalModal').classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalContinue').addEventListener('click', closeModal);
+document.getElementById('modalRetry').addEventListener('click', () => {
+  closeModal(); quizCorrect = 0;
+  xp = scrollXpEarned;
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong','dimmed','answered-opt'));
+    box.querySelectorAll('.quiz-explain').forEach(ex => ex.classList.remove('show-correct','show-wrong','show-reveal'));
+    const fb = box.querySelector('.quiz-feedback');
+    if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  });
+  initQuizzes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.getElementById('finalModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+</script>
+
+</body>
+</html>

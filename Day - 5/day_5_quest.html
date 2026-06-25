@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Imputation Quest — Missing Indicator, Random Sample &amp; KNN!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — LIGHT GAMIFIED
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #f0f4ff;
+  --bg2:       #e8edf8;
+  --bg3:       #dde4f5;
+  --card:      #ffffff;
+  --card2:     #f5f7ff;
+  --border:    rgba(99,102,241,0.12);
+  --border2:   rgba(99,102,241,0.25);
+
+  --neon-blue:   #2563eb;
+  --neon-cyan:   #0891b2;
+  --neon-purple: #7c3aed;
+  --neon-pink:   #db2777;
+  --neon-green:  #16a34a;
+  --neon-yellow: #b45309;
+  --neon-orange: #c2410c;
+  --neon-red:    #dc2626;
+
+  --text:  #1e1b4b;
+  --muted: #4b5563;
+  --dim:   #9ca3af;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-blue:   0 4px 16px rgba(37,99,235,0.18), 0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple: 0 4px 16px rgba(124,58,237,0.18), 0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:   0 4px 16px rgba(8,145,178,0.18),  0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:  0 4px 16px rgba(22,163,74,0.18),  0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow: 0 4px 16px rgba(180,83,9,0.18),   0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:   0 4px 16px rgba(219,39,119,0.18), 0 1px 4px rgba(219,39,119,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.container-main {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 1.5rem; position: relative; z-index: 1;
+}
+
+/* ═══ XP BAR ═══ */
+.xp-strip {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(240,244,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  padding: 0.65rem 0;
+}
+.xp-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.xp-label {
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+}
+.xp-bar-wrap {
+  flex: 1; min-width: 120px; background: rgba(37,99,235,0.1);
+  border-radius: 50px; height: 10px; border: 1px solid var(--border2); overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+  border-radius: 50px; transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 10px rgba(37,99,235,0.35); position: relative;
+}
+.xp-bar-fill::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0;} 50%{opacity:1;} }
+.xp-score {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.9rem; color: var(--neon-yellow); white-space: nowrap;
+}
+.xp-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.xp-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.65rem;
+  border-radius: 50px; border: 1px solid; white-space: nowrap;
+  transition: 0.3s; opacity: 0.35;
+}
+.xp-badge.earned { opacity: 1; animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes badgePop { 0%{transform:scale(0);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+.xp-badge.b1 { border-color: var(--neon-blue);   color: var(--neon-blue);   }
+.xp-badge.b2 { border-color: var(--neon-cyan);   color: var(--neon-cyan);   }
+.xp-badge.b3 { border-color: var(--neon-purple); color: var(--neon-purple); }
+.xp-badge.b4 { border-color: var(--neon-green);  color: var(--neon-green);  }
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative; overflow: hidden; padding: 6rem 0 5rem;
+  background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(8,145,178,0.07) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-orbit {
+  position: absolute; top: 50%; right: 8%; transform: translateY(-50%);
+  width: 420px; height: 420px; pointer-events: none;
+}
+.orbit-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-ring:nth-child(1) { width: 150px; height: 150px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 250px; height: 250px; animation: spin 20s linear infinite reverse; border-color: rgba(168,85,247,0.2); }
+.orbit-ring:nth-child(3) { width: 350px; height: 350px; animation: spin 30s linear infinite; border-color: rgba(6,182,212,0.15); }
+.orbit-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 50%; top: -4px; left: 50%; transform: translateX(-50%);
+}
+.orbit-ring:nth-child(1) .orbit-dot { background: var(--neon-blue);   box-shadow: var(--glow-blue); }
+.orbit-ring:nth-child(2) .orbit-dot { background: var(--neon-purple); box-shadow: var(--glow-purple); }
+.orbit-ring:nth-child(3) .orbit-dot { background: var(--neon-cyan);   box-shadow: var(--glow-cyan); }
+.orbit-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3rem; animation: float 4s ease-in-out infinite;
+}
+@keyframes spin  { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+@keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-12px);} }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px; padding: 0.3rem 1rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--neon-blue); margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-blue); box-shadow: var(--glow-blue); animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+.hero h1 {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 1.5rem;
+}
+.hero h1 .line1 { display: block; color: #1e1b4b; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 40%, var(--neon-purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 560px; margin-bottom: 2rem; line-height: 1.75; }
+.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-stat-item { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.8rem; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 0.8rem 2rem; border-radius: 50px; border: none;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  transition: 0.3s; animation: pulse-btn 2s infinite;
+}
+@keyframes pulse-btn { 0%,100%{box-shadow:0 4px 20px rgba(37,99,235,0.28);} 50%{box-shadow:0 4px 32px rgba(37,99,235,0.45);} }
+.hero-cta:hover { transform: translateY(-2px) scale(1.03); color: white; }
+
+/* ═══ QUEST MAP ═══ */
+.quest-map {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2rem; margin: 3rem 0;
+  position: relative; box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+}
+.quest-map::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.03));
+  pointer-events: none;
+}
+.quest-map-title {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+}
+.quest-map-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(234,179,8,0.3), transparent); }
+.quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
+.quest-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  text-decoration: none; color: var(--muted);
+  font-weight: 600; font-size: 0.88rem; transition: 0.25s;
+}
+.quest-item:hover {
+  background: rgba(37,99,235,0.07); border-color: rgba(37,99,235,0.3);
+  color: var(--neon-blue); transform: translateX(4px);
+}
+.quest-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+}
+
+/* ═══ LEVEL CARD ═══ */
+.level-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 2.5rem; margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.level-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; border-radius: 24px 24px 0 0;
+}
+.level-card.lvl-blue::before   { background: linear-gradient(90deg, var(--neon-blue),   var(--neon-cyan));   }
+.level-card.lvl-purple::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));   }
+.level-card.lvl-cyan::before   { background: linear-gradient(90deg, var(--neon-cyan),   var(--neon-green));  }
+.level-card.lvl-green::before  { background: linear-gradient(90deg, var(--neon-green),  var(--neon-cyan));   }
+.level-card.lvl-yellow::before { background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange)); }
+.level-card.lvl-pink::before   { background: linear-gradient(90deg, var(--neon-pink),   var(--neon-purple)); }
+.level-card.lvl-orange::before { background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow)); }
+.level-card:hover { box-shadow: 0 8px 32px rgba(37,99,235,0.12); }
+.level-card .corner-deco {
+  position: absolute; top: 1.2rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.25;
+}
+.lv-header { display: flex; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.8rem; }
+.lv-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; position: relative;
+}
+.lv-icon-wrap::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 18px;
+  border: 1px solid; opacity: 0.4;
+}
+.ico-blue   { background: rgba(37,99,235,0.12);  color: var(--neon-blue);   } .ico-blue::after   { border-color: var(--neon-blue);   }
+.ico-purple { background: rgba(124,58,237,0.12); color: var(--neon-purple); } .ico-purple::after { border-color: var(--neon-purple); }
+.ico-cyan   { background: rgba(8,145,178,0.12);  color: var(--neon-cyan);   } .ico-cyan::after   { border-color: var(--neon-cyan);   }
+.ico-green  { background: rgba(22,163,74,0.12);  color: var(--neon-green);  } .ico-green::after  { border-color: var(--neon-green);  }
+.ico-yellow { background: rgba(180,83,9,0.12);   color: var(--neon-yellow); } .ico-yellow::after { border-color: var(--neon-yellow); }
+.ico-pink   { background: rgba(219,39,119,0.12); color: var(--neon-pink);   } .ico-pink::after   { border-color: var(--neon-pink);   }
+.ico-orange { background: rgba(194,65,12,0.12);  color: var(--neon-orange); } .ico-orange::after { border-color: var(--neon-orange); }
+.lv-meta { flex: 1; }
+.lv-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 0.35rem; }
+.lv-title { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; line-height: 1.2; color: var(--text); }
+.lv-xp {
+  margin-top: 0.4rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.25);
+  border-radius: 50px; padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700; color: var(--neon-yellow);
+}
+
+/* ═══ CALLOUT ═══ */
+.callout {
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0; border: 1px solid; position: relative; overflow: hidden;
+}
+.callout::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.callout .ct { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.cb-blue   { background: rgba(37,99,235,0.06);  border-color: rgba(37,99,235,0.2);  } .cb-blue::before   { background: var(--neon-blue);   } .cb-blue   .ct { color: var(--neon-blue);   }
+.cb-purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); } .cb-purple::before { background: var(--neon-purple); } .cb-purple .ct { color: var(--neon-purple); }
+.cb-cyan   { background: rgba(8,145,178,0.06);  border-color: rgba(8,145,178,0.2);  } .cb-cyan::before   { background: var(--neon-cyan);   } .cb-cyan   .ct { color: var(--neon-cyan);   }
+.cb-green  { background: rgba(22,163,74,0.06);  border-color: rgba(22,163,74,0.2);  } .cb-green::before  { background: var(--neon-green);  } .cb-green  .ct { color: var(--neon-green);  }
+.cb-yellow { background: rgba(180,83,9,0.06);   border-color: rgba(180,83,9,0.2);   } .cb-yellow::before { background: var(--neon-yellow); } .cb-yellow .ct { color: var(--neon-yellow); }
+.cb-pink   { background: rgba(219,39,119,0.06); border-color: rgba(219,39,119,0.2); } .cb-pink::before   { background: var(--neon-pink);   } .cb-pink   .ct { color: var(--neon-pink);   }
+.cb-orange { background: rgba(194,65,12,0.06);  border-color: rgba(194,65,12,0.2);  } .cb-orange::before { background: var(--neon-orange); } .cb-orange .ct { color: var(--neon-orange); }
+
+/* ═══ STEP TIMELINE ═══ */
+.step-timeline { position: relative; padding-left: 2.8rem; }
+.step-timeline::before {
+  content: ''; position: absolute; left: 15px; top: 4px; bottom: 4px; width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-cyan));
+  opacity: 0.45; border-radius: 2px;
+}
+.step-item {
+  position: relative; margin-bottom: 1.3rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.1rem 1.3rem;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.05); transition: 0.25s;
+}
+.step-item:hover { border-color: var(--border2); background: #eef1ff; }
+.step-item::before {
+  content: attr(data-step);
+  position: absolute; left: -2.8rem; top: 1rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--neon-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem;
+  color: var(--neon-blue); box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+}
+.step-label { font-weight: 700; color: var(--text); font-size: 0.98rem; margin-bottom: 0.35rem; }
+.step-body  { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
+
+/* ═══ ACH CARD ═══ */
+.ach-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; text-align: center; position: relative; overflow: hidden;
+}
+.ach-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; opacity: 0; transition: opacity 0.3s;
+}
+.ach-card:hover { transform: translateY(-6px); border-color: var(--border2); }
+.ach-card:hover::after { opacity: 1; }
+.ach-card.ac-blue::after   { background: var(--neon-blue);   } .ach-card.ac-blue:hover   { box-shadow: 0 16px 48px rgba(59,130,246,0.2); }
+.ach-card.ac-purple::after { background: var(--neon-purple); } .ach-card.ac-purple:hover { box-shadow: 0 10px 28px rgba(124,58,237,0.15); }
+.ach-card.ac-cyan::after   { background: var(--neon-cyan);   } .ach-card.ac-cyan:hover   { box-shadow: 0 16px 48px rgba(6,182,212,0.2); }
+.ach-card.ac-green::after  { background: var(--neon-green);  } .ach-card.ac-green:hover  { box-shadow: 0 16px 48px rgba(34,197,94,0.2); }
+.ach-card.ac-yellow::after { background: var(--neon-yellow); } .ach-card.ac-yellow:hover { box-shadow: 0 10px 28px rgba(180,83,9,0.15); }
+.ach-card.ac-pink::after   { background: var(--neon-pink);   } .ach-card.ac-pink:hover   { box-shadow: 0 16px 48px rgba(236,72,153,0.2); }
+.ach-card.ac-orange::after { background: var(--neon-orange); } .ach-card.ac-orange:hover { box-shadow: 0 10px 28px rgba(194,65,12,0.15); }
+.ach-icon  { font-size: 2.2rem; margin-bottom: 0.75rem; display: block; }
+.ach-title { font-family: var(--font-head); font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem; }
+.ach-desc  { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+/* ═══ CODE BLOCK ═══ */
+.code-wrap {
+  background: #f8f9fc; border: 1px solid var(--border2);
+  border-radius: 14px; overflow: hidden; margin: 1.2rem 0;
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(37,99,235,0.06); padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase; }
+.code-dots { display: flex; gap: 5px; }
+.code-dot  { width: 10px; height: 10px; border-radius: 50%; }
+.code-dot:nth-child(1){ background:#dc2626; } .code-dot:nth-child(2){ background:#b45309; } .code-dot:nth-child(3){ background:#16a34a; }
+.code-wrap pre { margin: 0; padding: 1.2rem 1.4rem; overflow-x: auto; background: transparent; }
+.code-wrap pre code { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; }
+pre[class*="language-"] {
+  border-radius: 0 !important; font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important; margin: 0 !important; border: none !important;
+  background: transparent !important;
+}
+.code-output {
+  background: rgba(22,163,74,0.06); border-top: 1px solid rgba(22,163,74,0.2);
+  padding: 0.7rem 1.2rem; font-family: var(--font-mono);
+  font-size: 0.82rem; color: #14532d; line-height: 1.7;
+}
+
+/* ═══ EX CARD ═══ */
+.ex-card { border-radius: 16px; overflow: hidden; margin: 1.4rem 0; border: 1px solid; }
+.ex-card .ex-head { padding: 0.85rem 1.4rem; font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; gap: 0.6rem; }
+.ex-card .ex-body { padding: 1.4rem; background: #fafbff; }
+.ex-card.ex-story  { border-color: rgba(22,163,74,0.25);  } .ex-card.ex-story  .ex-head { background: rgba(22,163,74,0.08);  color: #166534; }
+.ex-card.ex-tech   { border-color: rgba(124,58,237,0.25); } .ex-card.ex-tech   .ex-head { background: rgba(124,58,237,0.08); color: #5b21b6; }
+.ex-card.ex-warn   { border-color: rgba(220,38,38,0.25);  } .ex-card.ex-warn   .ex-head { background: rgba(220,38,38,0.08);  color: #991b1b; }
+.ex-card.ex-tip    { border-color: rgba(8,145,178,0.25);  } .ex-card.ex-tip    .ex-head { background: rgba(8,145,178,0.08);  color: #0c4a6e; }
+.ex-card.ex-orange { border-color: rgba(194,65,12,0.25);  } .ex-card.ex-orange .ex-head { background: rgba(194,65,12,0.08);  color: #7c2d12; }
+
+/* ═══ TABLE ═══ */
+.gtbl { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+.gtbl thead th { background: rgba(37,99,235,0.08); color: var(--neon-blue); font-family: var(--font-head); font-weight: 700; padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid rgba(37,99,235,0.15); font-size: 0.85rem; letter-spacing: 0.5px; }
+.gtbl tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.92rem; vertical-align: top; }
+.gtbl tbody tr:last-child td { border-bottom: none; }
+.gtbl tbody tr:hover td { background: rgba(37,99,235,0.04); color: var(--text); }
+.gtbl tbody td strong { color: var(--text); }
+
+/* ═══ DIM CARD ═══ */
+.dim-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; position: relative; overflow: hidden;
+}
+.dim-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(37,99,235,0.1); }
+.dim-rank { font-family: var(--font-head); font-weight: 800; font-size: 2.5rem; line-height: 1; margin-bottom: 0.25rem; }
+.dim-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.8rem; }
+.dim-code { background: #f1f5f9; border-radius: 10px; padding: 0.65rem 0.9rem; font-family: var(--font-mono); font-size: 0.82rem; border: 1px solid rgba(99,102,241,0.15); margin-bottom: 0.8rem; }
+.dim-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.6; }
+.dim-example { font-size: 0.82rem; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid; font-style: italic; }
+
+/* ═══ STAT PILLS ═══ */
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border-radius: 50px; padding: 0.3rem 0.9rem;
+  font-weight: 700; font-size: 0.8rem; border: 1px solid;
+}
+.sp-blue   { background: rgba(37,99,235,0.08);  border-color: rgba(37,99,235,0.3);  color: var(--neon-blue);   }
+.sp-green  { background: rgba(22,163,74,0.08);  border-color: rgba(22,163,74,0.3);  color: var(--neon-green);  }
+.sp-yellow { background: rgba(180,83,9,0.08);   border-color: rgba(180,83,9,0.3);   color: var(--neon-yellow); }
+.sp-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--neon-purple); }
+.sp-cyan   { background: rgba(8,145,178,0.08);  border-color: rgba(8,145,178,0.3);  color: var(--neon-cyan);   }
+.sp-pink   { background: rgba(219,39,119,0.08); border-color: rgba(219,39,119,0.3); color: var(--neon-pink);   }
+.sp-orange { background: rgba(194,65,12,0.08);  border-color: rgba(194,65,12,0.3);  color: var(--neon-orange); }
+.sp-red    { background: rgba(220,38,38,0.08);  border-color: rgba(220,38,38,0.3);  color: var(--neon-red);    }
+
+/* ═══ INLINE CODE ═══ */
+.inline-code { background: rgba(8,145,178,0.08); color: #0e7490; padding: 0.1rem 0.45rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.88em; border: 1px solid rgba(37,99,235,0.25); }
+
+/* ═══ HIGHLIGHT ═══ */
+.hl      { background: rgba(180,83,9,0.1);   color: #92400e;          padding: 0 5px; border-radius: 4px; }
+.hl-blue { background: rgba(37,99,235,0.1);  color: var(--neon-blue); padding: 0 5px; border-radius: 4px; }
+.hl-red  { background: rgba(220,38,38,0.1);  color: var(--neon-red);  padding: 0 5px; border-radius: 4px; }
+
+/* ═══ GLOW DIVIDER ═══ */
+.glow-div {
+  height: 2px; border-radius: 2px; margin: 2rem 0; opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-cyan), transparent);
+}
+
+/* ═══ MERMAID ═══ */
+.mermaid-wrap {
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0;
+  text-align: center; overflow-x: auto; box-shadow: 0 2px 12px rgba(37,99,235,0.06);
+}
+
+/* ═══ QUIZ ═══ */
+.quiz-box {
+  background: #fffbf0; border: 1px solid rgba(180,83,9,0.18);
+  border-radius: 20px; padding: 1.6rem; margin: 1.8rem 0;
+  position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(180,83,9,0.07);
+}
+.quiz-box::before {
+  content: '⚡ QUICK CHALLENGE'; position: absolute; top: 0; right: 0;
+  background: linear-gradient(135deg, #b45309, #c2410c);
+  color: #fff; font-family: var(--font-head); font-weight: 800;
+  font-size: 0.62rem; letter-spacing: 2px; padding: 0.32rem 0.9rem; border-radius: 0 20px 0 12px;
+}
+.quiz-q { font-weight: 700; color: #1c1917; margin-bottom: 1.1rem; font-size: 1.02rem; line-height: 1.55; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+.quiz-opt {
+  background: #ffffff; border: 1.5px solid #e5e7eb; border-radius: 12px;
+  padding: 0.75rem 1.1rem; cursor: pointer; font-size: 0.93rem; color: #374151;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  font-weight: 500; display: flex; align-items: center; gap: 0.85rem; user-select: none;
+}
+.quiz-opt:not(.answered-opt):hover { background: #f3f4f6; border-color: #9ca3af; color: #111827; transform: translateX(3px); }
+.quiz-opt.correct { background: #f0fdf4; border-color: #16a34a; color: #14532d; font-weight: 700; }
+.quiz-opt.correct .opt-letter { background: #16a34a; color: #fff; }
+.quiz-opt.wrong   { background: #fef2f2; border-color: #dc2626; color: #991b1b; opacity: 0.8; }
+.quiz-opt.wrong   .opt-letter { background: #dc2626; color: #fff; }
+.quiz-opt.dimmed  { opacity: 0.45; pointer-events: none; }
+.quiz-opt .opt-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #f3f4f6; color: #6b7280; border: 1.5px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  flex-shrink: 0; transition: background 0.2s, color 0.2s;
+}
+.quiz-explain {
+  display: none; font-size: 0.84rem; font-weight: 500;
+  margin-top: -0.35rem; margin-bottom: 0.35rem;
+  padding: 0.5rem 0.85rem 0.5rem 1rem;
+  border-radius: 0 0 10px 10px; line-height: 1.55; border-left: 3px solid transparent;
+}
+.quiz-explain.show-correct { display: block; background: rgba(22,163,74,0.07);  color: #166534; border-left-color: #16a34a; }
+.quiz-explain.show-wrong   { display: block; background: rgba(220,38,38,0.06);  color: #991b1b; border-left-color: #dc2626; }
+.quiz-explain.show-reveal  { display: block; background: rgba(37,99,235,0.06);  color: #1e40af; border-left-color: #2563eb; }
+.quiz-feedback {
+  display: none; margin-top: 1rem; padding: 0.85rem 1.1rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+  align-items: center; gap: 0.6rem;
+}
+.quiz-feedback.show { display: flex; animation: fadeIn 0.35s; }
+.quiz-feedback.win  { background: linear-gradient(135deg,#f0fdf4,#dcfce7); color: #14532d; border: 1px solid rgba(22,163,74,0.3); }
+.quiz-feedback.lose { background: linear-gradient(135deg,#fef2f2,#fee2e2); color: #991b1b; border: 1px solid rgba(220,38,38,0.2); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;} }
+
+/* ═══ FOOTER ═══ */
+.gfooter {
+  background: #e8edf8; border-top: 1px solid var(--border);
+  padding: 3rem 0; margin-top: 4rem; text-align: center;
+}
+.gfooter-logo {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-orbit { display: none; }
+  .level-card { padding: 1.5rem; }
+  .xp-badges { display: none; }
+}
+
+/* ═══ TOAST ═══ */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.gtoast {
+  background: #ffffff; border: 1px solid var(--border2);
+  border-radius: 14px; padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  backdrop-filter: blur(12px); font-weight: 700; font-size: 0.88rem;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: auto; min-width: 260px; box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.gtoast.show { transform: none; }
+.gtoast-icon { font-size: 1.4rem; }
+
+/* ═══ MODAL ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15,23,42,0.55); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: #ffffff; border-radius: 28px; padding: 2.5rem 2.5rem 2rem;
+  max-width: 520px; width: 100%; position: relative; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(37,99,235,0.18), 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease; opacity: 0;
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+.modal-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem; background: #f3f4f6; border: none;
+  border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem;
+  color: #6b7280; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.modal-close:hover { background: #e5e7eb; color: #374151; }
+.modal-trophy   { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+.modal-title    { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; text-align: center; color: var(--text); margin-bottom: 0.4rem; }
+.modal-subtitle { color: var(--muted); text-align: center; font-size: 0.92rem; margin-bottom: 1.5rem; }
+.score-ring-wrap { display: flex; justify-content: center; margin-bottom: 1.2rem; }
+.score-ring { position: relative; width: 120px; height: 120px; }
+.score-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: #e5e7eb; stroke-width: 10; }
+.ring-fill { fill: none; stroke: #2563eb; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-num  { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; color: var(--text); line-height: 1; }
+.ring-label{ font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.grade-card { border-radius: 14px; padding: 0.85rem 1.2rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem; border: 1.5px solid; }
+.grade-s { background: #fef9c3; border-color: #b45309; }
+.grade-a { background: #f0fdf4; border-color: #16a34a; }
+.grade-b { background: #eff6ff; border-color: #2563eb; }
+.grade-c { background: #f5f3ff; border-color: #7c3aed; }
+.grade-d { background: #fef2f2; border-color: #dc2626; }
+.grade-letter { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; }
+.grade-msg    { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+.modal-xp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8f9ff; border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 12px; padding: 0.75rem 1.1rem; margin-bottom: 1.4rem;
+}
+.modal-xp-row .mxp-label { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+.modal-xp-row .mxp-val   {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-btns { display: flex; gap: 0.75rem; }
+.modal-btn-retry {
+  flex: 1; padding: 0.8rem 1rem; background: #f3f4f6; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; cursor: pointer; font-family: var(--font-head); font-weight: 700;
+  font-size: 0.92rem; color: #374151; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.modal-btn-retry:hover { background: #e5e7eb; border-color: #d1d5db; color: #111827; }
+.modal-btn-continue {
+  flex: 2; padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed); border: none;
+  border-radius: 12px; cursor: pointer; font-family: var(--font-head);
+  font-weight: 700; font-size: 0.92rem; color: #ffffff; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.modal-btn-continue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,0.4); }
+#confettiCanvas { position: fixed; inset: 0; z-index: 10001; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ XP STRIP ═══════════════════ -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 220 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">🚩 Indicator Pro</span>
+        <span class="xp-badge b2" id="badge2">🎲 Random Sampler</span>
+        <span class="xp-badge b3" id="badge3">🤝 KNN Master</span>
+        <span class="xp-badge b4" id="badge4">🏆 Imputation Ninja</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-solid fa-gamepad me-1"></i> Gamified Learning Quest</div>
+        <h1>
+          <span class="line1">Advanced Imputation</span>
+          <span class="line2">Indicator · Random · KNN</span>
+        </h1>
+        <p class="hero-sub">
+          4 boss levels. Missing Indicator se lekar KNN Imputer tak. Multivariate imputation seekho — real India examples ke saath. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, aur bano Advanced Imputation Ninja!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">220</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Clean Data</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">🤝</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- ═══════════════════ QUEST MAP ═══════════════════ -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1" class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> Missing Indicator — Kya Hai?</a>
+    <a href="#s2" class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> Missing Indicator — Python Code</a>
+    <a href="#s3" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Random Sample Imputation — Kya Hai?</a>
+    <a href="#s4" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Random Sample — Python Code &amp; When to Use</a>
+    <a href="#s5" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> KNN Imputer — Kya Hai?</a>
+    <a href="#s6" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> KNN Imputer — Step-by-Step &amp; Python</a>
+    <a href="#s7" class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> KNN — K Choose Karna &amp; Pitfalls</a>
+    <a href="#s8" class="quest-item"><span class="quest-num" style="background:rgba(219,39,119,0.15);color:var(--neon-pink);">🏆</span> Final Summary &amp; Comparison</a>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1-A : MISSING INDICATOR — KYA HAI?
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-flag"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">Missing Indicator — Missingness ko Feature Banao!</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Idea — Ek Line Mein</div>
+    <strong>Missing Indicator</strong> = ek naya binary column add karo jo <span class="hl">bataye ki original column mein value missing thi ya nahi</span>.<br><br>
+    Iska matlab: NaN ko fill bhi karo <em>aur</em> ek alag column mein record karo ki wahan NaN tha — taaki model khud seekh sake ki missing hona kya signal deta hai!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Sirf Fill Karna Kyun Kabhi Kaafi Nahi Hota?</div>
+    Jab tum mean ya most_frequent se fill karte ho, model ko pata nahi chalta ki woh value <strong>original thi ya fill ki gayi</strong>.<br><br>
+    Lekin missingness khud ek pattern ho sakti hai — jaise:<br>
+    → <span class="hl-red">High-income log income field blank chodh dete hain</span> (MNAR)<br>
+    → <span class="hl-red">Sick patients test results nahi dete</span><br>
+    → <span class="hl-red">Fraud transactions mein location missing hoti hai</span><br><br>
+    Agar ye pattern hai, toh <strong>is signal ko hata dena = information kho dena</strong>!
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1rem;"><i class="fa-solid fa-diagram-project me-2" style="color:var(--neon-blue)"></i>Kaise Kaam Karta Hai?</h5>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(220,38,38,0.3);">
+        <div class="dim-rank" style="color:var(--neon-red);">①</div>
+        <div class="dim-name" style="color:var(--neon-red);">Original Data</div>
+        <div class="dim-code">Age: [25, NaN, 30, NaN, 22]</div>
+        <div class="dim-desc">Age column mein 2 missing values hain. Seedha fill karne pe information kho jaati hai.</div>
+        <div class="dim-example" style="border-color:rgba(220,38,38,0.2);color:var(--muted);">Problem: Why was it missing?</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(180,83,9,0.3);">
+        <div class="dim-rank" style="color:var(--neon-yellow);">②</div>
+        <div class="dim-name" style="color:var(--neon-yellow);">Indicator Column Add</div>
+        <div class="dim-code">Age_Missing: [0, 1, 0, 1, 0]</div>
+        <div class="dim-desc">Naya binary column banao — 1 matlab "yahan NaN tha", 0 matlab "value thi".</div>
+        <div class="dim-example" style="border-color:rgba(180,83,9,0.2);color:var(--muted);">Signal preserved!</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">③</div>
+        <div class="dim-name" style="color:var(--neon-green);">Fill + Keep Both</div>
+        <div class="dim-code">Age: [25, 25.6, 30, 25.6, 22]<br>Age_Missing: [0, 1, 0, 1, 0]</div>
+        <div class="dim-desc">Original column bhi fill karo, indicator bhi rakho. Model dono use kar sakta hai!</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2);color:var(--muted);">Best of both worlds!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-green mt-4">
+    <div class="ct"><i class="fa-solid fa-india"></i> Real India Example — HDFC Bank Loan Applications</div>
+    HDFC ke loan application mein <strong>Monthly Income</strong> field often missing hota hai.<br>
+    → Agar income missing hai → ho sakta hai freelancer / self-employed hain (higher risk!)<br>
+    → Agar income fill hai → salaried employee hai (lower risk)<br><br>
+    SimpleImputer sirf NaN fill karega. <strong>Missing Indicator + Imputation</strong> dono karo toh model seekhega ki "income missing hona" khud ek risk signal hai!
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check-double"></i> Missing Indicator Kab Use Karein?</div>
+        ✅ MNAR (Missing Not At Random) data ho<br>
+        ✅ Missing pattern meaningful ho (fraud, risk)<br>
+        ✅ Missing % 5–40% range mein ho<br>
+        ✅ Tree-based models use kar rahe ho (RF, XGBoost)<br>
+        ✅ Business domain knowledge bata rahi ho ki missing = signal
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-xmark"></i> Kab Use Mat Karein?</div>
+        ❌ MCAR data — missingness completely random ho<br>
+        ❌ Very low missing % (&lt; 1%) — extra column pointless<br>
+        ❌ Bahut saari columns hain → feature explosion<br>
+        ❌ Linear models — collinearity issues ho sakti hain<br>
+        ❌ Missing % &gt; 70% — indicator bhi zyada noise dega
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1-B : MISSING INDICATOR — PYTHON CODE
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-code"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">Missing Indicator — Python Code</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> Method 1: pandas se Manually Banao (Simplest)</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Inline dataset: Student exam data ───
+data = {
+    'Name':    ['Aarav', 'Priya', 'Ravi', 'Sneha', 'Karan', 'Divya', 'Mohit', 'Ananya'],
+    'Age':     [22,      np.nan,  25,      23,      np.nan,  21,      24,      np.nan  ],
+    'Score':   [85,      90,      np.nan,  78,      88,      np.nan,  72,      95      ],
+    'Income':  [30000,   np.nan,  45000,   np.nan,  28000,   np.nan,  52000,   np.nan  ],
+    'City':    ['Mumbai','Delhi', np.nan,  'Surat', 'Mumbai',np.nan,  'Delhi', 'Pune'  ],
+}
+df = pd.DataFrame(data)
+
+print("Original Data:")
+print(df)
+print("\nMissing values:\n", df.isnull().sum())
+
+# ─── Step 1: Indicator columns banao ───
+# har column ke liye jahan NaN hai, 1 lagao, nahi toh 0
+df['Age_Missing']    = df['Age'].isnull().astype(int)
+df['Score_Missing']  = df['Score'].isnull().astype(int)
+df['Income_Missing'] = df['Income'].isnull().astype(int)
+df['City_Missing']   = df['City'].isnull().astype(int)
+
+# ─── Step 2: Original columns fill karo ───
+df['Age'].fillna(df['Age'].mean(), inplace=True)
+df['Score'].fillna(df['Score'].median(), inplace=True)
+df['Income'].fillna(df['Income'].median(), inplace=True)
+df['City'].fillna(df['City'].mode()[0], inplace=True)
+
+print("\nAfter Missing Indicator + Imputation:")
+print(df[['Name', 'Age', 'Age_Missing', 'Income', 'Income_Missing']])
+# Age_Missing = 1 wali rows mein imputed value hai
+# Model seekhega: "Age_Missing=1 waale students ki pattern kaisi hai?"</code></pre>
+        <div class="code-output">💡 isnull().astype(int) = True/False ko 1/0 mein convert karta hai! Ek line mein indicator ban jaata hai!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-gears"></i> Method 2: sklearn MissingIndicator (Reusable)</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — sklearn</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer, MissingIndicator
+
+# ─── Same inline dataset ───
+data = {
+    'Age':    [22,  np.nan, 25,  23,  np.nan, 21,  24,  np.nan],
+    'Score':  [85,  90,     np.nan, 78, 88,  np.nan, 72, 95   ],
+    'Income': [30000, np.nan, 45000, np.nan, 28000, np.nan, 52000, np.nan],
+}
+df = pd.DataFrame(data)
+
+# ─── MissingIndicator — sklearn ka official tool ───
+indicator = MissingIndicator(features='missing-only')
+# features='missing-only' → sirf unhi columns ke liye indicator banao jinmein NaN ho
+
+indicator_array = indicator.fit_transform(df)
+print("Indicator array shape:", indicator_array.shape)  # (8, 3) — 3 columns mein NaN tha
+
+# Indicator DataFrame banao
+indicator_cols = [df.columns[i] + '_Missing' for i in indicator.features_]
+df_indicator = pd.DataFrame(indicator_array.astype(int), columns=indicator_cols)
+
+# ─── Original columns impute karo ───
+imputer = SimpleImputer(strategy='mean')
+df_imputed = pd.DataFrame(
+    imputer.fit_transform(df),
+    columns=df.columns
+)
+
+# ─── Dono merge karo ───
+df_final = pd.concat([df_imputed, df_indicator], axis=1)
+
+print("\nFinal DataFrame with Indicators:")
+print(df_final.round(1))
+print("\nLearned missing column indices:", indicator.features_)
+# [0, 1, 2] → sab teeno columns mein NaN tha</code></pre>
+        <div class="code-output">📌 MissingIndicator(features='missing-only') → sirf unhi columns track karta hai jinmein actual NaN hain. features='all' karo toh sab columns track hoti hain!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 Missing Indicator ka main faayda kya hai simple imputation ke comparison mein?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Missing Indicator NaN ko delete nahi karta — ye ek alag column add karta hai. Original column fill hoti hai aur indicator column bhi rakha jaata hai."><span class="opt-letter">A</span>Ye NaN values wali rows delete kar deta hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. Missing Indicator imputation ka replacement nahi hai — ye ek alag feature hai jo imputation ke saath use hota hai. Dono ek saath use karo!"><span class="opt-letter">B</span>Ye imputation ki zaroorat khatam kar deta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! Ye sabse bada faayda hai. Simple imputation sirf NaN fill karta hai — missingness ka pattern lost ho jaata hai. Missing Indicator se model ko pata chalta hai ki kahan value original thi aur kahan fill ki gayi — ye ek naya, valuable signal hai!"><span class="opt-letter">C</span>Model ko pata chalta hai kahan value missing thi — missingness khud ek feature ban jaati hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Galat. Missing Indicator imputation accuracy improve nahi karta — ye ek alag binary column add karta hai. Accuracy model ki learning pe depend karti hai, na ki indicator pe directly."><span class="opt-letter">D</span>Imputed values zyada accurate ho jaati hain</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2-A : RANDOM SAMPLE IMPUTATION — KYA HAI?
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s3">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-dice"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">Random Sample Imputation — Distribution Preserve Karo!</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Idea — Ek Line Mein</div>
+    <strong>Random Sample Imputation</strong> = missing value ko fill karo usi column ke <span class="hl">ek randomly selected existing (non-missing) value</span> se — mean ya mode nahi!<br><br>
+    Ye method original data ki <strong>distribution preserve karta hai</strong> — mean/median imputation jo distribution ko artificially peak kar deta hai, woh problem yahan nahi hoti.
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-scale-balanced me-2" style="color:var(--neon-cyan)"></i>Mean Imputation vs Random Sample Imputation</h5>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="callout cb-orange h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-xmark"></i> Mean Imputation — Kya Hota Hai</div>
+        Original data: <span class="inline-code">[10, 90, 20, NaN, 80, 15, NaN, 85]</span><br><br>
+        Mean = (10+90+20+80+15+85) / 6 = <strong>50</strong><br><br>
+        After fill: <span class="inline-code">[10, 90, 20, <span style="color:var(--neon-red)">50</span>, 80, 15, <span style="color:var(--neon-red)">50</span>, 85]</span><br><br>
+        ❌ Real distribution bimodal thi (low + high values). Mean = 50 jo kabhi aaya hi nahi! Distribution distort ho gayi.
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-cyan h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check"></i> Random Sample — Distribution Bachti Hai</div>
+        Original data: <span class="inline-code">[10, 90, 20, NaN, 80, 15, NaN, 85]</span><br><br>
+        Random pick karo existing values se: 20, 80<br><br>
+        After fill: <span class="inline-code">[10, 90, 20, <span style="color:var(--neon-green)">20</span>, 80, 15, <span style="color:var(--neon-green)">80</span>, 85]</span><br><br>
+        ✅ Values real data se aayi hain! Distribution ka shape preserved hai — bimodal pattern intact!
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-green mt-3">
+    <div class="ct"><i class="fa-solid fa-india"></i> Real India Example — IPL Batting Data</div>
+    Imagine karo ek IPL dataset mein batsman ke <strong>Strike Rate</strong> column mein kuch values missing hain.<br><br>
+    → <strong>Mean imputation:</strong> Sab NaN → average strike rate (say 135) se fill. Ye aggressive hitters aur defensive hitters dono ke liye same value deta hai — wrong!<br>
+    → <strong>Random Sample:</strong> Koi NaN → kisi existing batsman ka actual strike rate (e.g., 162 ya 108) se fill. Distribution real rehti hai — kuch high, kuch low — exactly jaise real cricket data hota hai!
+  </div>
+
+  <div class="callout cb-yellow mt-2">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Ek Important Note</div>
+    Random Sample Imputation <strong>non-deterministic</strong> hai — har baar run karne par alag result aayega!<br>
+    Solution: <span class="inline-code">np.random.seed(42)</span> set karo taaki reproducible results milein. Production mein hamesha seed fix karo!
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2-B : RANDOM SAMPLE — CODE + WHEN TO USE
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s4">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-flask"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Skill Unlock</div>
+      <div class="lv-title">Random Sample Imputation — Python Code &amp; When to Use</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> Random Sample Imputation — Complete Python Code</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Inline dataset: IPL Batting Stats ───
+np.random.seed(42)
+data = {
+    'Player':       ['Rohit', 'Virat', 'Dhoni', 'Pant', 'Jadeja',
+                     'Bumrah', 'Shami', 'KL Rahul', 'Hardik', 'Surya'],
+    'Strike_Rate':  [130, np.nan, 135, 142, np.nan,
+                     np.nan, 120, 145, np.nan, 170   ],
+    'Avg_Score':    [38,  49,    np.nan, 32, 22,
+                     12,  np.nan, 45,  35,  np.nan  ],
+    'Matches':      [200, 215, 250, 100, 180,
+                     120, np.nan, 105, 90, np.nan   ],
+}
+df = pd.DataFrame(data)
+
+print("Original Data:")
+print(df)
+print("\nMissing values:\n", df.isnull().sum())
+
+# ─── Random Sample Imputation Function ───
+def random_sample_impute(df, col, random_state=42):
+    """Ek column ke NaN ko usi column ki random non-null values se fill karo."""
+    np.random.seed(random_state)
+
+    null_count = df[col].isnull().sum()
+
+    if null_count == 0:
+        return df  # koi NaN nahi — kuch karne ki zaroorat nahi
+
+    # Step 1: existing (non-null) values se random sample lo
+    random_values = df[col].dropna().sample(
+        n=null_count,         # utne hi values jitne NaN hain
+        replace=True,          # replacement ke saath (zyada NaN hone par bhi kaam kare)
+        random_state=random_state
+    ).values
+
+    # Step 2: NaN wali positions fill karo
+    df_copy = df.copy()
+    df_copy.loc[df_copy[col].isnull(), col] = random_values
+
+    return df_copy
+
+# ─── Sab columns pe apply karo ───
+num_cols = ['Strike_Rate', 'Avg_Score', 'Matches']
+df_imputed = df.copy()
+
+for col in num_cols:
+    df_imputed = random_sample_impute(df_imputed, col)
+
+print("\nAfter Random Sample Imputation:")
+print(df_imputed)
+
+# ─── Distribution compare karo ───
+print("\nStrike_Rate — Original Non-Null Stats:")
+print(df['Strike_Rate'].dropna().describe().round(1))
+
+print("\nStrike_Rate — After Imputation Stats:")
+print(df_imputed['Strike_Rate'].describe().round(1))
+# Mean aur std roughly same rahenge — distribution preserved!</code></pre>
+        <div class="code-output">🎲 Random Sample Imputation ka magic: mean/std imputation ke baad change ho jaata hai, random sample ke baad roughly same rehta hai! Distribution ka shape preserve hota hai.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1rem;"><i class="fa-solid fa-scale-balanced me-2" style="color:var(--neon-cyan)"></i>Kab Kya Use Karein — Quick Guide</h5>
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Situation</th><th>Recommended Method</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Data MCAR, small missing %</td><td><span class="stat-pill sp-blue">Mean / Median</span></td><td>Simple, fast, sufficient</td></tr>
+        <tr><td>Distribution preserve karna ho</td><td><span class="stat-pill sp-cyan">Random Sample</span></td><td>Shape maintain hoti hai</td></tr>
+        <tr><td>Missingness ek signal ho</td><td><span class="stat-pill sp-purple">Missing Indicator + Fill</span></td><td>Pattern model ko milta hai</td></tr>
+        <tr><td>Related columns se fill karna ho</td><td><span class="stat-pill sp-green">KNN Imputer</span></td><td>Multivariate — neighbours se seekhe</td></tr>
+        <tr><td>Time series data</td><td><span class="stat-pill sp-orange">ffill / bfill</span></td><td>Temporal sequence preserve hoti hai</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 Random Sample Imputation Mean Imputation se better kab hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Nahi. Random sample imputation kabhi bhi hamesha better nahi hoti. Simple MCAR data ke liye mean/median efficient aur fast hoti hai."><span class="opt-letter">A</span>Hamesha — ye mean imputation se hamesha superior hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! Random sample imputation tab shine karta hai jab data ka distribution bimodal, skewed ya multimodal ho — jaise income data jahan zyaadatar log low-income hain lekin kuch bahut high-income. Mean imputation ek artificial spike centre mein banaata hai, random sample real distribution preserve karta hai!"><span class="opt-letter">B</span>Jab data ka distribution bimodal ya skewed ho aur shape preserve karna ho</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi, ulta hai. Random sample imputation non-deterministic hai — har run pe alag results deta hai. Mean imputation deterministic hai. Reproducibility ke liye np.random.seed() set karna padta hai."><span class="opt-letter">C</span>Jab reproducible deterministic results chahiye hon</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Time series data ke liye ffill (forward fill) ya bfill (backward fill) best hote hain — temporal sequence maintain hoti hai. Random sample time series mein patterns destroy kar sakta hai."><span class="opt-letter">D</span>Time series data mein jahan sequence important ho</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3-A : KNN IMPUTER — KYA HAI?
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s5">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-users"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">KNN Imputer — Apne Neighbors se Seekho!</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Idea — Ek Line Mein</div>
+    <strong>KNN Imputer</strong> = missing value ko fill karo <span class="hl">similar rows (neighbours) ki values ka average leke</span> — ye multivariate imputation hai!<br><br>
+    Pehle ke methods ek column ko independently dekh ke fill karte the. KNN <strong>sabhi columns ki information ek saath</strong> use karta hai taaki best fill value dhundhe.
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-question-circle"></i> KNN Kaise Kaam Karta Hai? — Analogy</div>
+    Sochte hain tum ek naya neighbourhood mein shift hue. Tumhe nahi pata wahan ghar ka rent kya hoga.<br><br>
+    <strong>SimpleImputer (mean):</strong> Poore city ka average rent lo → <em>rough estimate</em><br>
+    <strong>KNN Imputer:</strong> Tumhare <em>similar</em> neighbours dhundho (same size ghar, same area, same floor) → unka average lo → <em>zyada accurate!</em><br><br>
+    Yahi KNN karta hai — <strong>similar rows = neighbours</strong>, unki non-missing values se missing value fill karta hai!
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-layer-group me-2" style="color:var(--neon-purple)"></i>Univariate vs Multivariate Imputation</h5>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="ach-card ac-orange">
+        <span class="ach-icon">🔢</span>
+        <div class="ach-title">Univariate (SimpleImputer)</div>
+        <div class="ach-desc">
+          Sirf <strong>ek column</strong> dekh ke fill karo.<br><br>
+          Age NaN hai? → Age column ka mean lo → fill karo.<br><br>
+          Salary information ignore! Height information ignore!<br><br>
+          <em>Like asking: "Sheher mein average age kya hai?"</em>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="ach-card ac-purple">
+        <span class="ach-icon">🤝</span>
+        <div class="ach-title">Multivariate (KNN Imputer)</div>
+        <div class="ach-desc">
+          <strong>Saari columns</strong> ek saath dekho.<br><br>
+          Age NaN hai? → Salary, Height, City sab dekho → similar rows dhundho → unki Age ka average lo!<br><br>
+          <em>Like asking: "Similar salary, height, city wale logon ki age kya hai?"</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-green mt-3">
+    <div class="ct"><i class="fa-solid fa-india"></i> Real India Example — Swiggy Delivery Riders</div>
+    Swiggy ke delivery riders ka data hai: <strong>Rating, Deliveries_Per_Day, Experience_Years, Earnings</strong>.<br><br>
+    Ek rider ki <strong>Rating missing</strong> hai.<br><br>
+    → <strong>SimpleImputer (mean):</strong> Sab riders ka average rating (say 4.1) dedo — inaccurate!<br>
+    → <strong>KNN Imputer:</strong> Isko same level ke riders dhundo — similar deliveries per day, similar experience → unka rating 4.6 hai → fill karo 4.6 se!<br><br>
+    Result: Experienced high-volume rider ko 4.6 milega, not the global average of 4.1. <strong>Zyada realistic!</strong>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3-B : KNN IMPUTER — STEP-BY-STEP + PYTHON
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s6">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-stairs"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Skill Unlock</div>
+      <div class="lv-title">KNN Imputer — Step-by-Step &amp; Python Code</div>
+    </div>
+  </div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-list-ol me-2" style="color:var(--neon-purple)"></i>KNN Imputation — Andar Se Kya Hota Hai?</h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">📊 Data Standardize Karo</div>
+      <div class="step-body">
+        KNN distances calculate karta hai — isliye <strong>scale matter karta hai</strong>!<br>
+        Age (22–65) aur Salary (20,000–5,00,000) ek saath distance mein — Salary dominate karega.<br>
+        <em style="color:var(--neon-purple);">KNNImputer internally standardization handle karta hai. Phir bhi pehle StandardScaler lagana good practice hai.</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">📏 Distance Calculate Karo</div>
+      <div class="step-body">
+        NaN wali row ke liye — baaki sabhi rows ke saath <strong>Euclidean distance</strong> nikalo (sirf available/non-NaN columns ke basis par).<br>
+        <em style="color:var(--neon-purple);">Row A: [Age=25, Salary=40k, NaN] → Row B: [Age=27, Salary=42k, Rating=4.2] → distance = √((25-27)² + (40k-42k)²)</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">🏆 K Nearest Neighbours Dhundho</div>
+      <div class="step-body">
+        Sabse kam distance wali <strong>K rows select karo</strong> — ye hain neighbours!<br>
+        Default: <span class="inline-code">n_neighbors=5</span> matlab 5 nearest rows.<br>
+        <em style="color:var(--neon-purple);">K=5 means: 5 most similar riders ke basis par missing rating fill karenge.</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">🧮 Weighted Average Lo</div>
+      <div class="step-body">
+        K neighbours ki missing column ki values ka <strong>weighted average</strong> nikalo.<br>
+        Jo neighbour closer hai (kam distance), uska weight zyada hoga — <em>uniform</em> ya <em>distance-based</em> weighting.<br>
+        <em style="color:var(--neon-purple);">Result: Distance-based fill → similar neighbours ka zyada influence!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-label">✅ Fill Karo</div>
+      <div class="step-body">
+        Calculated average se NaN replace karo. Har NaN ke liye ye process repeat hoti hai.<br>
+        <em style="color:var(--neon-purple);">Important: fit() train data pe, transform() dono train aur test pe — data leakage nahi hoga!</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-story mt-4">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> KNN Imputer — Complete Python Code</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — KNN Imputer</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import KNNImputer
+
+# ─── Inline dataset: Swiggy Delivery Riders ───
+data = {
+    'Rider':           ['Raju', 'Suresh', 'Amit', 'Vikram', 'Pooja',
+                        'Kiran', 'Deepak', 'Meena', 'Arjun', 'Sunita'],
+    'Deliveries_Day':  [18,   25,      np.nan, 30,      15,
+                        22,   28,      np.nan, 19,      26     ],
+    'Exp_Years':       [3,    5,       4,      6,       np.nan,
+                        4,    5,       3,      np.nan,  5      ],
+    'Avg_Distance_km': [8.5,  12.0,    10.5,   np.nan,  7.0,
+                        9.5,  np.nan,  8.0,    9.0,     11.5   ],
+    'Rating':          [4.2,  4.7,     np.nan, 4.9,     4.0,
+                        4.4,  4.8,     4.1,    np.nan,  4.6    ],
+}
+df = pd.DataFrame(data)
+df_nums = df.drop('Rider', axis=1)   # sirf numerical columns
+
+print("Original Data (numerical only):")
+print(df_nums)
+print("\nMissing values:\n", df_nums.isnull().sum())
+
+# ─── KNN Imputer with k=3 ───
+knn_imputer = KNNImputer(
+    n_neighbors=3,           # 3 nearest neighbours use karo
+    weights='distance'       # closer neighbours ka zyada weight
+)
+
+df_imputed = pd.DataFrame(
+    knn_imputer.fit_transform(df_nums),
+    columns=df_nums.columns
+)
+
+print("\nAfter KNN Imputation (k=3):")
+print(df_imputed.round(2))
+
+# ─── Before vs After — specific row check ───
+print("\nAmit (row 2) — Rating was NaN:")
+print(f"  Original: {df.loc[2, 'Rating']}")
+print(f"  KNN fill: {df_imputed.loc[2, 'Rating']:.2f}")
+# Amit ke 3 nearest neighbors (similar deliveries, exp, distance) ki rating use ki!</code></pre>
+        <div class="code-output">🤝 KNN Imputer ne Amit ki Rating Suresh (4.7), Kiran (4.4), Deepak (4.8) se fill ki — ye sab similar Deliveries_Day aur Exp_Years wale riders hain! Global mean (4.4) se zyada meaningful!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-code-compare"></i> SimpleImputer vs KNN Imputer — Side-by-Side</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — Comparison</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer, KNNImputer
+
+# ─── Same riders dataset ───
+data = {
+    'Deliveries_Day':  [18, 25, np.nan, 30, 15, 22, 28, np.nan, 19, 26],
+    'Exp_Years':       [3,  5,  4,      6,  np.nan, 4, 5,  3,      np.nan, 5],
+    'Rating':          [4.2, 4.7, np.nan, 4.9, 4.0, 4.4, 4.8, 4.1, np.nan, 4.6],
+}
+df = pd.DataFrame(data)
+
+# ─── Method 1: SimpleImputer (mean) ───
+mean_imputer = SimpleImputer(strategy='mean')
+df_mean = pd.DataFrame(
+    mean_imputer.fit_transform(df),
+    columns=df.columns
+)
+
+# ─── Method 2: KNNImputer ───
+knn_imputer = KNNImputer(n_neighbors=3)
+df_knn = pd.DataFrame(
+    knn_imputer.fit_transform(df),
+    columns=df.columns
+)
+
+# ─── Compare results ───
+print("Row 2 (Amit — Deliveries missing, Rating missing):")
+print(f"  Original:        Deliveries=NaN,  Rating=NaN")
+print(f"  Mean Imputed:    Deliveries={df_mean.loc[2,'Deliveries_Day']:.1f}, Rating={df_mean.loc[2,'Rating']:.2f}")
+print(f"  KNN Imputed:     Deliveries={df_knn.loc[2,'Deliveries_Day']:.1f},  Rating={df_knn.loc[2,'Rating']:.2f}")
+
+print("\nRow 4 (Pooja — Exp_Years missing):")
+print(f"  Mean Imputed:    Exp_Years={df_mean.loc[4,'Exp_Years']:.2f}")
+print(f"  KNN Imputed:     Exp_Years={df_knn.loc[4,'Exp_Years']:.2f}")
+# KNN: Pooja ki Deliveries (15) aur Rating (4.0) jaisi rows dhundi
+# → unka Exp_Years (2-3 years likely) use kiya
+# Mean: sab ka average (avg~4.3 years) — less accurate for Pooja!</code></pre>
+        <div class="code-output">📊 KNN vs Mean: Junior riders (low deliveries, low rating) ke liye KNN kam experience deta hai — mean imputation sab ko global average de deta hai. KNN context-aware hai!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 KNN Imputer SimpleImputer se fundamentally alag kyu hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. KNN Imputer NaN rows delete nahi karta — ye unhe fill karta hai. Delete karna data loss hoga jo clearly sahi nahi hai."><span class="opt-letter">A</span>Ye NaN wali rows ko dataset se delete karta hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. KNN Imputer sirf numerical data ke liye kaam karta hai by default. Categorical data ke liye special handling chahiye. SimpleImputer dono ke liye kaam karta hai."><span class="opt-letter">B</span>Ye categorical aur numerical dono columns ke liye equally kaam karta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! Ye multivariate imputation ka core concept hai. SimpleImputer (univariate) sirf ek column ki statistics use karta hai. KNN sabhi available columns ki information use karke similar rows (neighbours) dhundta hai, phir unki values se fill karta hai. Isliye KNN more accurate hota hai relationships wale data mein!"><span class="opt-letter">C</span>Ye missing value fill karne ke liye sabhi columns ki information use karta hai — sirf ek column nahi</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi, ulta hota hai. KNN Imputer computationally expensive hai — distance har row ke liye calculate hoti hai. SimpleImputer ek baar mean/mode calculate karta hai aur sirf fill karta hai — bahut fast."><span class="opt-letter">D</span>Ye SimpleImputer se computationally faster hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 4 : KNN — K CHOOSE KARNA + PITFALLS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s7">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-sliders"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">KNN — Sahi K Choose Karo &amp; Pitfalls</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-bullseye"></i> K ka Value Kaisa Choose Karein?</div>
+    <span class="inline-code">n_neighbors</span> (K) — ye ek important hyperparameter hai!
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(220,38,38,0.3);">
+        <div class="dim-rank" style="color:var(--neon-red);">K=1</div>
+        <div class="dim-name" style="color:var(--neon-red);">Too Small</div>
+        <div class="dim-code">Sirf 1 neighbour</div>
+        <div class="dim-desc">Noisy! Nearest row ka value directly use karo — agar woh row outlier ho toh fill bhi galat hogi.</div>
+        <div class="dim-example" style="border-color:rgba(220,38,38,0.2);color:var(--muted);">❌ Overfitting to single point</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">K=5</div>
+        <div class="dim-name" style="color:var(--neon-green);">Default (Good!)</div>
+        <div class="dim-code">5 neighbours (default)</div>
+        <div class="dim-desc">Balance of local pattern aur noise reduction. Chhote datasets ke liye generally best starting point.</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2);color:var(--muted);">✅ sklearn default — shuruaat yahan se karo</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(180,83,9,0.3);">
+        <div class="dim-rank" style="color:var(--neon-yellow);">K=20+</div>
+        <div class="dim-name" style="color:var(--neon-yellow);">Too Large</div>
+        <div class="dim-code">Bahut saare neighbours</div>
+        <div class="dim-desc">Blur ho jaata hai — local patterns miss hoti hain. Bade K pe result mean imputation jitna hi ho jaata hai!</div>
+        <div class="dim-example" style="border-color:rgba(180,83,9,0.2);color:var(--muted);">⚠️ Underfitting to global mean</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan mt-4">
+    <div class="ct"><i class="fa-solid fa-flask"></i> Practical Rule of Thumb</div>
+    → Small dataset (&lt;500 rows): <span class="inline-code">K = 3–5</span><br>
+    → Medium dataset (500–5000 rows): <span class="inline-code">K = 5–10</span><br>
+    → Large dataset (&gt;5000 rows): <span class="inline-code">K = 10–20</span><br><br>
+    General formula: <span class="inline-code">K ≈ √n</span> jahan n = dataset mein rows ki sankhya. Phir try karo 2-3 values aur results compare karo!
+  </div>
+
+  <div class="ex-card ex-warn">
+    <div class="ex-head"><i class="fa-solid fa-bug"></i> KNN ke Common Pitfalls</div>
+    <div class="ex-body">
+      <div class="step-timeline">
+        <div class="step-item" data-step="⚠️">
+          <div class="step-label">Scale ka Issue — Sabse Bada Trap!</div>
+          <div class="step-body">
+            Agar columns ka scale alag hai (Age: 0–100, Salary: 0–10,00,000), toh Salary distance mein dominate karega.<br>
+            Age ka effect practically zero ho jaayega → galat neighbours milenge.<br>
+            <em style="color:var(--neon-red);">Fix: StandardScaler ya MinMaxScaler pehle lagao, phir KNN Imputer use karo!</em>
+          </div>
+        </div>
+        <div class="step-item" data-step="⚠️">
+          <div class="step-label">Speed — Large Datasets pe Slow</div>
+          <div class="step-body">
+            KNN har NaN ke liye sabhi rows ke saath distance calculate karta hai → O(n²) complexity.<br>
+            10,000 rows × 50 columns → bahut slow ho sakta hai!<br>
+            <em style="color:var(--neon-red);">Fix: Chhota subset le ke test karo pehle. Ya SimpleImputer use karo agar speed priority ho.</em>
+          </div>
+        </div>
+        <div class="step-item" data-step="⚠️">
+          <div class="step-label">Categorical Columns — Direct Support Nahi</div>
+          <div class="step-body">
+            KNNImputer sirf numerical data ke saath kaam karta hai by default.<br>
+            Categorical columns (City, Gender) ke liye encoding zaroori hai.<br>
+            <em style="color:var(--neon-red);">Fix: Categorical columns ko pehle OrdinalEncoder se encode karo, tab KNN lagao. Ya unke liye SimpleImputer separately use karo.</em>
+          </div>
+        </div>
+        <div class="step-item" data-step="⚠️">
+          <div class="step-label">Bahut Zyada NaN — Accuracy Giregi</div>
+          <div class="step-body">
+            Agar ek row mein 80% values missing hain, toh distance calculation unreliable ho jaati hai — similar rows galat milenge.<br>
+            <em style="color:var(--neon-red);">Fix: Agar kisi row mein &gt; 50% values missing hon, woh row drop karna zyada practical hai.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="a" data-xp="25">
+    <div class="quiz-q">🤔 KNN Imputer mein <span class="inline-code">n_neighbors=1</span> set karne ka kya problem hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Bilkul sahi! K=1 ek outlier-sensitive technique hai — agar nearest neighbour khud ek outlier ho, toh uski value directly NaN mein daal di jaayegi. Ek akela noisy data point imputation ko poison kar sakta hai. K zyada hone pe multiple neighbours ka average liya jaata hai jo noise smooth karta hai."><span class="opt-letter">A</span>Ek akela nearest neighbour outlier ho sakta hai — imputation noise-sensitive ho jaata hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. K=1 hone se computation zyada fast hoti hai — sirf ek distance calculate karni hoti hai. Computationally ye fastest option hai, lekin accuracy mein sabse risky."><span class="opt-letter">B</span>K=1 pe computation bahut slow ho jaata hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. K=1 pe sklearn error nahi deta — ye valid parameter hai. Problem accuracy ka hai, syntax ka nahi."><span class="opt-letter">C</span>sklearn error throw karta hai invalid K ke liye</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi, ulta hota hai. K badhane se mean imputation jaisi behaviour hogi. K=1 pe sabse local, K=n pe global mean. K=1 mean se sabse far hota hai."><span class="opt-letter">D</span>K=1 mean imputation jaisi results deta hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     FINAL: SUMMARY + COMPARISON
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s8" style="background:linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.04), #ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary &amp; Complete Imputation Comparison</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Method</th><th>Core Idea</th><th>Best For</th><th>Key Limitation</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>Missing Indicator</strong></td><td>Missingness ko binary feature banao</td><td>MNAR data, fraud/risk signals</td><td>Extra columns — feature explosion</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>Random Sample</strong></td><td>Existing values se random fill</td><td>Distribution preserve karna</td><td>Non-deterministic — seed zaroori</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>KNN Imputer</strong></td><td>Similar rows ke neighbours se fill</td><td>Related columns wala data</td><td>Slow on large data, scale sensitive</td></tr>
+        <tr><td><span class="stat-pill sp-green">Prev</span> <strong>Mean/Median</strong></td><td>Column statistics se fill</td><td>MCAR, simple baseline</td><td>Distribution distorts, no relationships</td></tr>
+        <tr><td><span class="stat-pill sp-green">Prev</span> <strong>Most Frequent</strong></td><td>Mode se categorical fill</td><td>Dominant category data</td><td>High missing % mein biased</td></tr>
+        <tr><td><span class="stat-pill sp-orange">Prev</span> <strong>ffill / bfill</strong></td><td>Sequence se fill karo</td><td>Time series, stock/sensor data</td><td>Sirf temporal/ordered data</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    A["🕳️ Missing Values Detected"] --> B{What type?}
+    B --> C["🔢 Numerical"]
+    B --> D["🔤 Categorical"]
+    B --> T["⏩ Time Series"]
+    C --> E{Outliers present?}
+    E -->|No| F["strategy=mean"]
+    E -->|Yes| G["strategy=median"]
+    C --> RS["🎲 Random Sample\n(Distribution Preserve)"]
+    C --> KNN["🤝 KNN Imputer\n(Multivariate)"]
+    D --> H{Why missing?}
+    H -->|MCAR / MAR| I["strategy=most_frequent"]
+    H -->|MNAR| J["strategy=constant\n'Unknown'"]
+    T --> P["ffill / bfill"]
+    A --> MI["🚩 Missing Indicator\n(Add Binary Column)"]
+    F --> K["✅ Data Cleaned & Ready!"]
+    G --> K
+    RS --> K
+    KNN --> K
+    I --> K
+    J --> K
+    P --> K
+    MI --> K
+    style A fill:#fee2e2,stroke:#dc2626,color:#991b1b,rx:12
+    style B fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95,rx:12
+    style C fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style D fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style T fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style E fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style F fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style G fill:#d1fae5,stroke:#16a34a,color:#14532d,rx:10
+    style RS fill:#cffafe,stroke:#0891b2,color:#164e63,rx:10
+    style KNN fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style H fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style I fill:#d1fae5,stroke:#16a34a,color:#14532d,rx:10
+    style J fill:#fce7f3,stroke:#db2777,color:#831843,rx:10
+    style P fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style MI fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style K fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Tools — Zaroor Seekho</div>
+        <strong style="color:var(--neon-blue)">MissingIndicator</strong> — sklearn.impute se binary flags<br>
+        <strong style="color:var(--neon-cyan)">isnull().astype(int)</strong> — pandas se manual indicator<br>
+        <strong style="color:var(--neon-purple)">KNNImputer</strong> — sklearn.impute se multivariate fill<br>
+        <strong style="color:var(--neon-green)">np.random.seed()</strong> — Random Sample reproducibility<br>
+        <strong style="color:var(--neon-yellow)">sample(replace=True)</strong> — pandas Random Sampling
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein? (Next Quest!)</div>
+        🧬 <strong>MICE (Multiple Imputation)</strong> — iterative multivariate imputation<br>
+        📈 <strong>Regression Imputation</strong> — ek column predict karne se dusri fill<br>
+        🌲 <strong>Random Forest Imputation</strong> — powerful non-linear approach<br>
+        🔍 <strong>missingno library</strong> — missing patterns visualize karo<br>
+        🏗️ <strong>Feature Engineering</strong> — imputed + indicators se better models
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>Missing Indicator</strong> = Missingness ko feature banao — signal mat kho!<br>
+    → <strong>Random Sample</strong> = Distribution ka dost — shape preserve karo, mean nahi!<br>
+    → <strong>KNN Imputer</strong> = Context-aware imputation — similar neighbours se seekho!<br><br>
+    <strong style="color:var(--neon-pink)">Teeno methods seekh liye toh ab tum kisi bhi missing data challenge ke liye tayyar ho — Advanced Imputation Ninja ban gaye! 🥷🚀</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-solid fa-flag me-2"></i>Python Advanced Imputation Quest</div>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.5rem;">Missing Indicator · Random Sample Imputation · KNN Imputer | Gamified Tutorial</p>
+    <p style="color:var(--dim); font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking Data Science learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════ MODAL ═══════════════════ -->
+<canvas id="confettiCanvas"></canvas>
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare 4 quizzes complete kar liye!</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/4</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-retry"    id="modalRetry">   <i class="fa-solid fa-rotate-right"></i> Retry All</button>
+      <button class="modal-btn-continue" id="modalContinue"><i class="fa-solid fa-trophy"></i> Awesome, Continue!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ FINAL MODAL ═══ */
+function showFinalModal() {
+  const total = quizTotal, correct = quizCorrect;
+  const pct   = total > 0 ? correct / total : 0;
+  const quizXP = correct * 25;
+  const grades = [
+    { min: 1.0,  cls: 'grade-s', letter: 'S 🌟', msg: 'Zabardast! Sab 4/4 correct! Advanced Imputation Ninja! 🥷' },
+    { min: 0.75, cls: 'grade-a', letter: 'A 🎯', msg: 'Bahut badhiya! Almost perfect performance!' },
+    { min: 0.5,  cls: 'grade-b', letter: 'B 📘', msg: 'Accha kiya! Kuch topics dobara review karo.' },
+    { min: 0.25, cls: 'grade-c', letter: 'C 💪', msg: 'Theek hai! Concepts ko aur practice karo.' },
+    { min: 0.0,  cls: 'grade-d', letter: 'D 📚', msg: 'Aur mehnat karo! Tutorial dobara padho.' },
+  ];
+  const g = grades.find(gr => pct >= gr.min);
+  document.getElementById('ringNum').textContent    = correct + '/' + total;
+  document.getElementById('modalXpVal').textContent = quizXP + ' XP';
+  const gradeCard = document.getElementById('gradeCard');
+  gradeCard.className = 'grade-card ' + g.cls;
+  document.getElementById('gradeLetter').textContent = g.letter;
+  document.getElementById('gradeMsg').textContent    = g.msg;
+  if (pct === 1.0) {
+    document.getElementById('modalTrophy').textContent   = '🏆';
+    document.getElementById('modalTitle').textContent    = '🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent = 'Wah! Saare ' + total + '/' + total + ' sahi! Advanced Imputation Ninja!';
+  } else if (pct >= 0.5) {
+    document.getElementById('modalTrophy').textContent   = '🎯';
+    document.getElementById('modalTitle').textContent    = 'Quest Complete!';
+    document.getElementById('modalSubtitle').textContent = correct + ' out of ' + total + ' correct. Kafi accha kiya!';
+  } else {
+    document.getElementById('modalTrophy').textContent   = '📚';
+    document.getElementById('modalTitle').textContent    = 'Keep Trying!';
+    document.getElementById('modalSubtitle').textContent = 'Tutorial dobara padho aur retry karo!';
+  }
+  const circumference = 327, offset = circumference * (1 - pct);
+  const ringColors = { 'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626' };
+  const ringEl = document.getElementById('ringFill');
+  ringEl.style.stroke = ringColors[g.cls] || '#2563eb';
+  ringEl.style.transition = 'none'; ringEl.style.strokeDashoffset = '327';
+  setTimeout(() => {
+    ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+    ringEl.style.strokeDashoffset = offset;
+  }, 80);
+  document.getElementById('finalModal').classList.add('open');
+  if (pct >= 0.5) launchConfetti(pct);
+}
+
+function launchConfetti(pct) {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const count  = Math.floor(80 + pct * 140);
+  const colors = ['#2563eb','#7c3aed','#db2777','#16a34a','#b45309','#0891b2','#f59e0b'];
+  const pieces = Array.from({ length: count }, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * -canvas.height * 0.6,
+    w: Math.random() * 10 + 5, h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx: (Math.random() - 0.5) * 4, vy: Math.random() * 4 + 2,
+    rot: Math.random() * 360, vrot: (Math.random() - 0.5) * 9, alpha: 1,
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+    pieces.forEach(p => {
+      if (p.y > canvas.height + 20) return; alive = true;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if (p.y > canvas.height * 0.65) p.alpha -= 0.02;
+      p.alpha = Math.max(0, p.alpha);
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    });
+    frame++;
+    if (alive && frame < 260) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  })();
+}
+
+function initQuizzes() {
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      const n = opt.cloneNode(true); opt.parentNode.replaceChild(n, opt);
+    });
+    const correct = box.dataset.correct;
+    const qxp     = parseInt(box.dataset.xp) || 25;
+    let answered   = false;
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return; answered = true;
+        const isCorrect = opt.dataset.ans === correct;
+        const fb        = box.querySelector('.quiz-feedback');
+        box.querySelectorAll('.quiz-opt').forEach(o => {
+          o.classList.add('answered-opt');
+          const exDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+          if (o.dataset.ans === correct) { o.classList.add('correct'); if (exDiv) exDiv.classList.add('show-correct'); }
+          else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (exDiv) exDiv.classList.add('show-wrong'); }
+          else { o.classList.add('dimmed'); }
+        });
+        if (isCorrect) {
+          quizCorrect++;
+          fb.className = 'quiz-feedback show win';
+          fb.innerHTML = '<span style="font-size:1.3rem">🎉</span>&nbsp;Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+          addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+        } else {
+          fb.className = 'quiz-feedback show lose';
+          fb.innerHTML = '<span style="font-size:1.3rem">💡</span>&nbsp;Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+          showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+        }
+        const doneCount = Array.from(document.querySelectorAll('.quiz-box'))
+          .filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+        if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+      });
+    });
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, theme: 'base',
+  themeVariables: {
+    primaryColor: '#dbeafe', primaryTextColor: '#1e3a8a',
+    primaryBorderColor: '#2563eb', lineColor: '#94a3b8',
+    secondaryColor: '#d1fae5', tertiaryColor: '#ede9fe',
+    fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 24 }
+});
+
+/* ═══ XP SYSTEM ═══ */
+let xp = 0, scrollXpEarned = 0;
+const XP_MAX = 220;   // 4×30 scroll + 4×25 quiz = 220
+const earnedBadges = new Set();
+
+function addXP(amount, badgeId) {
+  if (badgeId) scrollXpEarned = Math.min(scrollXpEarned + amount, 120);
+  xp = Math.min(xp + amount, XP_MAX);
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  if (badgeId && !earnedBadges.has(badgeId)) {
+    earnedBadges.add(badgeId);
+    const el = document.getElementById(badgeId);
+    if (el) el.classList.add('earned');
+  }
+  if (xp >= XP_MAX) showToast('🏆', 'QUEST COMPLETE! 🎊', 'Advanced Imputation Ninja! 220/220 XP!', '#b45309');
+}
+
+function showToast(icon, title, msg, color) {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'gtoast';
+  t.innerHTML = `<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══ QUIZ SYSTEM ═══ */
+let quizTotal = 0, quizCorrect = 0;
+
+document.querySelectorAll('.quiz-box').forEach(box => {
+  quizTotal++;
+  const correct = box.dataset.correct;
+  const qxp     = parseInt(box.dataset.xp) || 25;
+  let answered   = false;
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    const explain = opt.dataset.explain || '';
+    if (explain) {
+      const div = document.createElement('div');
+      div.className = 'quiz-explain';
+      div.dataset.forAns = opt.dataset.ans;
+      div.textContent = explain;
+      opt.parentNode.insertBefore(div, opt.nextSibling);
+    }
+  });
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return; answered = true;
+      const ans = opt.dataset.ans, fb = box.querySelector('.quiz-feedback');
+      const isCorrect = ans === correct;
+      box.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.add('answered-opt');
+        const explainDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+        if (o.dataset.ans === correct) {
+          o.classList.add('correct'); if (explainDiv) explainDiv.classList.add('show-correct');
+        } else if (o === opt && !isCorrect) {
+          o.classList.add('wrong');   if (explainDiv) explainDiv.classList.add('show-wrong');
+        } else {
+          o.classList.add('dimmed');
+          if (o.dataset.ans === correct && explainDiv) explainDiv.classList.add('show-reveal');
+        }
+      });
+      if (isCorrect) {
+        quizCorrect++;
+        fb.className = 'quiz-feedback show win';
+        fb.innerHTML = '<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+        addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+      } else {
+        fb.className = 'quiz-feedback show lose';
+        fb.innerHTML = '<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+        showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+      }
+      const doneCount = Array.from(document.querySelectorAll('.quiz-box'))
+        .filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+      if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+    });
+  });
+});
+
+/* ═══ FADE-UP OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+/* ═══ XP ON SCROLL ═══ */
+const sectionXP = {
+  's1':  { xp: 30, badge: 'badge1', msg: '🚩 Indicator Pro badge unlocked!' },
+  's3':  { xp: 30, badge: 'badge2', msg: '🎲 Random Sampler badge unlocked!' },
+  's5':  { xp: 30, badge: 'badge3', msg: '🤝 KNN Master badge unlocked!' },
+  's7':  { xp: 30, badge: 'badge4', msg: '🏆 Imputation Ninja badge unlocked!' },
+};
+const xpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (sectionXP[id] && !earnedBadges.has(sectionXP[id].badge)) {
+        const { xp: sx, badge, msg } = sectionXP[id];
+        addXP(sx, badge); showToast('🏅', 'Badge Unlocked!', msg, '#7c3aed');
+      }
+      xpObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+['s1','s3','s5','s7'].forEach(id => {
+  const el = document.getElementById(id); if (el) xpObserver.observe(el);
+});
+
+/* ═══ SMOOTH SCROLL ═══ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* ═══ MODAL BUTTONS ═══ */
+function closeModal() { document.getElementById('finalModal').classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalContinue').addEventListener('click', closeModal);
+document.getElementById('modalRetry').addEventListener('click', () => {
+  closeModal();
+  quizCorrect = 0;
+  xp = scrollXpEarned;
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong','dimmed','answered-opt'));
+    box.querySelectorAll('.quiz-explain').forEach(ex => ex.classList.remove('show-correct','show-wrong','show-reveal'));
+    const fb = box.querySelector('.quiz-feedback');
+    if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  });
+  initQuizzes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.getElementById('finalModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+</body>
+</html>

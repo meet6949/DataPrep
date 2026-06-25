@@ -1,0 +1,222 @@
+[
+    {
+        "match_id": 1,
+        "team1": "Chennai Super Kings",
+        "team2": "Mumbai Indians",
+        "winner": "Mumbai Indians",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "field",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 171,
+        "runs_team2": 203
+    },
+    {
+        "match_id": 2,
+        "team1": "Rajasthan Royals",
+        "team2": "Mumbai Indians",
+        "winner": "Mumbai Indians",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "bat",
+        "venue": "Wankhede Stadium",
+        "runs_team1": 133,
+        "runs_team2": 152
+    },
+    {
+        "match_id": 3,
+        "team1": "Chennai Super Kings",
+        "team2": "KKR",
+        "winner": "Chennai Super Kings",
+        "toss_winner": "KKR",
+        "toss_decision": "bat",
+        "venue": "Eden Gardens",
+        "runs_team1": 193,
+        "runs_team2": 188
+    },
+    {
+        "match_id": 4,
+        "team1": "Mumbai Indians",
+        "team2": "RCB",
+        "winner": "RCB",
+        "toss_winner": "RCB",
+        "toss_decision": "bat",
+        "venue": "Chinnaswamy Stadium",
+        "runs_team1": 125,
+        "runs_team2": 207
+    },
+    {
+        "match_id": 5,
+        "team1": "Rajasthan Royals",
+        "team2": "Chennai Super Kings",
+        "winner": "Chennai Super Kings",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "field",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 168,
+        "runs_team2": 212
+    },
+    {
+        "match_id": 6,
+        "team1": "Delhi Capitals",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "bat",
+        "venue": "Wankhede Stadium",
+        "runs_team1": 191,
+        "runs_team2": 220
+    },
+    {
+        "match_id": 7,
+        "team1": "Mumbai Indians",
+        "team2": "Delhi Capitals",
+        "winner": "Mumbai Indians",
+        "toss_winner": "Delhi Capitals",
+        "toss_decision": "field",
+        "venue": "Eden Gardens",
+        "runs_team1": 173,
+        "runs_team2": 152
+    },
+    {
+        "match_id": 8,
+        "team1": "Delhi Capitals",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Delhi Capitals",
+        "toss_decision": "bat",
+        "venue": "Wankhede Stadium",
+        "runs_team1": 140,
+        "runs_team2": 207
+    },
+    {
+        "match_id": 9,
+        "team1": "RCB",
+        "team2": "Chennai Super Kings",
+        "winner": "RCB",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "bat",
+        "venue": "Eden Gardens",
+        "runs_team1": 219,
+        "runs_team2": 162
+    },
+    {
+        "match_id": 10,
+        "team1": "Rajasthan Royals",
+        "team2": "Chennai Super Kings",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "field",
+        "venue": "Eden Gardens",
+        "runs_team1": 219,
+        "runs_team2": 142
+    },
+    {
+        "match_id": 11,
+        "team1": "Delhi Capitals",
+        "team2": "Mumbai Indians",
+        "winner": "Delhi Capitals",
+        "toss_winner": "Delhi Capitals",
+        "toss_decision": "field",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 215,
+        "runs_team2": 133
+    },
+    {
+        "match_id": 12,
+        "team1": "Chennai Super Kings",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "bat",
+        "venue": "Chinnaswamy Stadium",
+        "runs_team1": 143,
+        "runs_team2": 188
+    },
+    {
+        "match_id": 13,
+        "team1": "KKR",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "bat",
+        "venue": "Wankhede Stadium",
+        "runs_team1": 141,
+        "runs_team2": 197
+    },
+    {
+        "match_id": 14,
+        "team1": "KKR",
+        "team2": "Delhi Capitals",
+        "winner": "Delhi Capitals",
+        "toss_winner": "Delhi Capitals",
+        "toss_decision": "bat",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 174,
+        "runs_team2": 195
+    },
+    {
+        "match_id": 15,
+        "team1": "RCB",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "bat",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 133,
+        "runs_team2": 154
+    },
+    {
+        "match_id": 16,
+        "team1": "Mumbai Indians",
+        "team2": "Rajasthan Royals",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "field",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 165,
+        "runs_team2": 205
+    },
+    {
+        "match_id": 17,
+        "team1": "Rajasthan Royals",
+        "team2": "RCB",
+        "winner": "Rajasthan Royals",
+        "toss_winner": "Rajasthan Royals",
+        "toss_decision": "field",
+        "venue": "Chinnaswamy Stadium",
+        "runs_team1": 137,
+        "runs_team2": 135
+    },
+    {
+        "match_id": 18,
+        "team1": "Mumbai Indians",
+        "team2": "Chennai Super Kings",
+        "winner": "Mumbai Indians",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "field",
+        "venue": "Arun Jaitley Stadium",
+        "runs_team1": 202,
+        "runs_team2": 151
+    },
+    {
+        "match_id": 19,
+        "team1": "RCB",
+        "team2": "Delhi Capitals",
+        "winner": "Delhi Capitals",
+        "toss_winner": "Delhi Capitals",
+        "toss_decision": "field",
+        "venue": "Wankhede Stadium",
+        "runs_team1": 176,
+        "runs_team2": 212
+    },
+    {
+        "match_id": 20,
+        "team1": "Delhi Capitals",
+        "team2": "Chennai Super Kings",
+        "winner": "Delhi Capitals",
+        "toss_winner": "Chennai Super Kings",
+        "toss_decision": "field",
+        "venue": "Chinnaswamy Stadium",
+        "runs_team1": 192,
+        "runs_team2": 153
+    }
+]

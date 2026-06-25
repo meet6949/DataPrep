@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science & AI/ML — Beginner Concepts | Complete Tutorial</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Prism.js Theme -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-light: #dbeafe;
+            --primary-dark: #1e3a8a;
+            --accent: #ea580c;
+            --accent-light: #ffedd5;
+            --info: #0891b2;
+            --info-light: #cffafe;
+            --warn: #d97706;
+            --warn-light: #fef3c7;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --purple: #7c3aed;
+            --purple-light: #ede9fe;
+            --teal: #0f766e;
+            --teal-light: #ccfbf1;
+            --slate: #475569;
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.85;
+            font-size: 17px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(160deg, #0f172a 0%, #1d4ed8 50%, #3b82f6 100%);
+            color: #fff;
+            padding: 4.5rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 15% 80%, rgba(255,255,255,0.06) 0%, transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(234,88,12,0.12) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero h1 { font-weight: 900; font-size: 2.8rem; letter-spacing: -1px; position: relative; z-index: 1; }
+        .hero p  { position: relative; z-index: 1; }
+        .hero-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(6px);
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            position: relative; z-index: 1;
+        }
+        .hero-badges { position: relative; z-index: 1; }
+        .hero-badges .badge {
+            background: rgba(255,255,255,0.15) !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-weight: 700;
+            font-size: 0.82rem;
+        }
+
+        /* ── TOC ── */
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: -3rem;
+            position: relative; z-index: 2;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+        }
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.45rem 0;
+            border-bottom: 1px dashed var(--border);
+            transition: 0.2s;
+        }
+        .toc a:hover { color: var(--primary-dark); transform: translateX(6px); }
+        .toc a i.dot { font-size: 0.55rem; color: var(--accent); }
+
+        /* ── SECTION CARD ── */
+        .sc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.025);
+            transition: box-shadow .3s;
+        }
+        .sc:hover { box-shadow: 0 6px 28px rgba(0,0,0,0.06); }
+
+        .st {
+            font-weight: 900; font-size: 1.65rem;
+            margin-bottom: 1.2rem;
+            display: flex; align-items: center; gap: 0.75rem;
+            color: var(--primary-dark);
+        }
+        .st .ic {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .ic-blue   { background: var(--primary-light); color: var(--primary);  }
+        .ic-orange { background: var(--accent-light);  color: var(--accent);   }
+        .ic-teal   { background: var(--teal-light);    color: var(--teal);     }
+        .ic-yellow { background: var(--warn-light);    color: var(--warn);     }
+        .ic-green  { background: var(--success-light); color: var(--success);  }
+        .ic-purple { background: var(--purple-light);  color: var(--purple);   }
+        .ic-info   { background: var(--info-light);    color: var(--info);     }
+
+        /* ── INFO BOXES ── */
+        .ib {
+            border-radius: 12px; padding: 1.4rem; margin: 1.2rem 0;
+            border-left: 5px solid;
+        }
+        .ib.blue   { background: var(--primary-light); border-color: var(--primary); }
+        .ib.orange { background: var(--accent-light);  border-color: var(--accent);  }
+        .ib.teal   { background: var(--teal-light);    border-color: var(--teal);    }
+        .ib.yellow { background: var(--warn-light);    border-color: var(--warn);    }
+        .ib.green  { background: var(--success-light); border-color: var(--success); }
+        .ib.purple { background: var(--purple-light);  border-color: var(--purple);  }
+        .ib.info   { background: var(--info-light);    border-color: var(--info);    }
+        .ib .bt { font-weight: 800; font-size: 1.02rem; margin-bottom: 0.45rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        /* ── MATH / FORMULA BLOCK ── */
+        .mb {
+            background: #f1f5f9; border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.4rem 2rem; margin: 1.2rem 0;
+            overflow-x: auto; text-align: center;
+        }
+
+        /* ── STEP BOXES ── */
+        .sbox {
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.2rem 1.4rem 1.2rem 4rem;
+            margin-bottom: 0.7rem; position: relative;
+        }
+        .sbox .sn {
+            position: absolute; left: 1rem; top: 1.15rem;
+            width: 34px; height: 34px;
+            background: var(--primary); color: #fff;
+            font-weight: 800; font-size: 0.85rem;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sbox .sl { font-weight: 700; color: var(--primary-dark); }
+        .sbox-code .sn { background: var(--slate); }
+
+        /* ── EXAMPLE CARDS ── */
+        .ex { border: 2px solid; border-radius: 14px; overflow: hidden; margin: 1.5rem 0; }
+        .ex.nt  { border-color: var(--success); }
+        .ex.te  { border-color: var(--purple); }
+        .ex .exh {
+            padding: 0.8rem 1.4rem; font-weight: 800; font-size: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .ex.nt .exh { background: var(--success-light); color: #14532d; }
+        .ex.te .exh { background: var(--purple-light);  color: #4c1d95; }
+        .ex .exb { padding: 1.4rem; }
+
+        /* ── CODE ── */
+        pre[class*="language-"] {
+            border-radius: 12px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            margin: 0.8rem 0 !important;
+        }
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.92em; }
+        .code-output {
+            background: #1e293b; color: #4ade80;
+            padding: 6px 14px; border-radius: 8px;
+            display: inline-block; margin-top: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+        }
+
+        /* ── MERMAID ── */
+        .mw {
+            background: #fff; border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;
+            text-align: center; overflow-x: auto;
+        }
+
+        /* ── TABLE ── */
+        .stbl { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .stbl thead th { background: var(--primary); color: #fff; font-weight: 700; padding: 0.8rem 1rem; border: none; }
+        .stbl tbody td { padding: 0.7rem 1rem; border-color: var(--border); }
+        .stbl tbody tr:nth-child(even) { background: #f8fafc; }
+
+        /* ── MISC ── */
+        .hl { background: linear-gradient(120deg, #fef3c7, #fde68a); padding: 0 4px; border-radius: 4px; }
+        .divider { height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--info)); border-radius: 4px; margin: 2rem 0; opacity: 0.35; }
+        .h6-block { font-weight: 800; margin-top: 1.5rem; }
+        .h6-block i { color: var(--success); }
+
+        /* ── COMPARISON / STAT CARD ── */
+        .cmp-card {
+            background: var(--card); border: 2px solid var(--border);
+            border-radius: 14px; padding: 1.5rem; text-align: center;
+            transition: .3s; height: 100%;
+        }
+        .cmp-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .cmp-card .cmp-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .cmp-card h5 { font-weight: 900; font-size: 1.1rem; }
+
+        /* ── DIMENSION CARD ── */
+        .dim-card {
+            border-radius: 14px; overflow: hidden;
+            border: 2px solid var(--border);
+            background: #fff; height: 100%;
+        }
+        .dim-card .dim-head {
+            padding: 0.85rem 1rem; font-weight: 900;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .dim-card .dim-body { padding: 1rem; font-size: 0.95rem; }
+        .dim-badge {
+            display: inline-block; padding: 0.15rem 0.6rem;
+            border-radius: 50px; font-size: 0.75rem; font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── FOOTER ── */
+        footer { background: #1e293b; color: #94a3b8; padding: 2.5rem 0; margin-top: 3rem; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.9rem; }
+            .sc { padding: 1.4rem; }
+            .hero { padding: 3rem 0 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-tag"><i class="fa-solid fa-brain me-1"></i> Data Science &amp; AI/ML Series</div>
+        <h1>Core Concepts in<br><span style="font-size:0.65em;font-weight:700;opacity:0.85;">Data Science &bull; Machine Learning &bull; Deep Learning</span></h1>
+        <p style="font-size:1.15rem;opacity:0.9;max-width:720px;">
+            Data Analysis se lekar Tensors tak — ye 5 topics har Data Science aur AI/ML student ko <strong>clearly samajhna chahiye</strong>.
+            Step-by-step explanations, real India examples, aur Python code ke saath!
+        </p>
+        <div class="hero-badges mt-3 d-flex gap-2 flex-wrap">
+            <span class="badge px-3 py-2 rounded-pill"><i class="fa-solid fa-child-reaching me-1"></i> Beginner Friendly</span>
+            <span class="badge px-3 py-2 rounded-pill"><i class="fa-solid fa-language me-1"></i> Hinglish Explanations</span>
+            <span class="badge px-3 py-2 rounded-pill"><i class="fa-solid fa-robot me-1"></i> AI/ML Focus</span>
+            <span class="badge px-3 py-2 rounded-pill"><i class="fa-brands fa-python me-1"></i> Python Code</span>
+            <span class="badge px-3 py-2 rounded-pill"><i class="fa-solid fa-india me-1"></i> India Use Cases</span>
+        </div>
+    </div>
+</section>
+
+<div class="container" style="max-width:1400px;">
+
+<!-- ═══════════════════ TOC ═══════════════════ -->
+<div class="toc">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-list-check me-2" style="color:var(--primary)"></i>Table of Contents — Kya Sikhoge?</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="#s1"><i class="fa-solid fa-circle dot"></i> Topic 1: What is Data Analysis?</a>
+            <a href="#s2"><i class="fa-solid fa-circle dot"></i> Topic 2: Data Analysis — Steps &amp; Process</a>
+            <a href="#s3"><i class="fa-solid fa-circle dot"></i> Topic 3: How to Plan a Data Science Project</a>
+            <a href="#s4"><i class="fa-solid fa-circle dot"></i> Topic 4: Project Planning — 6-Phase Framework</a>
+            <a href="#s5"><i class="fa-solid fa-circle dot"></i> Topic 5: Framing a Machine Learning Problem</a>
+        </div>
+        <div class="col-md-6">
+            <a href="#s6"><i class="fa-solid fa-circle dot"></i> Topic 6: ML Problem Types — Classification, Regression, Clustering</a>
+            <a href="#s7"><i class="fa-solid fa-circle dot"></i> Topic 7: What are Tensors?</a>
+            <a href="#s8"><i class="fa-solid fa-circle dot"></i> Topic 8: Tensors — In-Depth Explanation</a>
+            <a href="#s9"><i class="fa-solid fa-circle dot"></i> Topic 9: Tensor Operations &amp; Python Code</a>
+            <a href="#s10"><i class="fa-solid fa-circle dot"></i> Topic 10: Summary &amp; Real-World Applications</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S1: WHAT IS DATA ANALYSIS ═══════════════════ -->
+<div class="sc mt-4" id="s1">
+    <h2 class="st"><span class="ic ic-blue"><i class="fa-solid fa-magnifying-glass-chart"></i></span> What is Data Analysis?</h2>
+
+    <div class="ib blue">
+        <div class="bt"><i class="fa-solid fa-lightbulb text-warning"></i> Seedhi Baat — Ek Line Mein</div>
+        <strong>Data Analysis</strong> ka matlab hai — raw data ko <span class="hl">inspect, clean, transform aur model</span> karna taaki useful information aur insights nikaale ja sakein jisse better decisions liye ja sakein.
+    </div>
+
+    <p>
+        Sochte hain aapne ek exam diya. Result aaya — sirf marks nahi, teacher ne bataya: <strong>"Algebra mein weak ho, Geometry mein strong ho, 80% questions attempt kiye."</strong>
+        Yahi hota hai Data Analysis — numbers ko <strong>meaning dena</strong>!
+    </p>
+
+    <div class="ib yellow">
+        <div class="bt"><i class="fa-solid fa-star"></i> Data Analysis kyu zaroori hai AI/ML mein?</div>
+        AI/ML mein <strong>har model data se seekhta hai</strong>. Lekin agar data galat hai, toh model bhi galat sikhega!<br>
+        → <strong>Garbage In = Garbage Out</strong> — ye AI ka sabse bada rule hai.<br>
+        → Data Scientist apna <strong>60-70% time</strong> sirf data analysis mein lagata hai — modeling mein nahi!<br>
+        → Achha analysis = Achha model = Achhe results!
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-icons me-2"></i>Real India Examples — Jahan Data Analysis Hoti Hai</h4>
+
+    <div class="row g-3 mt-2">
+        <div class="col-md-6">
+            <div class="ib teal h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-cricket-bat-ball"></i> IPL Cricket Analytics</div>
+                <p class="mb-1"><strong>Data:</strong> Har ball ka data — pitch, batsman, bowler, field placing</p>
+                <p class="mb-0">CSK jaise teams <strong>data analysis</strong> karte hain — kaunsa batsman kin bowlers ke against weak hai? Toss decision kaise le? Yahi analysis match <strong>winning strategy</strong> banti hai!</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ib orange h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-motorcycle"></i> Swiggy / Zomato Delivery</div>
+                <p class="mb-1"><strong>Data:</strong> Order time, location, traffic, weather, restaurant prep time</p>
+                <p class="mb-0">Swiggy ke algorithms <strong>crores of orders ka data analyse</strong> karte hain — delivery time predict karna, delivery partner assign karna. Ye sab data analysis se hota hai!</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ib purple h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-hospital"></i> AIIMS Medical Analysis</div>
+                <p class="mb-1"><strong>Data:</strong> Patient records, test results, symptoms, history</p>
+                <p class="mb-0">Doctors aur researchers patient data analyse karte hain — <strong>disease patterns dhundte hain, early detection karte hain</strong>. COVID ke time India mein data analysis ne spread predict karne mein help ki!</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ib green h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-landmark"></i> HDFC / SBI Bank Fraud Detection</div>
+                <p class="mb-1"><strong>Data:</strong> Transactions — amount, location, time, merchant type</p>
+                <p class="mb-0">Banks <strong>real-time mein crores transactions analyse</strong> karte hain. Agar aapke account se achanak <strong>foreign country mein transaction</strong> hui — bank turant alert karta hai. Ye data analysis hai!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ib green mt-3">
+        <div class="bt"><i class="fa-solid fa-check-circle"></i> Summary</div>
+        <p class="mb-0">
+            Data Analysis = <strong>Data ko samjhna</strong>. Har industry mein use hoti hai.<br>
+            → Business decisions better hoti hain &nbsp; → Mistakes avoid hoti hain &nbsp; → Future predict karna possible hota hai<br>
+            <strong>Ye Data Science ka step 1 hai — bina iske koi ML model nahi banta!</strong>
+        </p>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S2: DATA ANALYSIS STEPS ═══════════════════ -->
+<div class="sc" id="s2">
+    <h2 class="st"><span class="ic ic-teal"><i class="fa-solid fa-list-ol"></i></span> Data Analysis — Steps aur Process</h2>
+
+    <div class="ib teal">
+        <div class="bt"><i class="fa-solid fa-bullseye"></i> Data Analysis ke 5 Main Steps</div>
+        Har professional Data Analyst yahi process follow karta hai — chahe company Netflix ho ya Paytm!
+    </div>
+
+    <div class="sbox">
+        <span class="sn">1</span>
+        <span class="sl">Data Collection (Data Ikatha Karo)</span><br>
+        Pehle <strong>data kahan se aayega</strong> ye decide karo. Sources: Databases (SQL), APIs (weather, social media), Excel files, Surveys, Web scraping.<br>
+        <em>Example: Ek e-commerce company ke liye — user purchase history, website clicks, product reviews collect karo.</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">2</span>
+        <span class="sl">Data Cleaning (Data Saaf Karo)</span><br>
+        Real-world data <strong>hamesha messy hota hai</strong>! Missing values hoti hain, typos hote hain, duplicates hote hain, outliers hote hain.<br>
+        → Missing age? → Average se fill karo ya row hatao<br>
+        → "Mumbai" aur "mumbai" aur "MUMBAI" — ye teeno same hain → standardize karo<br>
+        <em>Data Scientists ka 40-50% time yahi kaam mein lagta hai!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">3</span>
+        <span class="sl">Exploratory Data Analysis — EDA (Data Ko Samjho)</span><br>
+        Ab data ko <strong>explore karo</strong> — statistics aur visualizations se.<br>
+        → Mean, Median, Mode, Standard Deviation nikalo<br>
+        → Histograms, Box plots, Scatter plots banao<br>
+        → Patterns dhundo: "Young users phone se zyada order karte hain vs older users desktop se"
+    </div>
+
+    <div class="sbox">
+        <span class="sn">4</span>
+        <span class="sl">Analysis aur Modeling (Sawaalon Ke Jawab Dhundo)</span><br>
+        Ab <strong>specific questions ke answers</strong> dhundo.<br>
+        → Correlations nikalo: Kya Price aur Sales mein connection hai?<br>
+        → Trends dekho: Month-wise sales kaise change ho rahi hain?<br>
+        → Agar ML model banana hai toh data ko model ke liye prepare karo (feature engineering)
+    </div>
+
+    <div class="sbox">
+        <span class="sn">5</span>
+        <span class="sl">Interpretation aur Communication (Results Batao)</span><br>
+        Results sirf numbers mein nahi — <strong>story tell karo</strong>!<br>
+        → Charts, dashboards, reports banao<br>
+        → Non-technical managers ko simple language mein samjhao<br>
+        → <strong>"Sales 20% down hain kyunki monsoon mein delivery delay hoti hai"</strong> — ye hai good communication!
+    </div>
+
+    <div class="mw">
+        <div class="mermaid">
+graph LR
+    A["📥 Data<br/>Collection"] --> B["🧹 Data<br/>Cleaning"]
+    B --> C["🔍 EDA<br/>Exploration"]
+    C --> D["📊 Analysis &<br/>Modeling"]
+    D --> E["💡 Insights &<br/>Communication"]
+    E --> F["✅ Better<br/>Decisions"]
+
+    style A fill:#dbeafe,stroke:#1d4ed8,color:#1e293b,rx:12
+    style B fill:#ffedd5,stroke:#ea580c,color:#1e293b,rx:12
+    style C fill:#ccfbf1,stroke:#0f766e,color:#1e293b,rx:12
+    style D fill:#fef3c7,stroke:#d97706,color:#1e293b,rx:12
+    style E fill:#ede9fe,stroke:#7c3aed,color:#1e293b,rx:12
+    style F fill:#dcfce7,stroke:#16a34a,color:#1e293b,rx:12
+        </div>
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-flask me-2"></i>Data Analysis — Python Code Example</h4>
+
+    <div class="ex te mt-3">
+        <div class="exh"><i class="fa-brands fa-python"></i> EDA — Ek Chhota Sa Practical Example</div>
+        <div class="exb">
+            <div class="ib blue">
+                <div class="bt"><i class="fa-solid fa-bullseye"></i> Goal</div>
+                Ek sample dataset load karo aur basic EDA karo — jo har Data Scientist pehle karta hai!
+            </div>
+
+            <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>Step 1: Libraries Import karo</h6>
+            <pre><code class="language-python">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns</code></pre>
+            <div class="sbox sbox-code">
+                <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+                <span class="sl">pandas (pd):</span> Data ko tables (DataFrames) mein rakhne ke liye — Excel jaise!<br>
+                <span class="sl">numpy (np):</span> Numerical calculations ke liye — fast math!<br>
+                <span class="sl">matplotlib + seaborn:</span> Charts aur graphs banane ke liye!
+            </div>
+
+            <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>Step 2: Data Load aur Pehli Nazar</h6>
+            <pre><code class="language-python">df = pd.read_csv('sales_data.csv')
+
+print(df.shape)        # (1000, 8) — 1000 rows, 8 columns
+print(df.head())       # Pehli 5 rows dekho
+print(df.dtypes)       # Har column ka data type
+print(df.isnull().sum())  # Kitni missing values hain?</code></pre>
+            <div class="sbox sbox-code">
+                <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+                <span class="sl">df.shape:</span> Dataset ka size — kitni rows, kitne columns!<br>
+                <span class="sl">df.head():</span> Pehli 5 rows print karo — data kaisa dikhta hai!<br>
+                <span class="sl">df.isnull().sum():</span> Har column mein kitni missing values hain — cleaning ke liye!
+            </div>
+
+            <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>Step 3: Basic Statistics</h6>
+            <pre><code class="language-python">print(df.describe())
+# Output:
+#        Age    Sales   Rating
+# mean   29.5   4520.3   4.1
+# std     8.2   1230.5   0.7
+# min    18.0    500.0   1.0
+# max    65.0  15000.0   5.0</code></pre>
+            <div class="sbox sbox-code">
+                <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+                <span class="sl">df.describe():</span> Ek hi line mein — count, mean, std, min, max, quartiles sab aa jaata hai!<br>
+                Yahan dekha: Average age 29.5 hai, Sales kaafi spread out hai (std = 1230)
+            </div>
+
+            <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>Step 4: Missing Values Handle karo</h6>
+            <pre><code class="language-python"># Option 1: Missing rows hatao
+df_clean = df.dropna()
+
+# Option 2: Numerical columns ko mean se fill karo
+df['Age'].fillna(df['Age'].mean(), inplace=True)
+
+# Option 3: Categorical column ko mode se fill karo
+df['City'].fillna(df['City'].mode()[0], inplace=True)</code></pre>
+            <div class="sbox sbox-code">
+                <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+                <span class="sl">dropna():</span> Agar missing values wali rows important nahi toh sidha hatao.<br>
+                <span class="sl">fillna(mean):</span> Age missing hai? → Average age se fill karo — reasonable assumption!<br>
+                <span class="sl">fillna(mode):</span> City missing hai? → Sabse common city se fill karo!
+            </div>
+
+            <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>Step 5: Visualization — Pattern Dhundo</h6>
+            <pre><code class="language-python"># Sales distribution
+plt.figure(figsize=(10, 4))
+sns.histplot(df['Sales'], bins=30, kde=True, color='steelblue')
+plt.title('Sales Distribution')
+plt.xlabel('Sales Amount (₹)')
+plt.show()
+
+# Correlation heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+plt.title('Feature Correlation Heatmap')
+plt.show()</code></pre>
+            <div class="sbox sbox-code">
+                <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+                <span class="sl">histplot:</span> Sales ka distribution dekho — normal hai ya skewed? Outliers hain?<br>
+                <span class="sl">heatmap(corr()):</span> Kaunse features ek doosre se related hain? High correlation = information overlap = remove karo!
+            </div>
+
+            <div class="ib green mt-3">
+                <div class="bt"><i class="fa-solid fa-flag-checkered"></i> EDA ka Final Goal</div>
+                EDA ke baad tumhe pata hona chahiye:<br>
+                → Dataset mein <strong>kitni rows/columns</strong> hain<br>
+                → <strong>Missing values</strong> kahan hain aur kaise handle karein<br>
+                → <strong>Distributions</strong> kaisi hain — normal, skewed, bimodal?<br>
+                → Kaunse <strong>features important</strong> lagte hain prediction ke liye<br>
+                → Koi <strong>obvious patterns ya anomalies</strong> hain?
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S3: HOW TO PLAN DS PROJECT ═══════════════════ -->
+<div class="sc" id="s3">
+    <h2 class="st"><span class="ic ic-orange"><i class="fa-solid fa-diagram-project"></i></span> How to Plan a Data Science Project</h2>
+
+    <div class="ib orange">
+        <div class="bt"><i class="fa-solid fa-lightbulb text-warning"></i> Planning kyu zaroori hai?</div>
+        <p class="mb-0">
+            Bahut saare beginners seedha code likhne lagte hain — bina plan ke!<br>
+            Result? <strong>Project fail ho jaata hai</strong> — data galat tha, problem clearly define nahi ki thi, ya model production mein deploy nahi ho saka.<br><br>
+            <strong>Professional Data Scientists ka 1st rule:</strong> Pehle plan karo, phir code likho!<br>
+            → Google, Amazon, Netflix ke DS teams industry standard framework follow karti hain → <strong>CRISP-DM</strong>
+        </p>
+    </div>
+
+    <h4 class="fw-bold mt-4"><i class="fa-solid fa-award me-2" style="color:var(--primary)"></i>CRISP-DM — Industry Standard Framework</h4>
+    <p>
+        <strong>CRISP-DM</strong> ka full form hai: <span class="hl">Cross-Industry Standard Process for Data Mining</span><br>
+        Ye framework <strong>1999 mein</strong> banaya gaya tha aur aaj bhi <strong>most widely used</strong> Data Science methodology hai!
+    </p>
+
+    <div class="row g-3 mt-2">
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">🎯</div>
+                <h5>Business Understanding</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Pehle business problem samjho — "Kya achieve karna hai?" Technical solution baad mein!</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">📊</div>
+                <h5>Data Understanding</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Available data ko explore karo — quality check, completeness, relevance.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">🧹</div>
+                <h5>Data Preparation</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Cleaning, transformation, feature engineering — model ke liye data ready karo.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">🤖</div>
+                <h5>Modeling</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Algorithm select karo, train karo, tune karo. Multiple models try karo!</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">✅</div>
+                <h5>Evaluation</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Model business goal achieve kar raha hai kya? Metrics check karo — Accuracy, F1, RMSE.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cmp-card">
+                <div class="cmp-icon">🚀</div>
+                <h5>Deployment</h5>
+                <p class="mb-0 text-muted" style="font-size:0.92rem;">Real users ke liye deploy karo — API, app ya dashboard. Monitor karte raho!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ib yellow mt-4">
+        <div class="bt"><i class="fa-solid fa-rotate"></i> CRISP-DM Circular Hai — Linear Nahi!</div>
+        <p class="mb-0">
+            CRISP-DM ka sabse important concept: ye ek <strong>circular process</strong> hai!<br>
+            → Modeling ke baad pata chala ki data aur chahiye? → Wapas <strong>Data Collection</strong> pe jao!<br>
+            → Deployment ke baad model ki accuracy gir gayi? → Wapas <strong>Evaluation</strong> pe jao aur retrain karo!<br>
+            → <strong>Real-world DS projects kabhi "done" nahi hote</strong> — hamesha improve hote rehte hain!
+        </p>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S4: 6-PHASE PROJECT PLANNING ═══════════════════ -->
+<div class="sc" id="s4">
+    <h2 class="st"><span class="ic ic-yellow"><i class="fa-solid fa-stairs"></i></span> Project Planning — 6-Phase Detailed Framework</h2>
+
+    <p>Chalte hain ek <strong>real project example</strong> ke saath: <em>"Swiggy chahta hai delivery time predict karna"</em></p>
+
+    <div class="sbox">
+        <span class="sn">1</span>
+        <span class="sl">Phase 1: Problem Definition (Sabse Zaroori Step!)</span><br>
+        <strong>Business Question:</strong> "Delivery time predict karna" → <em>Ye vague hai!</em><br>
+        <strong>ML Question (Precise):</strong> "Given: restaurant location, customer location, traffic data, time of day, weather — predict delivery time in minutes within ±5 minutes accuracy"<br><br>
+        Poochho:<br>
+        → Target variable kya hai? (Delivery time in minutes)<br>
+        → Input features kya hain? (Location, traffic, time, weather)<br>
+        → Success metric kya hai? (±5 min accuracy, 90% time)<br>
+        → Kitna data chahiye? (Minimum 6 months historical data)
+    </div>
+
+    <div class="sbox">
+        <span class="sn">2</span>
+        <span class="sl">Phase 2: Data Collection Strategy</span><br>
+        <strong>Har project mein pehle decide karo:</strong><br>
+        → <strong>Internal data sources:</strong> Company database (past orders, delivery times, partner locations)<br>
+        → <strong>External data sources:</strong> Google Maps API (traffic), IMD weather API (rain/fog alerts)<br>
+        → <strong>Data volume:</strong> Kitna data enough hai? Rule of thumb: <em>ML model ke liye minimum 1000-10000 samples per class</em><br>
+        → <strong>Data freshness:</strong> Aaj ka traffic vs 1 saal purana traffic — alag hoga!
+    </div>
+
+    <div class="sbox">
+        <span class="sn">3</span>
+        <span class="sl">Phase 3: Exploratory Analysis aur Data Preparation</span><br>
+        Swiggy ke example mein:<br>
+        → <strong>EDA:</strong> Weekend pe delivery time zyada? Rain mein kaise affect hota hai?<br>
+        → <strong>Feature Engineering:</strong> "Distance in km" + "Traffic level" → <em>ek combined 'difficulty score' banana</em><br>
+        → <strong>Data Splits:</strong> 80% training data, 10% validation, 10% test — <em>kabhi test data pe train mat karo!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">4</span>
+        <span class="sl">Phase 4: Model Selection aur Training</span><br>
+        Simple se start karo, complex ki taraf jao:<br>
+        → <strong>Baseline:</strong> Simple average (10 min har baar predict karo) — ye tumhara starting point hai<br>
+        → <strong>Linear Regression:</strong> Simple, fast, interpretable — pehle ye try karo<br>
+        → <strong>Random Forest:</strong> Usually better than linear — try karo<br>
+        → <strong>XGBoost / Neural Network:</strong> Agar upar wale enough nahi hain toh<br>
+        <em>Pro tip: <strong>"Best model wahi hai jo deploy ho sake"</strong> — 99% accuracy ka model jo 10 seconds leta hai useless hai!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">5</span>
+        <span class="sl">Phase 5: Evaluation — Sahi Metrics Choose Karo</span><br>
+        Har problem ke liye alag metrics:<br>
+        → <strong>Regression (delivery time):</strong> MAE (Mean Absolute Error) = average mein kitne minutes galat<br>
+        → <strong>Classification:</strong> Accuracy, Precision, Recall, F1 Score<br>
+        → <strong>Business metric bhi dekho:</strong> "Model 8 min accurate hai but business ko 5 min chahiye" → fail!<br>
+        <em>Technical success ≠ Business success — dono check karo!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">6</span>
+        <span class="sl">Phase 6: Deployment aur Monitoring</span><br>
+        Model banana kafi nahi — production mein kaam karna chahiye!<br>
+        → <strong>API banana:</strong> Flask/FastAPI se model ko REST API banaao — app use kar sake<br>
+        → <strong>A/B Testing:</strong> 50% users ko old system, 50% ko new model — compare karo<br>
+        → <strong>Model Monitoring:</strong> Accuracy track karo — "Data Drift" hota hai jab real data change ho jaata hai vs training data<br>
+        → <strong>Retraining Schedule:</strong> Swiggy ka model monthly retrain hota hai — city expand ho, traffic change ho!
+    </div>
+
+    <div class="ib green mt-3">
+        <div class="bt"><i class="fa-solid fa-trophy"></i> Real India DS Project — Timeframes</div>
+        <div class="table-responsive mt-2">
+            <table class="table stbl mb-0">
+                <thead><tr><th>Phase</th><th>Typical Time</th><th>Swiggy Example</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Problem Definition</strong></td><td>1-2 days</td><td>Business team ke saath meeting, requirements gather karna</td></tr>
+                    <tr><td><strong>Data Collection</strong></td><td>1-2 weeks</td><td>Past 6 months orders database se nikalna, APIs setup karna</td></tr>
+                    <tr><td><strong>Data Preparation</strong></td><td>2-4 weeks</td><td>Missing values, outliers, feature engineering — largest time!</td></tr>
+                    <tr><td><strong>Modeling</strong></td><td>1-2 weeks</td><td>3-4 models try karna, hyperparameter tuning</td></tr>
+                    <tr><td><strong>Evaluation</strong></td><td>3-5 days</td><td>Business stakeholders ko results dikhana, approval lena</td></tr>
+                    <tr><td><strong>Deployment</strong></td><td>1-2 weeks</td><td>API deploy karna, app integration, monitoring setup</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S5: FRAMING ML PROBLEM ═══════════════════ -->
+<div class="sc" id="s5">
+    <h2 class="st"><span class="ic ic-purple"><i class="fa-solid fa-frame"></i></span> Framing a Machine Learning Problem</h2>
+
+    <div class="ib purple">
+        <div class="bt"><i class="fa-solid fa-lightbulb text-warning"></i> "Framing" ka matlab kya hai?</div>
+        <p class="mb-0">
+            <strong>ML Problem Framing</strong> = Ek vague real-world need ko ek <span class="hl">precise, solvable ML task</span> mein convert karna — jiske clear inputs, outputs aur success criteria hon.<br><br>
+            Ye <strong>Data Scientist ka sabse important skill</strong> hai — coding se bhi zyada zaroori!<br>
+            Ek galat framing se sab kuch galat hoga — chahe code kitna bhi acha likho.
+        </p>
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-arrows-left-right me-2"></i>Vague vs Precise — Framing ka Fark</h4>
+
+    <div class="row g-3 mt-1">
+        <div class="col-md-6">
+            <div class="ib orange h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-xmark text-danger"></i> ❌ Vague (Galat) Framing</div>
+                <p><em>"Humein customers ke baare mein predict karna hai"</em></p>
+                <p><em>"Product better banana hai"</em></p>
+                <p><em>"Sales badhani hai"</em></p>
+                <p class="mb-0 text-danger fw-bold">Ye problems ML se solve nahi hoti — kyunki ye precise nahi hain!</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ib green h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-check text-success"></i> ✅ Precise (Sahi) Framing</div>
+                <p><em>"Customer ke last 30 din ke behavior se predict karo: kya wo agale 7 din mein churn karega? (Yes/No)"</em></p>
+                <p><em>"User ki past purchases se next purchase category predict karo"</em></p>
+                <p class="mb-0 text-success fw-bold">Ab ye ML se solve ho sakti hai — input, output, success metric — sab clear hai!</p>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-clipboard-check me-2"></i>ML Problem Framing Checklist</h4>
+
+    <div class="sbox">
+        <span class="sn">❓</span>
+        <span class="sl">Question 1: Input (Features) kya hain?</span><br>
+        Model ko <strong>kya diya jaayega</strong> predict karne ke liye?<br>
+        Example (Loan Default prediction): Age, Income, Credit Score, Existing loans, Employment type, Location<br>
+        <em>Note: Features relevant hone chahiye! "Customer ka favourite color" loan default se related nahi!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">❓</span>
+        <span class="sl">Question 2: Output (Target) kya hai?</span><br>
+        Model <strong>kya predict karega</strong>?<br>
+        → Ek category? → <strong>Classification problem</strong> (Default: Yes/No)<br>
+        → Ek number? → <strong>Regression problem</strong> (Default probability: 0.73)<br>
+        → Groups? → <strong>Clustering problem</strong> (Customer segments: A, B, C)
+    </div>
+
+    <div class="sbox">
+        <span class="sn">❓</span>
+        <span class="sl">Question 3: Labelled Data available hai?</span><br>
+        → <strong>Labelled data hai</strong> (past loan data with "defaulted" column) → <strong>Supervised Learning</strong><br>
+        → <strong>Labels nahi hain</strong> (sirf transaction data, no categories) → <strong>Unsupervised Learning</strong><br>
+        → <strong>Partial labels hain</strong> → <strong>Semi-supervised Learning</strong><br>
+        <em>90% real-world ML problems Supervised Learning hain!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">❓</span>
+        <span class="sl">Question 4: Success Metric kya hogi?</span><br>
+        Ye decision business context pe depend karta hai:<br>
+        → <strong>Medical diagnosis:</strong> Recall zyada important (false negative = dangerous!)<br>
+        → <strong>Spam detection:</strong> Precision zyada important (false positive = important email delete!)<br>
+        → <strong>Sales prediction:</strong> RMSE ya MAE (actual vs predicted price difference minimize karo)<br>
+        <em>Metric galat choose ki toh model technically "good" hoga par business ke liye useless!</em>
+    </div>
+
+    <div class="sbox">
+        <span class="sn">❓</span>
+        <span class="sl">Question 5: Ethical aur Privacy Concerns?</span><br>
+        India mein DPDP Act 2023 (Digital Personal Data Protection) lagoo hai!<br>
+        → <strong>Kya user data use karna legal hai?</strong> Consent liya hai?<br>
+        → <strong>Bias check karo:</strong> Kya model ek gender ya religion ke logon ke saath unfair hai?<br>
+        → <strong>Explainability:</strong> Bank loan reject kar raha hai — customer ko <em>kyu</em> batana padega!
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S6: ML PROBLEM TYPES ═══════════════════ -->
+<div class="sc" id="s6">
+    <h2 class="st"><span class="ic ic-info"><i class="fa-solid fa-shapes"></i></span> ML Problem Types — Classification, Regression, Clustering</h2>
+
+    <div class="ib info">
+        <div class="bt"><i class="fa-solid fa-star"></i> Teen Main Categories</div>
+        Jab bhi koi ML problem frame karo, pehle identify karo: <strong>Classification hai? Regression hai? Ya Clustering?</strong><br>
+        Ye decision hi batata hai kaunsa algorithm use hoga!
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Classification -->
+    <h4 class="fw-bold mt-3" style="color:var(--primary);"><i class="fa-solid fa-tags me-2"></i>1. Classification — "Kaunsi Category?"</h4>
+
+    <div class="ib blue">
+        <div class="bt"><i class="fa-solid fa-circle-question"></i> Kab use karein?</div>
+        Jab output ek <strong>category/label</strong> ho — Yes/No, A/B/C, Cat/Dog/Bird
+    </div>
+
+    <div class="ex nt mt-3">
+        <div class="exh"><i class="fa-solid fa-lightbulb"></i> Non-Tech Examples — Classification</div>
+        <div class="exb">
+            <div class="sbox"><span class="sn">1</span><span class="sl">Email Spam Detection</span><br>
+            Input: Email ka text, sender, subject → Output: <strong>"Spam" ya "Not Spam"</strong><br>
+            <em>Gmail yahi karta hai! Crores of emails har din classify karta hai.</em></div>
+            <div class="sbox"><span class="sn">2</span><span class="sl">Paytm Fraud Detection</span><br>
+            Input: Transaction amount, location, time, user history → Output: <strong>"Fraud" ya "Legitimate"</strong><br>
+            <em>Real-time mein milliseconds mein decision hota hai!</em></div>
+            <div class="sbox"><span class="sn">3</span><span class="sl">Medical Diagnosis (AIIMS)</span><br>
+            Input: X-ray image, patient symptoms, age, history → Output: <strong>"Cancer" ya "Normal" ya "Benign"</strong><br>
+            <em>AI doctor ka assistant ban raha hai — early detection saves lives!</em></div>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-6 col-md-3"><div class="ib blue" style="margin:0;text-align:center;"><strong>Logistic Regression</strong><br><small>Simple, fast, interpretable</small></div></div>
+        <div class="col-6 col-md-3"><div class="ib teal" style="margin:0;text-align:center;"><strong>Decision Tree</strong><br><small>Easy to explain</small></div></div>
+        <div class="col-6 col-md-3"><div class="ib purple" style="margin:0;text-align:center;"><strong>Random Forest</strong><br><small>Usually best accuracy</small></div></div>
+        <div class="col-6 col-md-3"><div class="ib orange" style="margin:0;text-align:center;"><strong>Neural Network</strong><br><small>For images, text, audio</small></div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Regression -->
+    <h4 class="fw-bold mt-3" style="color:var(--teal);"><i class="fa-solid fa-chart-line me-2"></i>2. Regression — "Kitna?"</h4>
+
+    <div class="ib teal">
+        <div class="bt"><i class="fa-solid fa-circle-question"></i> Kab use karein?</div>
+        Jab output ek <strong>continuous number</strong> ho — price, age, temperature, score
+    </div>
+
+    <div class="ex nt mt-3">
+        <div class="exh"><i class="fa-solid fa-lightbulb"></i> Non-Tech Examples — Regression</div>
+        <div class="exb">
+            <div class="sbox"><span class="sn">1</span><span class="sl">Mumbai Property Price Prediction</span><br>
+            Input: Location, BHK, floor, amenities, nearby schools → Output: <strong>Price in ₹ (e.g. ₹85 lakhs)</strong><br>
+            <em>MagicBricks, Housing.com ye exactly karte hain!</em></div>
+            <div class="sbox"><span class="sn">2</span><span class="sl">Swiggy Delivery Time Prediction</span><br>
+            Input: Distance, traffic, time of day, rain, restaurant prep → Output: <strong>Delivery time in minutes (e.g. 34 min)</strong><br>
+            <em>Wo "34 minutes" ka estimate — regression model hai!</em></div>
+            <div class="sbox"><span class="sn">3</span><span class="sl">Stock Price Prediction (NSE/BSE)</span><br>
+            Input: Historical prices, volume, market sentiment, news → Output: <strong>Tomorrow's price (e.g. ₹2,450)</strong><br>
+            <em>Note: Stock prediction bahut hard hai — market irrational bhi hoti hai!</em></div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Clustering -->
+    <h4 class="fw-bold mt-3" style="color:var(--purple);"><i class="fa-solid fa-object-group me-2"></i>3. Clustering — "Kaunse Groups Hain?"</h4>
+
+    <div class="ib purple">
+        <div class="bt"><i class="fa-solid fa-circle-question"></i> Kab use karein?</div>
+        Jab <strong>labels nahi hain</strong> aur aap khud <strong>natural groups discover</strong> karna chahte ho. Unsupervised Learning!
+    </div>
+
+    <div class="ex nt mt-3">
+        <div class="exh"><i class="fa-solid fa-lightbulb"></i> Non-Tech Examples — Clustering</div>
+        <div class="exb">
+            <div class="sbox"><span class="sn">1</span><span class="sl">Amazon Customer Segmentation</span><br>
+            Input: Purchase history, browsing behavior, demographics → Output: <strong>Groups: "Budget shoppers", "Premium buyers", "Occasional visitors"</strong><br>
+            <em>Marketing team phir har group ke liye alag strategy banati hai!</em></div>
+            <div class="sbox"><span class="sn">2</span><span class="sl">NewsAPI / InShorts Article Grouping</span><br>
+            Input: News article text → Output: <strong>Groups: "Sports", "Politics", "Technology", "Entertainment"</strong><br>
+            <em>Bina kisi human labelling ke — algorithm khud groups dhundh leta hai!</em></div>
+        </div>
+    </div>
+
+    <div class="ib yellow mt-3">
+        <div class="bt"><i class="fa-solid fa-scale-balanced"></i> Quick Comparison</div>
+        <div class="table-responsive mt-2">
+            <table class="table stbl mb-0">
+                <thead><tr><th>Feature</th><th>Classification</th><th>Regression</th><th>Clustering</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Output type</strong></td><td>Category / Label</td><td>Continuous number</td><td>Group assignment</td></tr>
+                    <tr><td><strong>Labels chahiye?</strong></td><td>✅ Haan (Supervised)</td><td>✅ Haan (Supervised)</td><td>❌ Nahi (Unsupervised)</td></tr>
+                    <tr><td><strong>Example question</strong></td><td>"Spam hai ya nahi?"</td><td>"Price kitna hoga?"</td><td>"Kaunse customers similar hain?"</td></tr>
+                    <tr><td><strong>Common algorithms</strong></td><td>Logistic Regression, SVM, RF</td><td>Linear Regression, XGBoost</td><td>K-Means, DBSCAN, Hierarchical</td></tr>
+                    <tr><td><strong>Metric</strong></td><td>Accuracy, F1, AUC-ROC</td><td>MAE, RMSE, R²</td><td>Silhouette Score, Inertia</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S7: WHAT ARE TENSORS ═══════════════════ -->
+<div class="sc" id="s7">
+    <h2 class="st"><span class="ic ic-teal"><i class="fa-solid fa-cubes"></i></span> What are Tensors?</h2>
+
+    <div class="ib teal">
+        <div class="bt"><i class="fa-solid fa-lightbulb text-warning"></i> Seedha Definition</div>
+        <strong>Tensor</strong> ek <span class="hl">multi-dimensional array of numbers</span> hai — ek aisa container jo numbers ko organized tarike se store karta hai, jisme ek ya zyada dimensions ho sakti hain.<br><br>
+        Simple analogy: Sochte hain numbers ko rakhne ke alag-alag "boxes":<br>
+        → <strong>Ek akela number</strong> → Scalar (0D Tensor)<br>
+        → <strong>Numbers ki ek row/line</strong> → Vector (1D Tensor)<br>
+        → <strong>Numbers ka ek table</strong> → Matrix (2D Tensor)<br>
+        → <strong>Tables ka ek stack</strong> → 3D Tensor (aur aage bhi jaata hai!)
+    </div>
+
+    <p>
+        Tensors ko <strong>Google ke TensorFlow</strong> ne mainstream banaya — naam ka matlab hi hai "flow of tensors" — data tensors ke roop mein neural network mein flow karta hai!
+    </p>
+
+    <div class="ib yellow">
+        <div class="bt"><i class="fa-solid fa-star"></i> Tensors AI/ML mein kyu itne zaroori hain?</div>
+        <p class="mb-0">
+            Har cheez jo AI samjhta hai — woh pehle tensor banti hai:<br>
+            → <strong>Image:</strong> Tensor ban jaati hai (pixels = numbers)<br>
+            → <strong>Text:</strong> Tensor ban jaata hai (words = number vectors)<br>
+            → <strong>Audio:</strong> Tensor ban jaata hai (sound waves = number sequences)<br>
+            → <strong>Video:</strong> Tensor ban jaata hai (frames ka stack!)<br><br>
+            <strong>Deep Learning = Tensors pe operations karna!</strong> Neural network ka har layer tensor leti hai, transform karti hai, aur agle layer ko deti hai.
+        </p>
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-layer-group me-2"></i>Tensor Dimensions — 0D se nD tak</h4>
+
+    <div class="row g-3 mt-2">
+        <!-- 0D Scalar -->
+        <div class="col-md-6 col-lg-3">
+            <div class="dim-card" style="border-color:var(--primary);">
+                <div class="dim-head" style="background:var(--primary-light); color:var(--primary-dark);">
+                    <span class="dim-badge" style="background:var(--primary);color:white;">0D</span> Scalar
+                </div>
+                <div class="dim-body">
+                    <div class="mb" style="background:#f8fafc;padding:0.8rem;font-size:1.4rem;font-weight:900;color:var(--primary);font-family:'JetBrains Mono',monospace;">42</div>
+                    <p><strong>Ek akela number.</strong> Koi dimensions nahi.</p>
+                    <p class="text-muted" style="font-size:0.9rem;">Shape: <code>()</code><br>ndim: 0</p>
+                    <div class="ib blue" style="margin:0.5rem 0 0; padding:0.6rem 0.8rem;">
+                        <small><strong>Example:</strong> Temperature = 37°C, Exam score = 95, Age = 21</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1D Vector -->
+        <div class="col-md-6 col-lg-3">
+            <div class="dim-card" style="border-color:var(--teal);">
+                <div class="dim-head" style="background:var(--teal-light); color:var(--teal);">
+                    <span class="dim-badge" style="background:var(--teal);color:white;">1D</span> Vector
+                </div>
+                <div class="dim-body">
+                    <div class="mb" style="background:#f8fafc;padding:0.8rem;font-size:1rem;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;">[1, 2, 3, 4]</div>
+                    <p><strong>Numbers ki ek list.</strong> Ek dimension — length.</p>
+                    <p class="text-muted" style="font-size:0.9rem;">Shape: <code>(4,)</code><br>ndim: 1</p>
+                    <div class="ib teal" style="margin:0.5rem 0 0; padding:0.6rem 0.8rem;">
+                        <small><strong>Example:</strong> Stock prices = [₹100, ₹102, ₹98], A student ke 5 subject marks</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2D Matrix -->
+        <div class="col-md-6 col-lg-3">
+            <div class="dim-card" style="border-color:var(--warn);">
+                <div class="dim-head" style="background:var(--warn-light); color:#92400e;">
+                    <span class="dim-badge" style="background:var(--warn);color:white;">2D</span> Matrix
+                </div>
+                <div class="dim-body">
+                    <div class="mb" style="background:#f8fafc;padding:0.8rem;font-size:0.85rem;font-weight:700;color:#92400e;font-family:'JetBrains Mono',monospace;">[[1,2,3],<br> [4,5,6],<br> [7,8,9]]</div>
+                    <p><strong>Numbers ka table.</strong> Rows × Columns.</p>
+                    <p class="text-muted" style="font-size:0.9rem;">Shape: <code>(3,3)</code><br>ndim: 2</p>
+                    <div class="ib yellow" style="margin:0.5rem 0 0; padding:0.6rem 0.8rem;">
+                        <small><strong>Example:</strong> Excel sheet, Class marksheet (30 students × 5 subjects), Grayscale image</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D+ Tensor -->
+        <div class="col-md-6 col-lg-3">
+            <div class="dim-card" style="border-color:var(--purple);">
+                <div class="dim-head" style="background:var(--purple-light); color:#4c1d95;">
+                    <span class="dim-badge" style="background:var(--purple);color:white;">3D+</span> Tensor
+                </div>
+                <div class="dim-body">
+                    <div class="mb" style="background:#f8fafc;padding:0.8rem;font-size:0.85rem;font-weight:700;color:#4c1d95;font-family:'JetBrains Mono',monospace;">[ [[...], [...]],<br>  [[...], [...]] ]</div>
+                    <p><strong>Stacked matrices.</strong> 3 ya zyada dimensions.</p>
+                    <p class="text-muted" style="font-size:0.9rem;">Shape: <code>(3,224,224)</code><br>ndim: 3</p>
+                    <div class="ib purple" style="margin:0.5rem 0 0; padding:0.6rem 0.8rem;">
+                        <small><strong>Example:</strong> Color image (RGB), batch of images, video frames</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mw mt-4">
+        <div class="mermaid">
+graph LR
+    A["🔢 Scalar<br/>(0D)<br/>Single Number<br/>Shape: ()"] --> B["📏 Vector<br/>(1D)<br/>List of Numbers<br/>Shape: (n,)"]
+    B --> C["📊 Matrix<br/>(2D)<br/>Table<br/>Shape: (m,n)"]
+    C --> D["🎨 3D Tensor<br/>Color Image<br/>Shape: (3,H,W)"]
+    D --> E["📦 4D Tensor<br/>Batch of Images<br/>Shape: (B,3,H,W)"]
+    E --> F["🎬 5D Tensor<br/>Video<br/>Shape: (B,T,3,H,W)"]
+
+    style A fill:#dbeafe,stroke:#1d4ed8,color:#1e293b,rx:12
+    style B fill:#ccfbf1,stroke:#0f766e,color:#1e293b,rx:12
+    style C fill:#fef3c7,stroke:#d97706,color:#1e293b,rx:12
+    style D fill:#ede9fe,stroke:#7c3aed,color:#1e293b,rx:12
+    style E fill:#ffedd5,stroke:#ea580c,color:#1e293b,rx:12
+    style F fill:#dcfce7,stroke:#16a34a,color:#1e293b,rx:12
+        </div>
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-image me-2"></i>Practical Example: Ek Color Image Tensor Kaise Banti Hai?</h4>
+
+    <div class="ex nt mt-3">
+        <div class="exh"><i class="fa-solid fa-camera"></i> Color Image → 3D Tensor</div>
+        <div class="exb">
+            <p>Sochte hain tumhare phone se ek <strong>224×224 pixel color photo</strong> li. Ye ek 3D tensor hai!</p>
+            <div class="sbox"><span class="sn">R</span><span class="sl">Red Channel</span> — 224×224 matrix, har pixel ka red value (0-255)</div>
+            <div class="sbox"><span class="sn">G</span><span class="sl">Green Channel</span> — 224×224 matrix, har pixel ka green value (0-255)</div>
+            <div class="sbox"><span class="sn">B</span><span class="sl">Blue Channel</span> — 224×224 matrix, har pixel ka blue value (0-255)</div>
+            <div class="mb">
+                $$\text{Image Tensor Shape} = (3, 224, 224) = \underbrace{3}_{\text{Channels (RGB)}} \times \underbrace{224}_{\text{Height}} \times \underbrace{224}_{\text{Width}}$$
+                $$\text{Total numbers} = 3 \times 224 \times 224 = 150{,}528 \text{ numbers!}$$
+            </div>
+            <div class="ib green">
+                <div class="bt"><i class="fa-solid fa-check-circle"></i> Ek simple 224x224 image mein</div>
+                <strong>150,528 numbers</strong> hote hain — yahi neural network process karta hai! ImageNet (famous AI benchmark) mein ek model ko crores of such tensors se train kiya jaata hai.
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S8: TENSOR IN-DEPTH ═══════════════════ -->
+<div class="sc" id="s8">
+    <h2 class="st"><span class="ic ic-blue"><i class="fa-solid fa-microscope"></i></span> Tensors — In-Depth Explanation</h2>
+
+    <div class="ib blue">
+        <div class="bt"><i class="fa-solid fa-bullseye"></i> Teen Important Tensor Properties</div>
+        Har tensor ke teen main properties hote hain: <strong>Shape</strong> (size), <strong>Rank/ndim</strong> (dimensions ki count), <strong>dtype</strong> (data type). Ye teeno samjhna zaroori hai!
+    </div>
+
+    <!-- Shape -->
+    <h4 class="fw-bold mt-4" style="color:var(--primary);"><i class="fa-solid fa-ruler-combined me-2"></i>1. Tensor Shape — "Kitna Bada Hai?"</h4>
+
+    <p>Shape ek <strong>tuple</strong> hota hai jo har dimension ka size batata hai.</p>
+
+    <div class="sbox">
+        <span class="sn">📐</span>
+        <span class="sl">Shape Examples — Step by Step:</span><br>
+        → <code>Shape = ()</code> → Scalar (0D) — sirf ek number<br>
+        → <code>Shape = (5,)</code> → 1D Vector — 5 elements ki list<br>
+        → <code>Shape = (4, 3)</code> → 2D Matrix — 4 rows, 3 columns = 12 numbers<br>
+        → <code>Shape = (3, 224, 224)</code> → 3D Tensor — 3 channels, 224×224 pixels (color image!)<br>
+        → <code>Shape = (32, 3, 224, 224)</code> → 4D Tensor — 32 images ka batch (neural network training!)
+    </div>
+
+    <div class="mb">
+        $$\text{Total Elements} = \prod_{i} \text{Shape}[i]$$
+        $$\text{Example: Shape (32, 3, 224, 224)} \Rightarrow 32 \times 3 \times 224 \times 224 = 4{,}816{,}896 \text{ numbers!}$$
+    </div>
+
+    <div class="ib yellow">
+        <div class="bt"><i class="fa-solid fa-triangle-exclamation"></i> Shape Mismatch — Sabse Common Error!</div>
+        Neural network training mein <strong>sabse common error</strong> hai shape mismatch — ek layer ko shape (32, 512) chahiye par input shape (32, 256) aa rahi hai.<br>
+        <code>RuntimeError: mat1 and mat2 shapes cannot be multiplied (32×256 and 512×10)</code><br>
+        <strong>Har debugging session mein pehle shape check karo!</strong> → <code>print(tensor.shape)</code>
+    </div>
+
+    <!-- Rank/ndim -->
+    <h4 class="fw-bold mt-4" style="color:var(--teal);"><i class="fa-solid fa-sort-numeric-up me-2"></i>2. Rank (ndim) — "Kitni Dimensions Hain?"</h4>
+
+    <div class="sbox">
+        <span class="sn">📊</span>
+        <span class="sl">Rank = Number of dimensions = len(shape)</span><br>
+        → Scalar → Rank 0<br>
+        → Vector → Rank 1<br>
+        → Matrix → Rank 2<br>
+        → Color Image → Rank 3<br>
+        → Batch of images → Rank 4<br>
+        → Video batch → Rank 5 (Batch × Frames × Channels × Height × Width)
+    </div>
+
+    <!-- dtype -->
+    <h4 class="fw-bold mt-4" style="color:var(--accent);"><i class="fa-solid fa-database me-2"></i>3. Data Types (dtype) — "Kaunsa Number Format?"</h4>
+
+    <div class="table-responsive mt-2">
+        <table class="table stbl mb-0">
+            <thead><tr><th>dtype</th><th>Size</th><th>Range</th><th>AI/ML mein kab use karo</th></tr></thead>
+            <tbody>
+                <tr><td><code>float32</code></td><td>32 bits</td><td>±3.4 × 10³⁸</td><td><strong>Most common!</strong> Neural network weights, image pixels (0.0 to 1.0)</td></tr>
+                <tr><td><code>float16</code></td><td>16 bits</td><td>±6.5 × 10⁴</td><td>GPU training speedup (Mixed Precision Training) — same accuracy, 2x faster!</td></tr>
+                <tr><td><code>int64</code></td><td>64 bits</td><td>±9.2 × 10¹⁸</td><td>Class labels, indices, counts</td></tr>
+                <tr><td><code>int32</code></td><td>32 bits</td><td>±2.1 × 10⁹</td><td>Smaller integers — image pixel values (0-255)</td></tr>
+                <tr><td><code>bool</code></td><td>8 bits</td><td>True/False</td><td>Masks, conditions, attention masks in transformers</td></tr>
+                <tr><td><code>float64</code></td><td>64 bits</td><td>±1.8 × 10³⁰⁸</td><td>High-precision scientific calculations (rarely used in DL)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ib orange mt-3">
+        <div class="bt"><i class="fa-solid fa-zap"></i> float32 kyu float64 se better hai Deep Learning mein?</div>
+        <p class="mb-0">
+            → <strong>Memory:</strong> float32 = 4 bytes, float64 = 8 bytes → float32 mein 2x zyada data GPU VRAM mein fit hota hai!<br>
+            → <strong>Speed:</strong> Modern GPUs (NVIDIA A100) float32 operations float64 se 16x faster karte hain!<br>
+            → <strong>Accuracy:</strong> Deep learning mein float64 ki precision se koi fayda nahi — models already approximate hote hain<br>
+            <strong>Rule:</strong> Deep Learning → <code>float32</code>. Scientific computing → <code>float64</code>.
+        </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <h4 class="fw-bold mt-3" style="color:var(--accent);"><i class="fa-solid fa-icons me-2"></i>Non-Technical Examples — Tensors Real Life Mein</h4>
+
+    <div class="ex nt mt-3">
+        <div class="exh"><i class="fa-solid fa-film"></i> Non-Tech Example 1: Netflix ka Show — 4D Video Tensor</div>
+        <div class="exb">
+            <p>Sochte hain Netflix ek <strong>AI system train kar raha hai jo video content samjhe</strong> (auto-captioning, content moderation).</p>
+            <div class="sbox"><span class="sn">1</span><span class="sl">Ek video = stacked frames</span><br>Mirzapur Season 2 ka ek scene = 30 fps × 60 seconds = <strong>1,800 frames</strong></div>
+            <div class="sbox"><span class="sn">2</span><span class="sl">Har frame = ek color image tensor</span><br>1920×1080 HD frame = shape (3, 1080, 1920)</div>
+            <div class="sbox"><span class="sn">3</span><span class="sl">Full video clip (1 minute) = 4D Tensor</span><br>Shape: <code>(1800, 3, 1080, 1920)</code> = 1800 frames × 3 channels × 1080 × 1920</div>
+            <div class="sbox"><span class="sn">4</span><span class="sl">Batch of 8 such video clips = 5D Tensor</span><br>Shape: <code>(8, 1800, 3, 1080, 1920)</code> — yahi GPU ko ek baar mein process karna hota hai!</div>
+            <div class="ib green">
+                <div class="bt"><i class="fa-solid fa-check-circle"></i> Numbers kitne?</div>
+                8 × 1800 × 3 × 1080 × 1920 = <strong>89.5 Billion numbers</strong> sirf ek training batch mein! Isliye AI data centers mein crores ke GPU honge!
+            </div>
+        </div>
+    </div>
+
+    <div class="ex nt">
+        <div class="exh"><i class="fa-solid fa-comment-dots"></i> Non-Tech Example 2: WhatsApp Message → Text Tensor</div>
+        <div class="exb">
+            <p>Jab ChatGPT ya koi AI chatbot tumhara message padhta hai, pehle use <strong>tensor mein convert</strong> karta hai!</p>
+            <div class="sbox"><span class="sn">1</span><span class="sl">Original message:</span> "Aaj ka mausam kaisa hai?"</div>
+            <div class="sbox"><span class="sn">2</span><span class="sl">Tokenization:</span> ["Aaj", "ka", "mausam", "kaisa", "hai", "?"] → 6 tokens</div>
+            <div class="sbox"><span class="sn">3</span><span class="sl">Token IDs:</span> [1423, 897, 5621, 2341, 432, 12] → 1D integer tensor, shape <code>(6,)</code></div>
+            <div class="sbox"><span class="sn">4</span><span class="sl">Word Embeddings:</span> Har token ko 512-dimensional vector mein convert karo → 2D tensor, shape <code>(6, 512)</code></div>
+            <div class="sbox"><span class="sn">5</span><span class="sl">Transformer Input:</span> Shape <code>(batch_size, 6, 512)</code> → yahi GPT process karta hai!</div>
+            <div class="ib teal">
+                <div class="bt"><i class="fa-solid fa-magic-wand-sparkles"></i> Yahi hai "Language Model"</div>
+                Har word → numbers → tensors → neural network → tensors → numbers → words. Poora cycle tensors mein hota hai!
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S9: TENSOR OPERATIONS & CODE ═══════════════════ -->
+<div class="sc" id="s9">
+    <h2 class="st"><span class="ic ic-purple"><i class="fa-solid fa-code"></i></span> Tensor Operations aur Python Code</h2>
+
+    <div class="ib purple">
+        <div class="bt"><i class="fa-solid fa-bullseye"></i> 5 Most Important Tensor Operations</div>
+        Ye 5 operations har Deep Learning engineer daily use karta hai. Inhe samjhna = PyTorch/TensorFlow samjhna!
+    </div>
+
+    <h4 class="fw-bold mt-4" style="color:var(--primary);"><i class="fa-solid fa-hashtag me-2"></i>1. Reshape — Shape Badlo, Data Wahi Raho</h4>
+
+    <div class="mb">
+        $$\text{reshape}(T, \text{new\_shape}) \Rightarrow \text{Same data, different dimensions}$$
+        $$\text{Condition: Total elements must be same}$$
+        $$\text{Shape}(2,4) = 8 \text{ elements} \xrightarrow{\text{reshape}} \text{Shape}(4,2) = 8 \text{ elements} \checkmark$$
+    </div>
+
+    <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>PyTorch Code: Reshape</h6>
+    <pre><code class="language-python">import torch
+
+# 2D tensor (4×3 matrix)
+t = torch.tensor([[1, 2, 3],
+                   [4, 5, 6],
+                   [7, 8, 9],
+                   [10, 11, 12]])
+
+print("Original shape:", t.shape)    # torch.Size([4, 3])
+
+# Reshape to (2, 6)
+t1 = t.reshape(2, 6)
+print("Reshaped (2,6):", t1.shape)   # torch.Size([2, 6])
+
+# Reshape to (12,) — 1D vector
+t2 = t.reshape(-1)   # -1 = auto calculate
+print("Flattened:", t2.shape)        # torch.Size([12])
+
+# Reshape to (3, 4) — swap rows/cols
+t3 = t.reshape(3, 4)
+print("Reshaped (3,4):", t3.shape)   # torch.Size([3, 4])</code></pre>
+    <div class="sbox sbox-code">
+        <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+        <span class="sl">t.reshape(-1)</span> — <code>-1</code> matlab "auto calculate karo". PyTorch khud nikalta hai ki -1 = 12.<br>
+        <span class="sl">Kab use karo?</span> Ek image tensor (3, 224, 224) ko flatten karna hai fully-connected layer ke liye → reshape(3*224*224) = reshape(150528)
+    </div>
+
+    <div class="divider"></div>
+
+    <h4 class="fw-bold mt-3" style="color:var(--teal);"><i class="fa-solid fa-hashtag me-2"></i>2. Matrix Multiplication (matmul) — Neural Networks ka Dil</h4>
+
+    <div class="mb">
+        $$C = A \times B \quad \Rightarrow \quad C_{ij} = \sum_k A_{ik} \cdot B_{kj}$$
+        $$\text{Shape}(m \times k) \times \text{Shape}(k \times n) = \text{Shape}(m \times n)$$
+        $$\text{Inner dimensions must match: k = k!}$$
+    </div>
+
+    <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>PyTorch Code: MatMul</h6>
+    <pre><code class="language-python">import torch
+
+# Input: 3 samples, 4 features each
+x = torch.randn(3, 4)      # Shape: (3, 4)
+
+# Weight matrix: 4 inputs → 5 outputs
+W = torch.randn(4, 5)      # Shape: (4, 5)
+
+# Matrix multiplication (ye har neural network layer karta hai!)
+output = torch.matmul(x, W)   # Shape: (3, 5)
+# Ya shorthand: output = x @ W
+
+print("Input shape :", x.shape)       # torch.Size([3, 4])
+print("Weights shape:", W.shape)       # torch.Size([4, 5])
+print("Output shape :", output.shape) # torch.Size([3, 5])</code></pre>
+    <div class="sbox sbox-code">
+        <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+        <span class="sl">Ye poora neural network layer hai!</span> Linear layer = matmul + bias add. GPT-4 jaise models mein yahi operation billions of times hota hai har forward pass mein!<br>
+        <span class="sl">torch.randn:</span> Random normal distribution se numbers generate karo — neural network weight initialization ke liye use hota hai.
+    </div>
+
+    <div class="divider"></div>
+
+    <h4 class="fw-bold mt-3" style="color:var(--purple);"><i class="fa-solid fa-hashtag me-2"></i>3. Broadcasting — Alag Shapes ke Tensors ko Saath Operate Karo</h4>
+
+    <div class="ib purple">
+        <div class="bt"><i class="fa-solid fa-expand-arrows-alt"></i> Broadcasting kya hai?</div>
+        NumPy/PyTorch automatically <strong>chhote tensors ko bada banata hai</strong> (virtually, bina extra memory ke) taaki operations ho sakein. Ye bahut powerful feature hai!
+    </div>
+
+    <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>PyTorch Code: Broadcasting</h6>
+    <pre><code class="language-python">import torch
+
+# Matrix (4×3) + Vector (3,) — broadcasting!
+A = torch.ones(4, 3)    # Shape: (4, 3)
+b = torch.tensor([1.0, 2.0, 3.0])  # Shape: (3,)
+
+# b automatically broadcast hota hai (4,3) shape mein
+result = A + b          # Shape: (4, 3)
+print(result)
+# tensor([[2., 3., 4.],
+#         [2., 3., 4.],
+#         [2., 3., 4.],
+#         [2., 3., 4.]])
+
+# Batch normalization mein yahi hota hai!
+# batch (32, 512) + bias (512,) → (32, 512)
+batch = torch.randn(32, 512)
+bias  = torch.randn(512)
+output = batch + bias   # Broadcasting! Shape: (32, 512)</code></pre>
+    <div class="sbox sbox-code">
+        <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+        <span class="sl">Broadcasting Rule:</span> Dimensions right se compare karo. Agar same size hain → OK! Agar ek 1 hai → usse stretch karo. Agar na same hai na 1 → Error!<br>
+        <span class="sl">Real Use:</span> Neural network bias addition (har sample ke liye same bias add karo) broadcasting se hoti hai!
+    </div>
+
+    <div class="divider"></div>
+
+    <h4 class="fw-bold mt-3" style="color:var(--accent);"><i class="fa-solid fa-hashtag me-2"></i>4. Aggregation Operations — Summarize Karo</h4>
+
+    <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>PyTorch Code: Aggregation</h6>
+    <pre><code class="language-python">import torch
+
+t = torch.tensor([[1.0, 2.0, 3.0],
+                   [4.0, 5.0, 6.0]])   # Shape: (2, 3)
+
+print(t.sum())           # 21.0 (sab numbers ka sum)
+print(t.mean())          # 3.5  (average)
+print(t.max())           # 6.0  (maximum)
+print(t.min())           # 1.0  (minimum)
+
+# Dimension ke along aggregate karo!
+print(t.sum(dim=0))      # tensor([5., 7., 9.])  — har column ka sum
+print(t.sum(dim=1))      # tensor([6., 15.])     — har row ka sum
+print(t.mean(dim=1))     # tensor([2., 5.])      — har row ka average
+
+# Neural network loss calculation
+predictions = torch.tensor([2.5, 0.5, 2.0])
+targets     = torch.tensor([3.0, 1.0, 2.5])
+mae_loss = torch.mean(torch.abs(predictions - targets))
+print("MAE Loss:", mae_loss.item())  # 0.5</code></pre>
+    <div class="sbox sbox-code">
+        <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+        <span class="sl">dim=0:</span> Rows ke along sum karo → result mein columns rahenge (column-wise sum)<br>
+        <span class="sl">dim=1:</span> Columns ke along sum karo → result mein rows rahenge (row-wise sum)<br>
+        <span class="sl">Real use:</span> Neural network loss function (MSE, MAE, CrossEntropy) sab aggregation use karte hain!
+    </div>
+
+    <div class="divider"></div>
+
+    <h4 class="fw-bold mt-3" style="color:var(--success);"><i class="fa-solid fa-hashtag me-2"></i>5. GPU Transfer — CPU se GPU pe Move Karo</h4>
+
+    <h6 class="h6-block"><i class="fa-solid fa-play me-2"></i>PyTorch Code: GPU Operations</h6>
+    <pre><code class="language-python">import torch
+
+# GPU available hai check karo
+print(torch.cuda.is_available())     # True agar NVIDIA GPU hai
+
+# Tensor CPU pe create karo (default)
+x = torch.randn(1000, 1000)
+print(x.device)    # cpu
+
+# GPU pe move karo
+if torch.cuda.is_available():
+    x_gpu = x.to('cuda')        # Ya x.cuda()
+    print(x_gpu.device)         # cuda:0
+
+    # GPU pe fast computation
+    result = torch.matmul(x_gpu, x_gpu)
+
+    # Wapas CPU pe lao (display ke liye)
+    result_cpu = result.to('cpu')
+
+# Apple Silicon (M1/M2/M3) ke liye:
+x_mps = x.to('mps')   # MPS = Metal Performance Shaders</code></pre>
+    <div class="sbox sbox-code">
+        <span class="sn"><i class="fa-solid fa-code" style="font-size:0.7rem"></i></span>
+        <span class="sl">Kyu GPU?</span> CPU = sequential, ek kaam ek time. GPU = parallel, ek saath lakhs of operations!<br>
+        1000×1000 matmul: CPU = ~50ms, GPU (NVIDIA A100) = ~0.1ms → <strong>500x faster!</strong><br>
+        <span class="sl">Common error:</span> "Expected all tensors to be on the same device" — ek tensor CPU pe, doosra GPU pe → move karo!
+    </div>
+</div>
+
+
+<!-- ═══════════════════ S10: SUMMARY ═══════════════════ -->
+<div class="sc" id="s10" style="background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-color:var(--primary);">
+    <h2 class="st"><span class="ic ic-blue"><i class="fa-solid fa-graduation-cap"></i></span> Quick Summary — Poore Tutorial Ka Saar</h2>
+
+    <div class="table-responsive mt-3">
+        <table class="table stbl mb-0">
+            <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Takeaway</th><th>Real Use Case</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Data Analysis</strong></td>
+                    <td>Raw data → Meaningful insights</td>
+                    <td>60-70% DS time yahan lagta hai</td>
+                    <td>Swiggy delivery optimization, IPL analytics</td>
+                </tr>
+                <tr>
+                    <td><strong>DS Project Planning</strong></td>
+                    <td>CRISP-DM: 6-phase circular process</td>
+                    <td>Pehle plan karo, phir code likho!</td>
+                    <td>Every professional DS project follows this</td>
+                </tr>
+                <tr>
+                    <td><strong>ML Problem Framing</strong></td>
+                    <td>Vague → Precise problem definition</td>
+                    <td>Input, Output, Metric — teeno clear karo</td>
+                    <td>Loan default, churn prediction, spam detection</td>
+                </tr>
+                <tr>
+                    <td><strong>Classification</strong></td>
+                    <td>Output = Category (Yes/No, A/B/C)</td>
+                    <td>Supervised, labelled data chahiye</td>
+                    <td>Fraud detection, medical diagnosis</td>
+                </tr>
+                <tr>
+                    <td><strong>Regression</strong></td>
+                    <td>Output = Continuous number</td>
+                    <td>Supervised, predict karo "kitna"</td>
+                    <td>Property price, delivery time</td>
+                </tr>
+                <tr>
+                    <td><strong>Clustering</strong></td>
+                    <td>Output = Groups (no labels)</td>
+                    <td>Unsupervised, natural patterns dhundo</td>
+                    <td>Customer segmentation</td>
+                </tr>
+                <tr>
+                    <td><strong>Tensors (Basics)</strong></td>
+                    <td>N-dimensional number arrays</td>
+                    <td>0D→1D→2D→3D+ — sab data tensors bante hain</td>
+                    <td>Images (3D), Videos (5D), Text (2D)</td>
+                </tr>
+                <tr>
+                    <td><strong>Tensors (In-depth)</strong></td>
+                    <td>Shape, dtype, operations</td>
+                    <td>float32, reshape, matmul, GPU — Deep Learning basics</td>
+                    <td>PyTorch neural network training</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row g-3 mt-3">
+        <div class="col-md-6">
+            <div class="ib blue h-100" style="margin:0;">
+                <div class="bt"><i class="fa-brands fa-python"></i> Key Python Libraries — Ye Seekho</div>
+                → <strong>pandas, numpy:</strong> Data Analysis ke liye (must know!)<br>
+                → <strong>matplotlib, seaborn:</strong> Visualization<br>
+                → <strong>scikit-learn:</strong> ML models (Classification, Regression, Clustering)<br>
+                → <strong>PyTorch:</strong> Deep Learning + Tensor operations<br>
+                → <strong>TensorFlow/Keras:</strong> Alternative to PyTorch
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ib green h-100" style="margin:0;">
+                <div class="bt"><i class="fa-solid fa-road"></i> Aage Kya Seekhein?</div>
+                → <strong>Data Analysis:</strong> Advanced EDA, Feature Engineering<br>
+                → <strong>ML Models:</strong> Linear/Logistic Regression, Decision Trees, Random Forest<br>
+                → <strong>Deep Learning:</strong> Neural Networks, CNNs (images), RNNs (sequences)<br>
+                → <strong>Transformers:</strong> Attention mechanism, BERT, GPT<br>
+                → <strong>MLOps:</strong> Model deployment, monitoring, scaling
+            </div>
+        </div>
+    </div>
+
+    <div class="mw mt-4">
+        <div class="mermaid">
+graph TD
+    DA["🔍 Data Analysis<br/>EDA, Cleaning, Insights"] --> PP["📋 Project Planning<br/>CRISP-DM, 6 Phases"]
+    PP --> FR["🎯 Problem Framing<br/>Input, Output, Metric"]
+    FR --> CL["🏷️ Classification<br/>Spam, Fraud, Diagnosis"]
+    FR --> RG["📈 Regression<br/>Price, Time, Score"]
+    FR --> CL2["🔵 Clustering<br/>Segmentation, Groups"]
+    CL --> T["⚡ Tensors<br/>N-D Arrays of Numbers"]
+    RG --> T
+    CL2 --> T
+    T --> DL["🤖 Deep Learning<br/>PyTorch, TensorFlow"]
+    DL --> AI["🚀 AI Applications<br/>ChatGPT, Image AI, Siri"]
+
+    style DA fill:#dbeafe,stroke:#1d4ed8,color:#1e293b,rx:12
+    style PP fill:#ffedd5,stroke:#ea580c,color:#1e293b,rx:12
+    style FR fill:#ede9fe,stroke:#7c3aed,color:#1e293b,rx:12
+    style CL fill:#ccfbf1,stroke:#0f766e,color:#1e293b,rx:12
+    style RG fill:#fef3c7,stroke:#d97706,color:#1e293b,rx:12
+    style CL2 fill:#dcfce7,stroke:#16a34a,color:#1e293b,rx:12
+    style T fill:#cffafe,stroke:#0891b2,color:#1e293b,rx:12
+    style DL fill:#ffe4e6,stroke:#e11d48,color:#1e293b,rx:12
+    style AI fill:#f0fdf4,stroke:#16a34a,color:#1e293b,rx:12
+        </div>
+    </div>
+
+    <div class="ib teal mt-3">
+        <div class="bt"><i class="fa-solid fa-heart"></i> Final Message</div>
+        <p class="mb-0">
+            <strong>Data Analysis</strong> = Data ka doctor — usse samjho, diagnose karo, theek karo.<br><br>
+            → <strong>Project Planning</strong> = Data Science ka GPS — bina plan ke khoge!<br>
+            → <strong>Problem Framing</strong> = Sahi sawaal poochho — sahi jawab milega<br>
+            → <strong>Classification/Regression/Clustering</strong> = Teen main "tools" — problem dekho, tool chunno<br>
+            → <strong>Tensors</strong> = AI ka universal language — har data in numbers, in arrays, in tensors!<br><br>
+            <strong>In 5 concepts ko samajh liya toh Data Science aur AI/ML ka 30% foundation ready hai!</strong><br>
+            Ab aage badhte hain — algorithms, deep learning, aur real projects ki taraf! 🚀
+        </p>
+    </div>
+</div>
+
+
+</div><!-- /container -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+    <div class="container text-center">
+        <p class="mb-1 fw-bold" style="color:white;"><i class="fa-solid fa-brain me-2"></i>Data Science &amp; AI/ML Tutorial Series</p>
+        <p class="mb-1">Data Analysis · Project Planning · ML Framing · Tensors | Complete Beginner Tutorial</p>
+        <p class="mb-0" style="font-size:0.85rem;">Made with <i class="fa-solid fa-heart text-danger"></i> for Hindi-speaking AI/ML learners across India</p>
+    </div>
+</footer>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- MathJax 3 -->
+<script>
+window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+<!-- Prism.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+<!-- Mermaid.js -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+        primaryColor: '#dbeafe', primaryTextColor: '#1e293b',
+        primaryBorderColor: '#1d4ed8', lineColor: '#64748b',
+        secondaryColor: '#f0fdf4', tertiaryColor: '#fef3c7',
+        fontFamily: 'DM Sans, sans-serif', fontSize: '14px'
+    },
+    flowchart: { curve: 'basis', padding: 20 }
+});
+</script>
+
+<!-- Smooth Scroll -->
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if(t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+});
+</script>
+
+</body>
+</html>

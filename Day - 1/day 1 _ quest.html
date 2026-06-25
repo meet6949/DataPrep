@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DS & AI/ML Quest — Level Up Your Skills!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — LIGHT GAMIFIED
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #f0f4ff;
+  --bg2:       #e8edf8;
+  --bg3:       #dde4f5;
+  --card:      #ffffff;
+  --card2:     #f5f7ff;
+  --border:    rgba(99,102,241,0.12);
+  --border2:   rgba(99,102,241,0.25);
+
+  --neon-blue:   #2563eb;
+  --neon-cyan:   #0891b2;
+  --neon-purple: #7c3aed;
+  --neon-pink:   #db2777;
+  --neon-green:  #16a34a;
+  --neon-yellow: #b45309;
+  --neon-orange: #c2410c;
+  --neon-red:    #dc2626;
+
+  --text:  #1e1b4b;
+  --muted: #4b5563;
+  --dim:   #9ca3af;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-blue:   0 4px 16px rgba(37,99,235,0.18), 0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple: 0 4px 16px rgba(124,58,237,0.18), 0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:   0 4px 16px rgba(8,145,178,0.18),  0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:  0 4px 16px rgba(22,163,74,0.18),  0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow: 0 4px 16px rgba(180,83,9,0.18),   0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:   0 4px 16px rgba(219,39,119,0.18), 0 1px 4px rgba(219,39,119,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+/* ── GLOBAL GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.container-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative; z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════
+   XP BAR (STICKY TOP)
+═══════════════════════════════════════════════ */
+.xp-strip {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(240,244,255,0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  padding: 0.65rem 0;
+}
+.xp-inner {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+}
+.xp-label {
+  font-family: var(--font-head);
+  font-weight: 800; font-size: 0.8rem;
+  color: var(--neon-yellow);
+  letter-spacing: 2px; text-transform: uppercase;
+  white-space: nowrap;
+}
+.xp-bar-wrap {
+  flex: 1; min-width: 120px;
+  background: rgba(37,99,235,0.1);
+  border-radius: 50px; height: 10px;
+  border: 1px solid var(--border2); overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+  border-radius: 50px;
+  transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 10px rgba(37,99,235,0.35);
+  position: relative;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0;} 50%{opacity:1;} }
+.xp-score {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.9rem; color: var(--neon-yellow);
+  white-space: nowrap;
+}
+.xp-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.xp-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 0.2rem 0.65rem; border-radius: 50px;
+  border: 1px solid; white-space: nowrap;
+  transition: 0.3s; opacity: 0.35;
+}
+.xp-badge.earned { opacity: 1; animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes badgePop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.xp-badge.b1 { border-color: var(--neon-blue);   color: var(--neon-blue);   }
+.xp-badge.b2 { border-color: var(--neon-cyan);   color: var(--neon-cyan);   }
+.xp-badge.b3 { border-color: var(--neon-purple); color: var(--neon-purple); }
+.xp-badge.b4 { border-color: var(--neon-green);  color: var(--neon-green);  }
+.xp-badge.b5 { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 6rem 0 5rem;
+  background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(8,145,178,0.07) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-orbit {
+  position: absolute; top: 50%; right: 8%;
+  transform: translateY(-50%);
+  width: 420px; height: 420px;
+  pointer-events: none;
+}
+.orbit-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-ring:nth-child(1) { width: 150px; height: 150px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 250px; height: 250px; animation: spin 20s linear infinite reverse; border-color: rgba(168,85,247,0.2); }
+.orbit-ring:nth-child(3) { width: 350px; height: 350px; animation: spin 30s linear infinite; border-color: rgba(6,182,212,0.15); }
+.orbit-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 50%; top: -4px; left: 50%; transform: translateX(-50%);
+}
+.orbit-ring:nth-child(1) .orbit-dot { background: var(--neon-blue); box-shadow: var(--glow-blue); }
+.orbit-ring:nth-child(2) .orbit-dot { background: var(--neon-purple); box-shadow: var(--glow-purple); }
+.orbit-ring:nth-child(3) .orbit-dot { background: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+.orbit-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3rem; animation: float 4s ease-in-out infinite;
+}
+@keyframes spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+@keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-12px);} }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px; padding: 0.3rem 1rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--neon-blue);
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-blue); box-shadow: var(--glow-blue);
+  animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+.hero h1 {
+  font-family: var(--font-head);
+  font-weight: 800; font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1; letter-spacing: -1.5px;
+  margin-bottom: 1.5rem;
+}
+.hero h1 .line1 { display: block; color: #1e1b4b; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 40%, var(--neon-purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 1.1rem; color: var(--muted); max-width: 560px;
+  margin-bottom: 2rem; line-height: 1.75;
+}
+.hero-stats {
+  display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem;
+}
+.hero-stat-item { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.8rem; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 0.8rem 2rem; border-radius: 50px; border: none;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  transition: 0.3s; animation: pulse-btn 2s infinite;
+}
+@keyframes pulse-btn { 0%,100%{box-shadow:0 4px 20px rgba(37,99,235,0.28);} 50%{box-shadow:0 4px 32px rgba(37,99,235,0.45);} }
+.hero-cta:hover { transform: translateY(-2px) scale(1.03); color: white; }
+
+/* ═══════════════════════════════════════════════
+   QUEST MAP (TOC)
+═══════════════════════════════════════════════ */
+.quest-map {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 3rem 0;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+}
+.quest-map::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.03));
+  pointer-events: none;
+}
+.quest-map-title {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.1rem; color: var(--neon-yellow);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.quest-map-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(234,179,8,0.3), transparent);
+}
+.quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
+.quest-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: #f8f9ff;
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  text-decoration: none; color: var(--muted);
+  font-weight: 600; font-size: 0.88rem;
+  transition: 0.25s;
+}
+.quest-item:hover {
+  background: rgba(37,99,235,0.07);
+  border-color: rgba(37,99,235,0.3);
+  color: var(--neon-blue); transform: translateX(4px);
+}
+.quest-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL CARD (SECTION WRAPPER)
+═══════════════════════════════════════════════ */
+.level-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.level-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 24px 24px 0 0;
+}
+.level-card.lvl-blue::before   { background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); }
+.level-card.lvl-purple::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); }
+.level-card.lvl-cyan::before   { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); }
+.level-card.lvl-green::before  { background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan)); }
+.level-card.lvl-yellow::before { background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange)); }
+.level-card.lvl-pink::before   { background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple)); }
+
+.level-card:hover { box-shadow: 0 8px 32px rgba(37,99,235,0.12); }
+
+/* corner decoration */
+.level-card .corner-deco {
+  position: absolute; top: 1.2rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0.25;
+}
+
+.lv-header {
+  display: flex; align-items: flex-start; gap: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+.lv-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  position: relative;
+}
+.lv-icon-wrap::after {
+  content: '';
+  position: absolute; inset: -3px; border-radius: 18px;
+  border: 1px solid; opacity: 0.4;
+}
+.ico-blue   { background: rgba(37,99,235,0.12);   color: var(--neon-blue);   } .ico-blue::after   { border-color: var(--neon-blue);   }
+.ico-purple { background: rgba(124,58,237,0.12); color: var(--neon-purple); } .ico-purple::after { border-color: var(--neon-purple); }
+.ico-cyan   { background: rgba(8,145,178,0.12);  color: var(--neon-cyan);   } .ico-cyan::after   { border-color: var(--neon-cyan);   }
+.ico-green  { background: rgba(22,163,74,0.12);  color: var(--neon-green);  } .ico-green::after  { border-color: var(--neon-green);  }
+.ico-yellow { background: rgba(180,83,9,0.12);   color: var(--neon-yellow); } .ico-yellow::after { border-color: var(--neon-yellow); }
+.ico-pink   { background: rgba(219,39,119,0.12); color: var(--neon-pink);   } .ico-pink::after   { border-color: var(--neon-pink);   }
+.ico-orange { background: rgba(194,65,12,0.12);  color: var(--neon-orange); } .ico-orange::after { border-color: var(--neon-orange); }
+
+.lv-meta { flex: 1; }
+.lv-eyebrow {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dim); margin-bottom: 0.35rem;
+}
+.lv-title {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.6rem; line-height: 1.2; color: var(--text);
+}
+.lv-xp {
+  margin-top: 0.4rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.25);
+  border-radius: 50px; padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700; color: var(--neon-yellow);
+}
+
+/* ═══════════════════════════════════════════════
+   CALLOUT BOXES (info boxes)
+═══════════════════════════════════════════════ */
+.callout {
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0; border: 1px solid;
+  position: relative; overflow: hidden;
+}
+.callout::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.callout .ct { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+.cb-blue   { background: rgba(37,99,235,0.06); border-color: rgba(37,99,235,0.2); } .cb-blue::before   { background: var(--neon-blue); }   .cb-blue   .ct { color: var(--neon-blue); }
+.cb-purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); } .cb-purple::before { background: var(--neon-purple); } .cb-purple .ct { color: var(--neon-purple); }
+.cb-cyan   { background: rgba(8,145,178,0.06);  border-color: rgba(8,145,178,0.2);  } .cb-cyan::before   { background: var(--neon-cyan); }   .cb-cyan   .ct { color: var(--neon-cyan); }
+.cb-green  { background: rgba(22,163,74,0.06);  border-color: rgba(22,163,74,0.2);  } .cb-green::before  { background: var(--neon-green); }  .cb-green  .ct { color: var(--neon-green); }
+.cb-yellow { background: rgba(180,83,9,0.06);   border-color: rgba(180,83,9,0.2);  } .cb-yellow::before { background: var(--neon-yellow); } .cb-yellow .ct { color: var(--neon-yellow); }
+.cb-pink   { background: rgba(219,39,119,0.06); border-color: rgba(219,39,119,0.2); } .cb-pink::before   { background: var(--neon-pink); }   .cb-pink   .ct { color: var(--neon-pink); }
+.cb-orange { background: rgba(194,65,12,0.06);  border-color: rgba(194,65,12,0.2); } .cb-orange::before { background: var(--neon-orange); } .cb-orange .ct { color: var(--neon-orange); }
+
+/* ═══════════════════════════════════════════════
+   STEP TIMELINE
+═══════════════════════════════════════════════ */
+.step-timeline { position: relative; padding-left: 2.5rem; }
+.step-timeline::before {
+  content: '';
+  position: absolute; left: 14px; top: 4px; bottom: 4px; width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-cyan));
+  opacity: 0.45; border-radius: 2px;
+}
+.step-item {
+  position: relative; margin-bottom: 1.2rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.1rem 1.3rem 1.1rem 1.2rem;
+  transition: 0.25s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.05);
+}
+.step-item:hover { border-color: var(--border2); background: #eef1ff; }
+.step-item::before {
+  content: attr(data-step);
+  position: absolute; left: -2.5rem; top: 1rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #ffffff; border: 2px solid var(--neon-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+}
+.step-label { font-weight: 700; color: var(--text); font-size: 0.98rem; margin-bottom: 0.35rem; }
+.step-body { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
+
+/* ═══════════════════════════════════════════════
+   ACHIEVEMENT CARDS (comparison/feature cards)
+═══════════════════════════════════════════════ */
+.ach-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; text-align: center;
+  position: relative; overflow: hidden;
+}
+.ach-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.ach-card:hover { transform: translateY(-6px); border-color: var(--border2); box-shadow: 0 10px 30px rgba(37,99,235,0.10); }
+.ach-card:hover::after { opacity: 1; }
+.ach-card.ac-blue:hover   { box-shadow: 0 16px 48px rgba(59,130,246,0.2); }
+.ach-card.ac-blue::after  { background: var(--neon-blue); }
+.ach-card.ac-purple:hover { box-shadow: 0 10px 28px rgba(124,58,237,0.15); }
+.ach-card.ac-purple::after { background: var(--neon-purple); }
+.ach-card.ac-cyan:hover   { box-shadow: 0 16px 48px rgba(6,182,212,0.2); }
+.ach-card.ac-cyan::after  { background: var(--neon-cyan); }
+.ach-card.ac-green:hover  { box-shadow: 0 16px 48px rgba(34,197,94,0.2); }
+.ach-card.ac-green::after { background: var(--neon-green); }
+.ach-card.ac-yellow:hover { box-shadow: 0 10px 28px rgba(180,83,9,0.15); }
+.ach-card.ac-yellow::after { background: var(--neon-yellow); }
+.ach-card.ac-pink:hover   { box-shadow: 0 16px 48px rgba(236,72,153,0.2); }
+.ach-card.ac-pink::after  { background: var(--neon-pink); }
+.ach-card.ac-orange:hover { box-shadow: 0 10px 28px rgba(194,65,12,0.15); }
+.ach-card.ac-orange::after { background: var(--neon-orange); }
+
+.ach-icon { font-size: 2.2rem; margin-bottom: 0.75rem; display: block; }
+.ach-title { font-family: var(--font-head); font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem; }
+.ach-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+/* ═══════════════════════════════════════════════
+   EXAMPLE CARDS (nt = story, te = technical)
+═══════════════════════════════════════════════ */
+.ex-card { border-radius: 16px; overflow: hidden; margin: 1.5rem 0; border: 1px solid; }
+.ex-card.ex-story { border-color: rgba(34,197,94,0.25); }
+.ex-card.ex-tech  { border-color: rgba(168,85,247,0.25); }
+.ex-card .ex-head {
+  padding: 0.85rem 1.4rem; font-weight: 800; font-size: 0.92rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.ex-card.ex-story .ex-head { background: rgba(22,163,74,0.08); color: #166534; }
+.ex-card.ex-tech  .ex-head { background: rgba(124,58,237,0.08); color: #5b21b6; }
+.ex-card .ex-body { padding: 1.4rem; background: #fafbff; }
+
+/* ═══════════════════════════════════════════════
+   CODE BLOCKS
+═══════════════════════════════════════════════ */
+pre[class*="language-"] {
+  border-radius: 14px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.88rem !important;
+  margin: 1rem 0 !important;
+  border: 1px solid rgba(99,102,241,0.12) !important;
+}
+code { font-family: var(--font-mono); font-size: 0.88em; }
+.inline-code {
+  background: rgba(8,145,178,0.08); color: #0e7490;
+  padding: 0.1rem 0.45rem; border-radius: 6px;
+  font-family: var(--font-mono); font-size: 0.88em;
+  border: 1px solid rgba(37,99,235,0.25);
+}
+.code-output {
+  background: #f0fdf4; color: #166534;
+  padding: 0.6rem 1rem; border-radius: 10px;
+  display: block; margin-top: 0.5rem;
+  font-family: var(--font-mono); font-size: 0.85rem;
+  border: 1px solid rgba(22,163,74,0.25);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════
+   DIMENSION / TENSOR CARDS
+═══════════════════════════════════════════════ */
+.dim-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; position: relative; overflow: hidden;
+}
+.dim-card:hover { transform: translateY(-4px); }
+.dim-rank {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 2.5rem; line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.dim-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.8rem; }
+.dim-code {
+  background: #f1f5f9; border-radius: 10px; padding: 0.65rem 0.9rem;
+  font-family: var(--font-mono); font-size: 0.82rem;
+  border: 1px solid rgba(99,102,241,0.15); margin-bottom: 0.8rem;
+}
+.dim-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.75rem; }
+.dim-example {
+  font-size: 0.82rem; padding: 0.5rem 0.75rem;
+  border-radius: 8px; border: 1px solid;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════
+   FORMULA / MATH BLOCK
+═══════════════════════════════════════════════ */
+.math-block {
+  background: #f5f7ff;
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 14px; padding: 1.4rem 2rem; margin: 1.2rem 0;
+  text-align: center; overflow-x: auto;
+}
+.math-label { font-size: 0.78rem; font-weight: 700; color: #6b7280; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem; }
+
+/* ═══════════════════════════════════════════════
+   TABLE
+═══════════════════════════════════════════════ */
+.gtbl { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+.gtbl thead th {
+  background: rgba(37,99,235,0.08); color: var(--neon-blue);
+  font-family: var(--font-head); font-weight: 700;
+  padding: 0.9rem 1rem; text-align: left;
+  border-bottom: 1px solid rgba(37,99,235,0.15);
+  font-size: 0.85rem; letter-spacing: 0.5px;
+}
+.gtbl tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.92rem; vertical-align: top; }
+.gtbl tbody tr:last-child td { border-bottom: none; }
+.gtbl tbody tr:hover td { background: rgba(37,99,235,0.04); color: var(--text); }
+.gtbl tbody td strong { color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   MERMAID
+═══════════════════════════════════════════════ */
+.mermaid-wrap {
+  background: #f8f9ff;
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0;
+  text-align: center; overflow-x: auto;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.06);
+}
+
+/* ═══════════════════════════════════════════════
+   QUIZ / CHALLENGE BOX
+═══════════════════════════════════════════════ */
+.quiz-box {
+  background: #fffbf0;
+  border: 1px solid rgba(180,83,9,0.18);
+  border-radius: 20px; padding: 1.6rem;
+  margin: 1.8rem 0; position: relative; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(180,83,9,0.07);
+}
+.quiz-box::before {
+  content: '⚡ QUICK CHALLENGE';
+  position: absolute; top: 0; right: 0;
+  background: linear-gradient(135deg, #b45309, #c2410c);
+  color: #fff; font-family: var(--font-head); font-weight: 800;
+  font-size: 0.62rem; letter-spacing: 2px;
+  padding: 0.32rem 0.9rem; border-radius: 0 20px 0 12px;
+}
+.quiz-q {
+  font-weight: 700; color: #1c1917;
+  margin-bottom: 1.1rem; font-size: 1.02rem;
+  line-height: 1.55;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+
+/* ── UNIFORM options — all look IDENTICAL before answering ── */
+.quiz-opt {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px; padding: 0.75rem 1.1rem;
+  cursor: pointer; font-size: 0.93rem; color: #374151;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  font-weight: 500;
+  display: flex; align-items: center; gap: 0.85rem;
+  user-select: none;
+}
+/* Hover: subtle neutral lift — no color hint whatsoever */
+.quiz-opt:not(.answered-opt):hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+  transform: translateX(3px);
+}
+/* After answering — reveal states */
+.quiz-opt.correct {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #14532d;
+  font-weight: 700;
+}
+.quiz-opt.correct .opt-letter {
+  background: #16a34a; color: #fff;
+}
+.quiz-opt.wrong {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #991b1b;
+  opacity: 0.8;
+}
+.quiz-opt.wrong .opt-letter {
+  background: #dc2626; color: #fff;
+}
+.quiz-opt.dimmed {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.quiz-opt .opt-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #f3f4f6; color: #6b7280;
+  border: 1.5px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  flex-shrink: 0; transition: background 0.2s, color 0.2s;
+}
+
+/* Explain text — standalone div after each option, hidden by default */
+.quiz-explain {
+  display: none;
+  font-size: 0.84rem; font-weight: 500;
+  margin-top: -0.35rem; margin-bottom: 0.35rem;
+  padding: 0.5rem 0.85rem 0.5rem 1rem;
+  border-radius: 0 0 10px 10px;
+  line-height: 1.55;
+  border-left: 3px solid transparent;
+}
+.quiz-explain.show-correct {
+  display: block;
+  background: rgba(22,163,74,0.07); color: #166534;
+  border-left-color: #16a34a;
+}
+.quiz-explain.show-wrong {
+  display: block;
+  background: rgba(220,38,38,0.06); color: #991b1b;
+  border-left-color: #dc2626;
+}
+.quiz-explain.show-reveal {
+  display: block;
+  background: rgba(37,99,235,0.06); color: #1e40af;
+  border-left-color: #2563eb;
+}
+
+/* Result banner below options */
+.quiz-feedback {
+  display: none; margin-top: 1rem; padding: 0.85rem 1.1rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+  align-items: center; gap: 0.6rem;
+}
+.quiz-feedback.show { display: flex; animation: fadeIn 0.35s; }
+.quiz-feedback.win  {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  color: #14532d; border: 1px solid rgba(22,163,74,0.3);
+}
+.quiz-feedback.lose {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: #991b1b; border: 1px solid rgba(220,38,38,0.2);
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;} }
+
+/* ═══════════════════════════════════════════════
+   STAT PILLS
+═══════════════════════════════════════════════ */
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border-radius: 50px; padding: 0.3rem 0.9rem;
+  font-weight: 700; font-size: 0.8rem; border: 1px solid;
+}
+.sp-blue   { background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.3); color: var(--neon-blue); }
+.sp-green  { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.3);  color: var(--neon-green); }
+.sp-yellow { background: rgba(180,83,9,0.08);  border-color: rgba(180,83,9,0.3);  color: var(--neon-yellow); }
+.sp-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--neon-purple); }
+.sp-cyan   { background: rgba(8,145,178,0.08); border-color: rgba(8,145,178,0.3);  color: var(--neon-cyan); }
+.sp-pink   { background: rgba(219,39,119,0.08); border-color: rgba(219,39,119,0.3); color: var(--neon-pink); }
+.sp-orange { background: rgba(194,65,12,0.08); border-color: rgba(194,65,12,0.3); color: var(--neon-orange); }
+
+/* ═══════════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════════ */
+.glow-div {
+  height: 2px; border-radius: 2px; margin: 2rem 0; opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-cyan), transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   HIGHLIGHT TEXT
+═══════════════════════════════════════════════ */
+.hl { background: rgba(180,83,9,0.1); color: #92400e; padding: 0 5px; border-radius: 4px; }
+.hl-blue { background: rgba(37,99,235,0.1); color: var(--neon-blue); padding: 0 5px; border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+.gfooter {
+  background: #e8edf8;
+  border-top: 1px solid var(--border);
+  padding: 3rem 0; margin-top: 4rem;
+  text-align: center;
+}
+.gfooter-logo {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+.fade-up {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-orbit { display: none; }
+  .level-card { padding: 1.5rem; }
+  .xp-badges { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   NOTIFICATION TOAST
+═══════════════════════════════════════════════ */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.gtoast {
+  background: #ffffff; border: 1px solid var(--border2);
+  border-radius: 14px; padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  backdrop-filter: blur(12px);
+  font-weight: 700; font-size: 0.88rem;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: auto; min-width: 260px;
+  box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.gtoast.show { transform: none; }
+.gtoast-icon { font-size: 1.4rem; }
+
+/* ═══════════════════════════════════════════════
+   FINAL RESULT MODAL
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.modal-overlay.open {
+  opacity: 1; pointer-events: auto;
+}
+.modal-box {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 2.5rem 2.5rem 2rem;
+  max-width: 520px; width: 100%;
+  position: relative; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(37,99,235,0.18), 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0;
+}
+.modal-overlay.open .modal-box {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+/* Coloured top band */
+.modal-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, #2563eb, #7c3aed, #db2777);
+}
+/* Close button */
+.modal-close {
+  position: absolute; top: 1.1rem; right: 1.2rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #f3f4f6; border: none; cursor: pointer;
+  font-size: 1rem; color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: #e5e7eb; color: #111827; }
+
+/* Trophy animation */
+.modal-trophy {
+  text-align: center; font-size: 4rem;
+  margin-bottom: 0.5rem;
+  animation: trophyBounce 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+}
+@keyframes trophyBounce {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  70%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.modal-title {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.6rem;
+  color: #1e1b4b; text-align: center; margin-bottom: 0.35rem;
+  line-height: 1.2;
+}
+.modal-subtitle {
+  text-align: center; color: #6b7280; font-size: 0.95rem;
+  margin-bottom: 1.5rem; line-height: 1.5;
+}
+
+/* Score ring */
+.score-ring-wrap {
+  display: flex; justify-content: center; margin-bottom: 1.5rem;
+}
+.score-ring {
+  width: 120px; height: 120px; position: relative;
+}
+.score-ring svg {
+  transform: rotate(-90deg);
+  width: 120px; height: 120px;
+}
+.score-ring .ring-bg {
+  fill: none; stroke: #f3f4f6; stroke-width: 10;
+}
+.score-ring .ring-fill {
+  fill: none; stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 327; stroke-dashoffset: 327;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1) 0.5s;
+}
+.score-ring .ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.score-ring .ring-num {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.7rem; line-height: 1; color: #1e1b4b;
+}
+.score-ring .ring-label {
+  font-size: 0.72rem; color: #9ca3af;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* Grade card */
+.grade-card {
+  border-radius: 16px; padding: 1rem 1.2rem; margin-bottom: 1.4rem;
+  text-align: center; border: 2px solid;
+}
+.grade-card .grade-letter {
+  font-family: var(--font-head); font-weight: 800; font-size: 2rem;
+  line-height: 1; margin-bottom: 0.2rem;
+}
+.grade-card .grade-msg {
+  font-size: 0.92rem; font-weight: 600; line-height: 1.4;
+}
+/* Grade themes */
+.grade-s  { background: linear-gradient(135deg,#fefce8,#fef9c3); border-color: #b45309; }
+.grade-s  .grade-letter { color: #92400e; }
+.grade-s  .grade-msg    { color: #78350f; }
+.grade-a  { background: linear-gradient(135deg,#f0fdf4,#dcfce7); border-color: #16a34a; }
+.grade-a  .grade-letter { color: #166534; }
+.grade-a  .grade-msg    { color: #14532d; }
+.grade-b  { background: linear-gradient(135deg,#eff6ff,#dbeafe); border-color: #2563eb; }
+.grade-b  .grade-letter { color: #1d4ed8; }
+.grade-b  .grade-msg    { color: #1e3a8a; }
+.grade-c  { background: linear-gradient(135deg,#f5f3ff,#ede9fe); border-color: #7c3aed; }
+.grade-c  .grade-letter { color: #6d28d9; }
+.grade-c  .grade-msg    { color: #4c1d95; }
+.grade-d  { background: linear-gradient(135deg,#fef2f2,#fee2e2); border-color: #dc2626; }
+.grade-d  .grade-letter { color: #b91c1c; }
+.grade-d  .grade-msg    { color: #991b1b; }
+
+/* XP earned row */
+.modal-xp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8f9ff; border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 12px; padding: 0.75rem 1.1rem; margin-bottom: 1.4rem;
+}
+.modal-xp-row .mxp-label { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+.modal-xp-row .mxp-val   {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* Buttons */
+.modal-btns { display: flex; gap: 0.75rem; }
+.modal-btn-retry {
+  flex: 1; padding: 0.8rem 1rem;
+  background: #f3f4f6; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #374151; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.modal-btn-retry:hover { background: #e5e7eb; border-color: #d1d5db; color: #111827; }
+.modal-btn-continue {
+  flex: 2; padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  border: none; border-radius: 12px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #ffffff; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.modal-btn-continue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,0.4); }
+
+/* Confetti canvas */
+#confettiCanvas {
+  position: fixed; inset: 0; z-index: 10001;
+  pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ XP STRIP ═══════════════════ -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 275 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">🔍 Analyst</span>
+        <span class="xp-badge b2" id="badge2">🗺️ Planner</span>
+        <span class="xp-badge b3" id="badge3">🎯 Framer</span>
+        <span class="xp-badge b4" id="badge4">🧊 Tensor</span>
+        <span class="xp-badge b5" id="badge5">🚀 ML Ninja</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-solid fa-gamepad me-1"></i> Gamified Learning Quest</div>
+        <h1>
+          <span class="line1">Level Up Your</span>
+          <span class="line2">Data Science & AI/ML</span>
+        </h1>
+        <p class="hero-sub">
+          5 boss levels. Real India examples. Python code. Quizzes that test your brain. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, and go from zero to hero in Data Science & AI/ML!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">500</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Knowledge</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">🧠</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- ═══════════════════ QUEST MAP ═══════════════════ -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1" class="quest-item"><span class="quest-num" style="background:rgba(59,130,246,0.15);color:var(--neon-blue);">L1</span> What is Data Analysis?</a>
+    <a href="#s2" class="quest-item"><span class="quest-num" style="background:rgba(59,130,246,0.15);color:var(--neon-blue);">L1</span> Data Analysis — Steps & EDA</a>
+    <a href="#s3" class="quest-item"><span class="quest-num" style="background:rgba(168,85,247,0.15);color:var(--neon-purple);">L2</span> How to Plan a DS Project</a>
+    <a href="#s4" class="quest-item"><span class="quest-num" style="background:rgba(168,85,247,0.15);color:var(--neon-purple);">L2</span> 6-Phase Framework Deep Dive</a>
+    <a href="#s5" class="quest-item"><span class="quest-num" style="background:rgba(6,182,212,0.15);color:var(--neon-cyan);">L3</span> Framing an ML Problem</a>
+    <a href="#s6" class="quest-item"><span class="quest-num" style="background:rgba(6,182,212,0.15);color:var(--neon-cyan);">L3</span> Classification vs Regression vs Clustering</a>
+    <a href="#s7" class="quest-item"><span class="quest-num" style="background:rgba(34,197,94,0.15);color:var(--neon-green);">L4</span> What are Tensors?</a>
+    <a href="#s8" class="quest-item"><span class="quest-num" style="background:rgba(34,197,94,0.15);color:var(--neon-green);">L4</span> Tensor In-Depth</a>
+    <a href="#s9" class="quest-item"><span class="quest-num" style="background:rgba(234,179,8,0.15);color:var(--neon-yellow);">L5</span> Tensor Operations & Python</a>
+    <a href="#s10" class="quest-item"><span class="quest-num" style="background:rgba(236,72,153,0.15);color:var(--neon-pink);">🏆</span> Final Summary & Roadmap</a>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1: DATA ANALYSIS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s1" data-xp="50" data-badge="badge1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">What is Data Analysis?</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +50 XP on completion</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Definition</div>
+    <strong>Data Analysis</strong> ka matlab hai — raw data ko <span class="hl">inspect, clean, transform aur model</span> karna taaki useful information nikaali ja sake aur better decisions liye ja sakein.<br><br>
+    Simple analogy: Tumne exam diya. Sirf marks nahi bataye gaye — <strong>"Algebra mein weak, Geometry mein strong, 80% questions attempt kiye."</strong> Yahi hota hai data analysis — <strong>numbers ko meaning dena!</strong>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> AI/ML ka Golden Rule</div>
+    <strong>Garbage In = Garbage Out!</strong> Agar data galat hai toh model bhi galat sikhega.<br>
+    → Data Scientists apna <strong>60–70% time</strong> sirf data analysis mein lagate hain — modeling mein nahi!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1rem;"><i class="fa-solid fa-map-pin me-2" style="color:var(--neon-blue)"></i>Real India Examples 🇮🇳</h5>
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+      <div class="ach-card ac-blue">
+        <span class="ach-icon">🏏</span>
+        <div class="ach-title">IPL Cricket</div>
+        <div class="ach-desc">CSK ke coaches har ball ka data analyse karte hain — kaunsa batsman kis bowler ke against weak hai? Data analysis = winning strategy!</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ach-card ac-orange">
+        <span class="ach-icon">🛵</span>
+        <div class="ach-title">Swiggy / Zomato</div>
+        <div class="ach-desc">Crores of orders ka data analyse karo → delivery time predict karo, partner assign karo. Wo "34 min" estimate data analysis ka result hai!</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ach-card ac-pink">
+        <span class="ach-icon">🏥</span>
+        <div class="ach-title">AIIMS Medical</div>
+        <div class="ach-desc">Patient records analyse karo → disease patterns dhundho → early detection karo. COVID ke time India mein spread data analysis ne predict kiya!</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ach-card ac-green">
+        <span class="ach-icon">🏦</span>
+        <div class="ach-title">SBI / HDFC Bank</div>
+        <div class="ach-desc">Real-time mein crores of transactions analyse karo. Achanak foreign transaction? Bank turant alert karta hai — ye data analysis hai!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEVEL 1B: EDA STEPS ── -->
+<div class="level-card lvl-blue fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-list-ol"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">Data Analysis — 5 Steps + Python EDA</div>
+    </div>
+  </div>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">📥 Data Collection — Ikatha Karo</div>
+      <div class="step-body">Databases (SQL), APIs, Excel files, Surveys, Web scraping — pehle decide karo data kahan se aayega.<br><em style="color:var(--neon-blue)">E-commerce: user purchase history, website clicks, product reviews collect karo.</em></div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">🧹 Data Cleaning — Saaf Karo</div>
+      <div class="step-body">Real data hamesha messy hota hai! Missing values, typos, duplicates, outliers — sab fix karo.<br><em style="color:var(--neon-blue)">"Mumbai" + "mumbai" + "MUMBAI" = same cheez → standardize karo!</em></div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">🔍 EDA — Explore Karo</div>
+      <div class="step-body">Statistics (mean, median, std) + Visualizations (histograms, box plots, scatter plots). Patterns dhundho!<br><em style="color:var(--neon-blue)">"Young users phone se zyada order karte hain" — ye EDA se pata chalta hai!</em></div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">📊 Analysis & Modeling — Jawab Dhundho</div>
+      <div class="step-body">Correlations nikalo, trends dekho, feature engineering karo, ML model ke liye data prepare karo.</div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-label">💡 Communicate — Story Batao</div>
+      <div class="step-body">Charts, dashboards, reports banao. Non-technical managers ko simple language mein samjhao.<br><em style="color:var(--neon-blue)">"Sales 20% down — monsoon mein delivery delay hoti hai." — ye hai good communication!</em></div>
+    </div>
+  </div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph LR
+    A["📥 Collect"] --> B["🧹 Clean"]
+    B --> C["🔍 EDA"]
+    C --> D["📊 Analyse"]
+    D --> E["💡 Communicate"]
+    E --> F["✅ Decisions"]
+    style A fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style B fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style C fill:#cffafe,stroke:#0891b2,color:#164e63,rx:10
+    style D fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style E fill:#1a2e1a,stroke:#22c55e,color:#86efac,rx:10
+    style F fill:#0f2f0f,stroke:#4ade80,color:#4ade80,rx:10
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> Python EDA — Starter Code</div>
+    <div class="ex-body">
+      <pre><code class="language-python">import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 1. Load & First Look
+df = pd.read_csv('sales_data.csv')
+print(df.shape)          # (1000, 8) — rows, columns
+print(df.head())         # Pehli 5 rows
+print(df.isnull().sum()) # Missing values kahan?
+
+# 2. Basic Stats — ek line mein sab kuch!
+print(df.describe())
+# mean, std, min, max, quartiles — instant!
+
+# 3. Handle Missing Values
+df['Age'].fillna(df['Age'].mean(), inplace=True)    # Number → mean
+df['City'].fillna(df['City'].mode()[0], inplace=True) # Category → mode
+
+# 4. Visualize Pattern
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.title('Feature Correlation Heatmap')
+plt.show()</code></pre>
+      <div class="code-output">✅ EDA ke baad pata hona chahiye: dataset size, missing values, distributions, important features, outliers!</div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 Data Scientist apna kitna time Data Analysis mein lagata hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Nahi — 10–20% toh bahut kam hai. Real DS work mein data cleaning hi sabse lamba step hai."><span class="opt-letter">A</span>10–20%</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Haan! Data Scientists ka 60–70% time data analysis mein lagta hai — modeling se kaafi zyada!"><span class="opt-letter">B</span>60–70%</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Close hai, par nahi. Industry average 60–70% hai — data preparation bohot time-consuming hoti hai!"><span class="opt-letter">C</span>30–40%</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Zyada estimate hai. 60–70% sahi hai — kuch time modeling aur deployment pe bhi jaata hai."><span class="opt-letter">D</span>90%+</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2: PROJECT PLANNING
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s3" data-xp="50" data-badge="badge2">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">How to Plan a Data Science Project</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +50 XP on completion</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Beginners ki Sabse Badi Galti</div>
+    Seedha code likhne lagte hain — bina plan ke! Result? <strong>Project fail ho jaata hai.</strong><br>
+    Professional Data Scientists ka 1st rule: <span class="hl">Pehle plan karo, phir code likho!</span><br>
+    → Google, Amazon, Netflix ke DS teams → <strong>CRISP-DM framework</strong> follow karti hain.
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-award"></i> CRISP-DM = Industry Standard</div>
+    <strong>Cross-Industry Standard Process for Data Mining</strong> — 1999 mein banaya, aaj bhi most used!<br>
+    Ek <strong>circular process</strong> hai — linear nahi! Kabhi bhi kisi bhi phase mein wapas jaana pad sakta hai.
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-4">
+      <div class="ach-card ac-blue">
+        <span class="ach-icon">🎯</span>
+        <div class="ach-title">Business Understanding</div>
+        <div class="ach-desc">Pehle business problem samjho — "Kya achieve karna hai?" Technical solution baad mein!</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-cyan">
+        <span class="ach-icon">📊</span>
+        <div class="ach-title">Data Understanding</div>
+        <div class="ach-desc">Available data explore karo — quality, completeness, relevance check karo.</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-orange">
+        <span class="ach-icon">🧹</span>
+        <div class="ach-title">Data Preparation</div>
+        <div class="ach-desc">Cleaning, transformation, feature engineering — model ke liye data ready karo.</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-purple">
+        <span class="ach-icon">🤖</span>
+        <div class="ach-title">Modeling</div>
+        <div class="ach-desc">Algorithm select karo, train karo, tune karo. Multiple models try karo — compare!</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-green">
+        <span class="ach-icon">✅</span>
+        <div class="ach-title">Evaluation</div>
+        <div class="ach-desc">Business goal achieve ho raha hai? Accuracy, F1, RMSE — metrics check karo.</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-yellow">
+        <span class="ach-icon">🚀</span>
+        <div class="ach-title">Deployment</div>
+        <div class="ach-desc">Real users ke liye deploy karo. API, app ya dashboard. Monitor karte raho!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="level-card lvl-purple fade-up" id="s4">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-stairs"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Deep Dive</div>
+      <div class="lv-title">6-Phase Framework — Swiggy Example</div>
+    </div>
+  </div>
+
+  <p style="color:var(--muted)">Real project walkthrough: <strong style="color:var(--text)">"Swiggy chahta hai delivery time predict karna."</strong> Chalte hain CRISP-DM se!</p>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">🎯 Problem Definition — Sabse Zaroori!</div>
+      <div class="step-body">
+        <span style="color:#b91c1c">Vague:</span> "Delivery time predict karna" — ye kafi nahi!<br>
+        <span style="color:var(--neon-green)">Precise:</span> "Given restaurant location, customer location, traffic, time, weather → predict delivery time in minutes (±5 min accuracy, 90% of time)"<br>
+        <em style="color:var(--dim)">Target variable? Input features? Success metric? Kitna data chahiye?</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">📦 Data Collection Strategy</div>
+      <div class="step-body">
+        Internal: Past orders DB, delivery times, partner locations<br>
+        External: Google Maps API (traffic), IMD weather API<br>
+        <em style="color:var(--dim)">Rule of thumb: ML ke liye minimum 1000–10,000 samples per class!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">🔬 EDA + Feature Engineering</div>
+      <div class="step-body">
+        EDA: Weekend pe delivery zyada late hoti hai? Rain mein kaise affect?<br>
+        Feature Engineering: Distance + Traffic → "difficulty score" banana<br>
+        <em style="color:var(--dim)">80% training, 10% validation, 10% test. Kabhi test data pe train mat karo!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">🤖 Model Selection</div>
+      <div class="step-body">
+        Simple se start karo:<br>
+        Baseline → Linear Regression → Random Forest → XGBoost / Neural Network<br>
+        <em style="color:var(--neon-yellow)">Pro tip: "Best model wahi jo deploy ho sake" — 99% accurate but 10 second slow = useless!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-label">📏 Evaluation</div>
+      <div class="step-body">
+        Regression → MAE (kitne minutes galat on average?)<br>
+        <em style="color:var(--dim)">Technical success ≠ Business success. "Model 8 min accurate, business ko 5 min chahiye" → FAIL!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="6">
+      <div class="step-label">🚀 Deployment + Monitoring</div>
+      <div class="step-body">
+        Flask/FastAPI se REST API → app se connect karo<br>
+        A/B testing → monthly retraining schedule<br>
+        <em style="color:var(--dim)">"Data Drift" hota hai jab real data training data se different ho jaata hai!</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan mt-3">
+    <div class="ct"><i class="fa-solid fa-clock"></i> Real Project Timelines</div>
+    <div class="table-responsive">
+      <table class="gtbl">
+        <thead><tr><th>Phase</th><th>Typical Time</th><th>Key Task</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Problem Definition</strong></td><td><span class="stat-pill sp-blue">1–2 days</span></td><td>Business team meeting, requirements</td></tr>
+          <tr><td><strong>Data Collection</strong></td><td><span class="stat-pill sp-cyan">1–2 weeks</span></td><td>Database access, APIs setup</td></tr>
+          <tr><td><strong>Data Preparation</strong></td><td><span class="stat-pill sp-yellow">2–4 weeks</span></td><td>⚠️ Sabse zyada time — cleaning!</td></tr>
+          <tr><td><strong>Modeling</strong></td><td><span class="stat-pill sp-purple">1–2 weeks</span></td><td>3–4 models, hyperparameter tuning</td></tr>
+          <tr><td><strong>Evaluation</strong></td><td><span class="stat-pill sp-green">3–5 days</span></td><td>Stakeholder approval</td></tr>
+          <tr><td><strong>Deployment</strong></td><td><span class="stat-pill sp-pink">1–2 weeks</span></td><td>API, integration, monitoring</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 CRISP-DM mein sabse zyada time kis phase mein lagta hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Modeling sirf 1–2 weeks ka hota hai. Asli time toh data tayyar karne mein lagta hai!"><span class="opt-letter">A</span>Modeling</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi — Deployment 1–2 weeks ka hota hai. Data Preparation sabse bada bottleneck hai CRISP-DM mein."><span class="opt-letter">B</span>Deployment</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! Data Preparation mein 2–4 weeks lagte hain — cleaning, feature engineering, splits — ye sabse lamba phase hai!"><span class="opt-letter">C</span>Data Preparation</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Evaluation sirf 3–5 din ka hota hai. Data Preparation hi sabse time-consuming phase hai!"><span class="opt-letter">D</span>Evaluation</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3: ML PROBLEM FRAMING
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s5" data-xp="50" data-badge="badge3">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-crosshairs"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">Framing a Machine Learning Problem</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +50 XP on completion</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> "Framing" kya hota hai?</div>
+    ML Problem Framing = ek vague real-world need ko ek <span class="hl">precise, solvable ML task</span> mein convert karna — jiske clear inputs, outputs aur success criteria hon.<br><br>
+    Ye <strong>Data Scientist ka #1 skill</strong> hai — coding se zyada zaroori! Galat framing = sab kuch galat.
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-xmark"></i> ❌ Vague (Galat) Framing</div>
+        <p style="color:var(--muted);font-style:italic;">"Humein customers ke baare mein predict karna hai"</p>
+        <p style="color:var(--muted);font-style:italic;">"Product better banana hai"</p>
+        <p style="color:var(--muted);font-style:italic;">"Sales badhani hai"</p>
+        <p style="color:#b91c1c;font-weight:700;margin:0;">ML se solve nahi hoga — precise nahi hai!</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check"></i> ✅ Precise (Sahi) Framing</div>
+        <p style="color:var(--muted);font-style:italic;">"Customer ke last 30 din ke behavior se predict karo: kya wo agale 7 din mein churn karega? (Yes/No)"</p>
+        <p style="color:var(--neon-green);font-weight:700;margin:0;">Ab ML se solve hoga! Input ✓ Output ✓ Metric ✓</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-clipboard-check me-2" style="color:var(--neon-cyan)"></i>ML Problem Framing Checklist</h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="❓">
+      <div class="step-label">Input (Features) kya hain?</div>
+      <div class="step-body">Model ko kya diya jaayega predict karne ke liye?<br><em style="color:var(--neon-cyan)">Loan Default: Age, Income, Credit Score, Existing loans, Employment type</em></div>
+    </div>
+    <div class="step-item" data-step="❓">
+      <div class="step-label">Output (Target) kya hai?</div>
+      <div class="step-body">
+        → Category? → <strong style="color:var(--neon-blue)">Classification</strong> (Default: Yes/No)<br>
+        → Number? → <strong style="color:var(--neon-cyan)">Regression</strong> (Probability: 0.73)<br>
+        → Groups? → <strong style="color:var(--neon-purple)">Clustering</strong> (Segments: A, B, C)
+      </div>
+    </div>
+    <div class="step-item" data-step="❓">
+      <div class="step-label">Labelled Data available hai?</div>
+      <div class="step-body">
+        Labels hain → <strong style="color:var(--neon-green)">Supervised Learning</strong><br>
+        Labels nahi → <strong style="color:var(--neon-yellow)">Unsupervised Learning</strong><br>
+        <em style="color:var(--dim)">90% real-world ML problems = Supervised Learning!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="❓">
+      <div class="step-label">Success Metric kya hogi?</div>
+      <div class="step-body">
+        Medical: Recall important (false negative = dangerous!)<br>
+        Spam: Precision important (false positive = important email delete!)<br>
+        Sales: RMSE / MAE — price difference minimize karo
+      </div>
+    </div>
+    <div class="step-item" data-step="❓">
+      <div class="step-label">Ethical & Privacy Concerns?</div>
+      <div class="step-body">India mein DPDP Act 2023! Consent liya? Gender/Religion bias? Explainability — bank kyu loan reject kar raha hai batao!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEVEL 3B: ML TYPES ── -->
+<div class="level-card lvl-cyan fade-up" id="s6">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-shapes"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Skill Unlock</div>
+      <div class="lv-title">Classification vs Regression vs Clustering</div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Classification -->
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(59,130,246,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue)">🏷️</div>
+        <div class="dim-name" style="color:var(--neon-blue)">Classification</div>
+        <div class="dim-code" style="color:var(--neon-blue)">Output = Category</div>
+        <div class="dim-desc">"Kaunsi category mein aata hai?"<br>Yes/No, Spam/Not, Cat/Dog, Fraud/Safe</div>
+        <div class="dim-example" style="border-color:rgba(59,130,246,0.2); color:var(--muted);">
+          🏦 Paytm Fraud Detection<br>
+          📧 Gmail Spam Filter<br>
+          🏥 AIIMS Diagnosis
+        </div>
+        <div class="mt-2"><span class="stat-pill sp-blue">Supervised ✅</span></div>
+        <div class="mt-2" style="font-size:0.8rem; color:var(--dim);">Algorithms: Logistic Reg, SVM, Random Forest, Neural Net</div>
+      </div>
+    </div>
+
+    <!-- Regression -->
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(6,182,212,0.3);">
+        <div class="dim-rank" style="color:var(--neon-cyan)">📈</div>
+        <div class="dim-name" style="color:var(--neon-cyan)">Regression</div>
+        <div class="dim-code" style="color:var(--neon-cyan)">Output = Number</div>
+        <div class="dim-desc">"Kitna hoga?"<br>Price, time, score, temperature</div>
+        <div class="dim-example" style="border-color:rgba(6,182,212,0.2); color:var(--muted);">
+          🏠 Mumbai Property Price<br>
+          🛵 Swiggy Delivery Time<br>
+          📉 NSE Stock Prediction
+        </div>
+        <div class="mt-2"><span class="stat-pill sp-cyan">Supervised ✅</span></div>
+        <div class="mt-2" style="font-size:0.8rem; color:var(--dim);">Algorithms: Linear Reg, XGBoost, LSTM, Prophet</div>
+      </div>
+    </div>
+
+    <!-- Clustering -->
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(168,85,247,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple)">🔵</div>
+        <div class="dim-name" style="color:var(--neon-purple)">Clustering</div>
+        <div class="dim-code" style="color:var(--neon-purple)">Output = Groups</div>
+        <div class="dim-desc">"Kaunse groups hain?"<br>Labels nahi hote — AI khud dhundta hai!</div>
+        <div class="dim-example" style="border-color:rgba(168,85,247,0.2); color:var(--muted);">
+          🛍️ Amazon Customer Segments<br>
+          📰 InShorts Article Grouping<br>
+          🎵 Spotify Song Similarity
+        </div>
+        <div class="mt-2"><span class="stat-pill sp-purple">Unsupervised ❌</span></div>
+        <div class="mt-2" style="font-size:0.8rem; color:var(--dim);">Algorithms: K-Means, DBSCAN, Hierarchical</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow mt-4">
+    <div class="ct"><i class="fa-solid fa-scale-balanced"></i> Quick Comparison Table</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Feature</th><th style="color:#93c5fd">Classification</th><th style="color:#67e8f9">Regression</th><th style="color:#d8b4fe">Clustering</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Output</strong></td><td>Category / Label</td><td>Continuous Number</td><td>Group ID</td></tr>
+          <tr><td><strong>Labels?</strong></td><td>✅ Yes (Supervised)</td><td>✅ Yes (Supervised)</td><td>❌ No (Unsupervised)</td></tr>
+          <tr><td><strong>Question</strong></td><td>"Spam hai?"</td><td>"Price kitna?"</td><td>"Similar groups?"</td></tr>
+          <tr><td><strong>Metric</strong></td><td>Accuracy, F1, AUC</td><td>MAE, RMSE, R²</td><td>Silhouette Score</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 "Mumbai mein property price predict karna" — ye kaunsa ML problem type hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Classification mein output ek category hoti hai (Yes/No, Spam/Not). Price ek number hai — toh ye Regression hai!"><span class="opt-letter">A</span>Classification</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Perfect! Property price ek continuous number hai (jaise ₹85 lakhs) — isliye ye Regression problem hai. Output = number = Regression!"><span class="opt-letter">B</span>Regression</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Clustering mein labels nahi hote aur hum groups dhundte hain. Yahan toh humein ek specific price predict karni hai."><span class="opt-letter">C</span>Clustering</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Property price prediction supervised learning hai — humein training data mein prices (labels) milte hain."><span class="opt-letter">D</span>Unsupervised Learning</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 4: TENSORS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s7" data-xp="50" data-badge="badge4">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-cubes"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">What are Tensors?</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +50 XP on completion</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Definition</div>
+    <strong>Tensor</strong> = <span class="hl">multi-dimensional array of numbers</span> — ek container jo numbers ko organized tarike se store karta hai kisi bhi number of dimensions mein.<br><br>
+    Sochte hain numbers rakhne ke "boxes":<br>
+    → <strong>Ek number</strong> → Scalar (0D) &nbsp;→&nbsp; <strong>Numbers ki line</strong> → Vector (1D) &nbsp;→&nbsp; <strong>Numbers ka table</strong> → Matrix (2D) &nbsp;→&nbsp; <strong>Tables ka stack</strong> → 3D+
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-star"></i> Tensors AI/ML mein kyu zaroori hain?</div>
+    Har cheez jo AI samjhta hai — woh pehle tensor banti hai:<br>
+    🖼️ Image → <span class="stat-pill sp-blue">3D Tensor</span>&nbsp; 📝 Text → <span class="stat-pill sp-purple">2D Tensor</span>&nbsp; 🎵 Audio → <span class="stat-pill sp-cyan">1D Tensor</span>&nbsp; 🎬 Video → <span class="stat-pill sp-pink">5D Tensor</span><br><br>
+    <strong>Deep Learning = Tensors pe operations karna!</strong> TensorFlow ka naam bhi "flow of tensors" se aata hai!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-layer-group me-2" style="color:var(--neon-green)"></i>Dimension Explorer — 0D se 5D tak</h5>
+
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+      <div class="dim-card" style="border-color:rgba(59,130,246,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue);">0D</div>
+        <div class="dim-name" style="color:var(--neon-blue);">Scalar</div>
+        <div class="dim-code">42</div>
+        <div class="dim-desc">Ek akela number. Koi dimension nahi.<br>Shape: <span class="inline-code">()</span></div>
+        <div class="dim-example" style="border-color:rgba(59,130,246,0.2); color:var(--muted);">🌡️ Temperature = 37°C<br>📊 Accuracy = 0.95</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="dim-card" style="border-color:rgba(6,182,212,0.3);">
+        <div class="dim-rank" style="color:var(--neon-cyan);">1D</div>
+        <div class="dim-name" style="color:var(--neon-cyan);">Vector</div>
+        <div class="dim-code">[1, 2, 3, 4, 5]</div>
+        <div class="dim-desc">Numbers ki list. Ek dimension — length.<br>Shape: <span class="inline-code">(5,)</span></div>
+        <div class="dim-example" style="border-color:rgba(6,182,212,0.2); color:var(--muted);">📈 Stock prices: [₹100, ₹102]<br>📝 5 subject marks</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="dim-card" style="border-color:rgba(234,179,8,0.3);">
+        <div class="dim-rank" style="color:var(--neon-yellow);">2D</div>
+        <div class="dim-name" style="color:var(--neon-yellow);">Matrix</div>
+        <div class="dim-code">[[1,2,3],<br> [4,5,6],<br> [7,8,9]]</div>
+        <div class="dim-desc">Numbers ka table. Rows × Columns.<br>Shape: <span class="inline-code">(3, 3)</span></div>
+        <div class="dim-example" style="border-color:rgba(234,179,8,0.2); color:var(--muted);">📋 Marksheet (30 × 5)<br>🖤 Grayscale image</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="dim-card" style="border-color:rgba(168,85,247,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">3D+</div>
+        <div class="dim-name" style="color:var(--neon-purple);">Tensor</div>
+        <div class="dim-code">(3, 224, 224)<br>(B, 3, H, W)</div>
+        <div class="dim-desc">Stacked matrices. n dimensions.<br>Shape: <span class="inline-code">(3, 224, 224)</span></div>
+        <div class="dim-example" style="border-color:rgba(168,85,247,0.2); color:var(--muted);">🎨 Color image (RGB)<br>📦 Batch of images</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mermaid-wrap mt-4">
+    <div class="mermaid">
+graph LR
+    A["🔢 Scalar<br/>(0D) = ()"] --> B["📏 Vector<br/>(1D) = (n,)"]
+    B --> C["📊 Matrix<br/>(2D) = (m,n)"]
+    C --> D["🎨 Image Tensor<br/>(3D) = (3,H,W)"]
+    D --> E["📦 Batch<br/>(4D) = (B,3,H,W)"]
+    E --> F["🎬 Video<br/>(5D) = (B,T,3,H,W)"]
+    style A fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style B fill:#cffafe,stroke:#0891b2,color:#164e63,rx:10
+    style C fill:#2d2a0a,stroke:#eab308,color:#fde047,rx:10
+    style D fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style E fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:10
+    style F fill:#fce7f3,stroke:#db2777,color:#831843,rx:10
+    </div>
+  </div>
+
+  <div class="ex-card ex-story mt-3">
+    <div class="ex-head"><i class="fa-solid fa-camera"></i> Color Image → 3D Tensor: Step by Step</div>
+    <div class="ex-body">
+      <p style="color:var(--muted);">Tumne phone se ek <strong style="color:var(--text)">224×224 pixel color photo</strong> khinchi. AI ke liye ye kaise banti hai?</p>
+      <div class="step-timeline">
+        <div class="step-item" data-step="R">
+          <div class="step-label" style="color:#f87171;">Red Channel</div>
+          <div class="step-body">224×224 matrix — har pixel ka red value (0–255). Shape: <span class="inline-code">(224, 224)</span></div>
+        </div>
+        <div class="step-item" data-step="G">
+          <div class="step-label" style="color:#4ade80;">Green Channel</div>
+          <div class="step-body">224×224 matrix — har pixel ka green value. Shape: <span class="inline-code">(224, 224)</span></div>
+        </div>
+        <div class="step-item" data-step="B">
+          <div class="step-label" style="color:#60a5fa;">Blue Channel</div>
+          <div class="step-body">224×224 matrix — har pixel ka blue value. Shape: <span class="inline-code">(224, 224)</span></div>
+        </div>
+      </div>
+      <div class="math-block">
+        <div class="math-label">Final Image Tensor</div>
+        $$\text{Shape} = (3, 224, 224) \Rightarrow 3 \times 224 \times 224 = \mathbf{150{,}528 \text{ numbers!}}$$
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEVEL 4B: TENSOR IN-DEPTH ── -->
+<div class="level-card lvl-green fade-up" id="s8">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-microscope"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Deep Dive</div>
+      <div class="lv-title">Tensors In-Depth — Shape, dtype, Real Examples</div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-ruler-combined"></i> Shape</div>
+        <p>Har dimension ka size batata hai.</p>
+        <p><span class="inline-code">()</span> → Scalar</p>
+        <p><span class="inline-code">(5,)</span> → 5-element vector</p>
+        <p><span class="inline-code">(4, 3)</span> → 4×3 matrix = 12 numbers</p>
+        <p><span class="inline-code">(3, 224, 224)</span> → RGB image</p>
+        <p style="margin:0;"><span class="inline-code">(32, 3, 224, 224)</span> → 32 images batch</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="callout cb-cyan h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-database"></i> Data Types (dtype)</div>
+        <p><strong style="color:var(--neon-cyan)">float32</strong> — Most common! Neural network weights</p>
+        <p><strong style="color:var(--neon-blue)">float16</strong> — GPU speedup (Mixed Precision)</p>
+        <p><strong style="color:var(--neon-green)">int64</strong> — Labels, indices, counts</p>
+        <p><strong style="color:var(--neon-yellow)">bool</strong> — Masks, conditions, attention</p>
+        <p style="margin:0; font-size:0.85rem; color:var(--dim);">Deep Learning → <strong>float32</strong>. Scientific → float64.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="callout cb-orange h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-zap"></i> float32 kyu best hai?</div>
+        <p>Memory: 4 bytes vs float64's 8 bytes → <strong>2× zyada data GPU mein fit!</strong></p>
+        <p>Speed: A100 GPU = <strong>float32 16× faster</strong> than float64!</p>
+        <p style="margin:0;">DL mein float64 ki precision ki zaroorat nahi — models already approximate hote hain!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> ⚠️ Sabse Common Error — Shape Mismatch!</div>
+    Neural network training mein har beginner yahi error paata hai:<br>
+    <span class="inline-code" style="color:var(--neon-red);">RuntimeError: mat1 and mat2 shapes cannot be multiplied (32×256 and 512×10)</span><br>
+    <strong>Fix:</strong> <span class="inline-code">print(tensor.shape)</span> — debugging ka step #1!
+  </div>
+
+  <div class="ex-card ex-story mt-3">
+    <div class="ex-head"><i class="fa-solid fa-film"></i> Non-Tech Example: Netflix Video → 5D Tensor</div>
+    <div class="ex-body">
+      <p style="color:var(--muted)">Sochte hain Netflix ek AI train kar raha hai jo video samjhe (auto-captioning).</p>
+      <div class="step-timeline">
+        <div class="step-item" data-step="1"><div class="step-label">Ek video = stacked frames</div><div class="step-body">1 minute clip = 30fps × 60s = <strong>1,800 frames</strong></div></div>
+        <div class="step-item" data-step="2"><div class="step-label">Har frame = color image tensor</div><div class="step-body">1920×1080 HD frame → Shape: <span class="inline-code">(3, 1080, 1920)</span></div></div>
+        <div class="step-item" data-step="3"><div class="step-label">Full video (1 min) = 4D Tensor</div><div class="step-body">Shape: <span class="inline-code">(1800, 3, 1080, 1920)</span></div></div>
+        <div class="step-item" data-step="4"><div class="step-label">Batch of 8 clips = 5D Tensor!</div><div class="step-body">Shape: <span class="inline-code">(8, 1800, 3, 1080, 1920)</span> = <strong>89.5 Billion numbers</strong> — ek batch mein!</div></div>
+      </div>
+      <div class="callout cb-green mt-2" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-server"></i> Isliye Data Centers!</div>
+        89.5B numbers process karne ke liye crores ke GPUs chahiye. Isliye AI companies ka infrastructure itna costly hai!
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 Ek RGB color image ka tensor shape kya hoga? (224×224 pixels)</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat — ye sirf grayscale (black & white) image ka shape hoga. Color image mein 3 channels (R, G, B) hote hain!"><span class="opt-letter">A</span>(224, 224)</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi — ye ek 3D cube hoga (224×224×224). Color image ka sahi shape (3, 224, 224) hota hai — 3 channels ke saath."><span class="opt-letter">B</span>(224, 224, 224)</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Ekdum sahi! Shape (3, 224, 224) = 3 color channels (R, G, B) × 224 height × 224 width. Har color channel ek 2D matrix hai!"><span class="opt-letter">C</span>(3, 224, 224)</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi — 1 channel ka matlab sirf ek color plane hoga (jaise grayscale). RGB color image mein 3 channels hote hain."><span class="opt-letter">D</span>(1, 224, 224)</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 5: TENSOR OPERATIONS + CODE
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-yellow fade-up" id="s9" data-xp="50" data-badge="badge5">
+  <div class="corner-deco">LEVEL 5</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-code"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 5 · Boss Topic</div>
+      <div class="lv-title">Tensor Operations & Python Code</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +50 XP on completion</div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-bullseye"></i> 5 Most Important Operations</div>
+    Ye 5 operations har Deep Learning engineer daily use karta hai. Inhe samjhna = PyTorch/TensorFlow samjhna!
+  </div>
+
+  <!-- Operation 1: Reshape -->
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-expand"></i> Operation 1: reshape() — Shape Badlo, Data Same Raho</div>
+    <div class="ex-body">
+      <div class="math-block">
+        <div class="math-label">Condition</div>
+        $$\text{Total elements must be same: Shape}(2,4) = 8 \xrightarrow{\text{reshape}} \text{Shape}(4,2) = 8 \checkmark$$
+      </div>
+      <pre><code class="language-python">import torch
+
+t = torch.tensor([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+print("Original:", t.shape)      # torch.Size([4, 3])
+
+t1 = t.reshape(2, 6)
+print("Reshaped:", t1.shape)     # torch.Size([2, 6])
+
+t2 = t.reshape(-1)               # -1 = auto calculate!
+print("Flattened:", t2.shape)    # torch.Size([12])</code></pre>
+      <div class="code-output">💡 -1 ka matlab "auto calculate karo" → PyTorch khud nikalta hai! Image (3,224,224) → flatten → reshape(150528) for FC layer.</div>
+    </div>
+  </div>
+
+  <!-- Operation 2: MatMul -->
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-table-cells"></i> Operation 2: matmul() — Neural Network ka Dil</div>
+    <div class="ex-body">
+      <div class="math-block">
+        <div class="math-label">Matrix Multiplication</div>
+        $$C = A \times B \Rightarrow \text{Shape}(m,k) \times \text{Shape}(k,n) = \text{Shape}(m,n)$$
+        $$\text{Inner dimensions must match: } k = k !$$
+      </div>
+      <pre><code class="language-python">import torch
+
+x = torch.randn(3, 4)       # 3 samples, 4 features
+W = torch.randn(4, 5)       # 4 input → 5 output (layer weights)
+
+# Ye poora neural network layer hai!
+output = x @ W              # Ya torch.matmul(x, W)
+
+print("Input:", x.shape)    # torch.Size([3, 4])
+print("Weights:", W.shape)  # torch.Size([4, 5])
+print("Output:", output.shape) # torch.Size([3, 5])</code></pre>
+      <div class="code-output">⚡ GPT-4 mein yahi operation billions of times hota hai har forward pass mein! GPU is 500x faster than CPU for this!</div>
+    </div>
+  </div>
+
+  <!-- Operation 3: Broadcasting -->
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-expand-arrows-alt"></i> Operation 3: Broadcasting — Smart Shape Matching</div>
+    <div class="ex-body">
+      <pre><code class="language-python">import torch
+
+A = torch.ones(4, 3)                        # Shape: (4, 3)
+b = torch.tensor([1.0, 2.0, 3.0])          # Shape: (3,)
+
+result = A + b   # b auto-broadcasts to (4,3)!
+print(result)
+# tensor([[2., 3., 4.],
+#         [2., 3., 4.],   ← har row pe same b add hua!
+#         [2., 3., 4.],
+#         [2., 3., 4.]])
+
+# Real use: Batch normalization bias
+batch = torch.randn(32, 512)
+bias  = torch.randn(512)
+output = batch + bias   # (32,512) + (512,) → (32,512) ✅</code></pre>
+      <div class="code-output">📐 Broadcasting Rule: Right se dimensions compare karo. Same ya 1 hai → OK! Na same na 1 → Error!</div>
+    </div>
+  </div>
+
+  <!-- Operation 4: Aggregation -->
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-sigma"></i> Operation 4: Aggregation — Sum, Mean, Max</div>
+    <div class="ex-body">
+      <pre><code class="language-python">import torch
+
+t = torch.tensor([[1.0, 2.0, 3.0],
+                   [4.0, 5.0, 6.0]])   # Shape: (2, 3)
+
+print(t.sum())             # 21.0
+print(t.mean())            # 3.5
+print(t.sum(dim=0))        # tensor([5., 7., 9.])  ← column-wise
+print(t.sum(dim=1))        # tensor([6., 15.])     ← row-wise
+
+# Loss function calculate karo!
+pred    = torch.tensor([2.5, 0.5, 2.0])
+targets = torch.tensor([3.0, 1.0, 2.5])
+mae_loss = torch.mean(torch.abs(pred - targets))
+print("MAE Loss:", mae_loss.item())   # 0.5</code></pre>
+      <div class="code-output">🎯 Neural network loss (MSE, MAE, CrossEntropy) sab aggregation operations hain!</div>
+    </div>
+  </div>
+
+  <!-- Operation 5: GPU -->
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-microchip"></i> Operation 5: GPU Transfer — Speed Supercharge!</div>
+    <div class="ex-body">
+      <pre><code class="language-python">import torch
+
+print(torch.cuda.is_available())     # True agar NVIDIA GPU
+
+x = torch.randn(1000, 1000)         # CPU tensor
+print(x.device)    # cpu
+
+# GPU pe move karo!
+if torch.cuda.is_available():
+    x_gpu = x.to('cuda')
+    print(x_gpu.device)    # cuda:0
+
+    # GPU pe 500x faster computation!
+    result = torch.matmul(x_gpu, x_gpu)
+
+    # Wapas CPU (display ke liye)
+    result_cpu = result.to('cpu')
+
+# Apple M1/M2/M3 ke liye:
+x_mps = x.to('mps')   # Metal Performance Shaders</code></pre>
+      <div class="code-output">🚀 1000×1000 matmul: CPU = 50ms, NVIDIA A100 GPU = 0.1ms → 500× FASTER! Common Error: "Expected all tensors on same device" → .to('cuda') karo!</div>
+    </div>
+  </div>
+
+  <!-- QUIZ 5 -->
+  <div class="quiz-box" data-quiz="5" data-correct="d" data-xp="25">
+    <div class="quiz-q">🤔 <span class="inline-code">t.reshape(-1)</span> mein -1 ka kya matlab hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat — reverse karne ke liye torch.flip() use hota hai. -1 in reshape mein ek dimension ko auto-calculate karne ka shorthand hai."><span class="opt-letter">A</span>Tensor ko reverse karo</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi — dimension remove karne ke liye squeeze() use hota hai. -1 in reshape sirf ek placeholder hai jo auto-calculate hota hai."><span class="opt-letter">B</span>Last dimension remove karo</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Galat — negative indexing alag concept hai (jaise t[-1] = last element). Yahan reshape mein -1 ek special value hai jo auto-size calculate karta hai."><span class="opt-letter">C</span>Negative indexing hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Bilkul! -1 ka matlab PyTorch khud calculate karta hai ki us dimension mein kitne elements aane chahiye, taaki total elements same rahein. Bohot useful shortcut!"><span class="opt-letter">D</span>Size auto-calculate karo</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     FINAL: SUMMARY + ROADMAP
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s10" style="background:linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.04), #ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary & Your Roadmap</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Takeaway</th><th>Real Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>Data Analysis</strong></td><td>Raw data → Insights</td><td>60–70% DS time yahan</td><td>IPL, Swiggy, AIIMS</td></tr>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>EDA + Steps</strong></td><td>Collect → Clean → Explore → Communicate</td><td>pandas.describe() = magic!</td><td>Every DS project</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L2</span> <strong>Project Planning</strong></td><td>CRISP-DM 6-phase circular</td><td>Pehle plan, phir code!</td><td>Swiggy delivery prediction</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L3</span> <strong>ML Framing</strong></td><td>Vague → Precise problem</td><td>Input + Output + Metric clear karo</td><td>Loan default, churn</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L3</span> <strong>Class/Reg/Clust</strong></td><td>3 main ML problem types</td><td>Output type se type decide hota hai</td><td>Fraud, price, segments</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Tensors</strong></td><td>N-dimensional number arrays</td><td>0D→1D→2D→3D+ sab data tensor</td><td>Images, text, video</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Tensor In-Depth</strong></td><td>Shape, dtype, real examples</td><td>float32, shape mismatch errors</td><td>Netflix AI, ChatGPT</td></tr>
+        <tr><td><span class="stat-pill sp-yellow">L5</span> <strong>Tensor Ops</strong></td><td>reshape, matmul, broadcast, GPU</td><td>matmul = neural network ka core</td><td>PyTorch training</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph TD
+    DA["🔍 Data Analysis"] --> PP["📋 Project Planning"]
+    PP --> FR["🎯 Problem Framing"]
+    FR --> CL["🏷️ Classification"]
+    FR --> RG["📈 Regression"]
+    FR --> CL2["🔵 Clustering"]
+    CL --> T["⚡ Tensors"]
+    RG --> T
+    CL2 --> T
+    T --> DL["🤖 Deep Learning"]
+    DL --> AI["🚀 AI Apps"]
+    style DA fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:12
+    style PP fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:12
+    style FR fill:#cffafe,stroke:#0891b2,color:#164e63,rx:12
+    style CL fill:#eff6ff,stroke:#3b82f6,color:#1e40af,rx:10
+    style RG fill:#d1fae5,stroke:#059669,color:#064e3b,rx:10
+    style CL2 fill:#f3e8ff,stroke:#9333ea,color:#4a1d96,rx:10
+    style T fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    style DL fill:#fce7f3,stroke:#db2777,color:#831843,rx:12
+    style AI fill:#fef9c3,stroke:#b45309,color:#713f12,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Libraries — Zaroor Seekho</div>
+        <strong style="color:var(--neon-blue)">pandas, numpy</strong> — Data Analysis must-know<br>
+        <strong style="color:var(--neon-cyan)">matplotlib, seaborn</strong> — Visualization<br>
+        <strong style="color:var(--neon-green)">scikit-learn</strong> — All ML models<br>
+        <strong style="color:var(--neon-orange)">PyTorch</strong> — Deep Learning + Tensors<br>
+        <strong style="color:var(--neon-yellow)">TensorFlow/Keras</strong> — Alternative DL framework
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein?</div>
+        🎓 <strong>Linear/Logistic Regression</strong> — start yahan se!<br>
+        🌲 <strong>Decision Trees, Random Forest</strong><br>
+        🧠 <strong>Neural Networks, CNNs</strong> (images)<br>
+        🤗 <strong>Transformers, BERT, GPT</strong> (text)<br>
+        ⚙️ <strong>MLOps</strong> — deploy, monitor, scale
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>Data Analysis</strong> = Data ka doctor — usse samjho, diagnose karo<br>
+    → <strong>Project Planning</strong> = GPS — bina plan ke khoge!<br>
+    → <strong>Problem Framing</strong> = Sahi sawaal poochho — sahi jawab milega<br>
+    → <strong>Tensors</strong> = AI ki universal language — har data in numbers, in arrays<br><br>
+    <strong style="color:var(--neon-pink)">In 5 concepts ko samajh liya toh Data Science aur AI/ML ka 30% foundation ready hai! 🚀</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-solid fa-brain me-2"></i>DS & AI/ML Quest</div>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.5rem;">Data Analysis · Project Planning · ML Framing · Tensors | Gamified Tutorial</p>
+    <p style="color:var(--dim); font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking AI/ML learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════ TOAST CONTAINER ═══════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════ FINAL RESULT MODAL ═══════════════════ -->
+<canvas id="confettiCanvas"></canvas>
+
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare 5 quizzes complete kar liye!</div>
+
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/5</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+
+    <div class="modal-btns">
+      <button class="modal-btn-retry" id="modalRetry">
+        <i class="fa-solid fa-rotate-right"></i> Retry All
+      </button>
+      <button class="modal-btn-continue" id="modalContinue">
+        <i class="fa-solid fa-trophy"></i> Awesome, Continue!
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ FINAL MODAL ═══ */
+function showFinalModal() {
+  const total = quizTotal;
+  const correct = quizCorrect;
+  const pct = total > 0 ? correct / total : 0;
+  const quizXP = correct * 25;
+
+  const grades = [
+    { min: 1.0,  cls: 'grade-s', letter: 'S 🌟', msg: 'Zabardast! Tum ek star student ho! Saare 5/5 correct!' },
+    { min: 0.8,  cls: 'grade-a', letter: 'A 🎯', msg: 'Bahut badhiya! Almost perfect performance!' },
+    { min: 0.6,  cls: 'grade-b', letter: 'B 📘', msg: 'Accha kiya! Kuch topics dobara review karo.' },
+    { min: 0.4,  cls: 'grade-c', letter: 'C 💪', msg: 'Theek hai! Concepts ko aur practice karo.' },
+    { min: 0.0,  cls: 'grade-d', letter: 'D 📚', msg: 'Aur mehnat karo! Tutorial dobara padho.' },
+  ];
+  const g = grades.find(gr => pct >= gr.min);
+
+  document.getElementById('ringNum').textContent  = correct + '/' + total;
+  document.getElementById('modalXpVal').textContent = quizXP + ' XP';
+
+  const gradeCard = document.getElementById('gradeCard');
+  gradeCard.className = 'grade-card ' + g.cls;
+  document.getElementById('gradeLetter').textContent = g.letter;
+  document.getElementById('gradeMsg').textContent    = g.msg;
+
+  if (pct === 1.0) {
+    document.getElementById('modalTrophy').textContent  = '🏆';
+    document.getElementById('modalTitle').textContent   = '🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent = 'Wah! Saare ' + total + '/' + total + ' sahi! Tum ML Ninja ho!';
+  } else if (pct >= 0.6) {
+    document.getElementById('modalTrophy').textContent  = '🎯';
+    document.getElementById('modalTitle').textContent   = 'Quest Complete!';
+    document.getElementById('modalSubtitle').textContent = correct + ' out of ' + total + ' correct. Kafi accha kiya!';
+  } else if (pct >= 0.4) {
+    document.getElementById('modalTrophy').textContent  = '💪';
+    document.getElementById('modalTitle').textContent   = 'Quest Attempt Done!';
+    document.getElementById('modalSubtitle').textContent = 'Concepts review karo aur phir try karo!';
+  } else {
+    document.getElementById('modalTrophy').textContent  = '📚';
+    document.getElementById('modalTitle').textContent   = 'Keep Trying!';
+    document.getElementById('modalSubtitle').textContent = 'Tutorial dobara padho aur retry karo!';
+  }
+
+  // Animate ring
+  const circumference = 327;
+  const offset = circumference * (1 - pct);
+  const ringColors = { 'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626' };
+  const ringEl = document.getElementById('ringFill');
+  ringEl.style.stroke = ringColors[g.cls] || '#2563eb';
+  // Reset then animate
+  ringEl.style.transition = 'none';
+  ringEl.style.strokeDashoffset = '327';
+  setTimeout(() => {
+    ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+    ringEl.style.strokeDashoffset = offset;
+  }, 80);
+
+  document.getElementById('finalModal').classList.add('open');
+  if (pct >= 0.6) launchConfetti(pct);
+}
+
+/* ── Confetti ── */
+function launchConfetti(pct) {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const count  = Math.floor(80 + pct * 140);
+  const colors = ['#2563eb','#7c3aed','#db2777','#16a34a','#b45309','#0891b2','#f59e0b'];
+  const pieces = Array.from({length: count}, () => ({
+    x:    Math.random() * canvas.width,
+    y:    Math.random() * -canvas.height * 0.6,
+    w:    Math.random() * 10 + 5,
+    h:    Math.random() * 6  + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx:   (Math.random() - 0.5) * 4,
+    vy:   Math.random() * 4 + 2,
+    rot:  Math.random() * 360,
+    vrot: (Math.random() - 0.5) * 9,
+    alpha: 1,
+  }));
+
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    pieces.forEach(p => {
+      if (p.y > canvas.height + 20) return;
+      alive = true;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if (p.y > canvas.height * 0.65) p.alpha -= 0.02;
+      p.alpha = Math.max(0, p.alpha);
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive && frame < 260) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  })();
+}
+
+/* ── Modal button listeners attached after DOM is ready ── */
+/* (moved to DOMContentLoaded so modal HTML exists when listeners bind) */
+
+/* ── Re-init quizzes after retry ── */
+function initQuizzes() {
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    // Clone opts to remove old listeners
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      const n = opt.cloneNode(true);
+      opt.parentNode.replaceChild(n, opt);
+    });
+    const correct = box.dataset.correct;
+    const qxp     = parseInt(box.dataset.xp) || 25;
+    let answered   = false;
+
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        const isCorrect = opt.dataset.ans === correct;
+        const fb = box.querySelector('.quiz-feedback');
+
+        box.querySelectorAll('.quiz-opt').forEach(o => {
+          o.classList.add('answered-opt');
+          const exDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+          if (o.dataset.ans === correct) {
+            o.classList.add('correct');
+            if (exDiv) exDiv.classList.add('show-correct');
+          } else if (o === opt && !isCorrect) {
+            o.classList.add('wrong');
+            if (exDiv) exDiv.classList.add('show-wrong');
+          } else {
+            o.classList.add('dimmed');
+          }
+        });
+
+        if (isCorrect) {
+          quizCorrect++;
+          fb.className = 'quiz-feedback show win';
+          fb.innerHTML = '<span style="font-size:1.3rem">🎉</span>&nbsp; Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+          addXP(qxp);
+          showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+        } else {
+          fb.className = 'quiz-feedback show lose';
+          fb.innerHTML = '<span style="font-size:1.3rem">💡</span>&nbsp; Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+          showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+        }
+
+        const doneCount = Array.from(document.querySelectorAll('.quiz-box'))
+          .filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+        if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+      });
+    });
+  });
+}
+</script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, theme: 'base',
+  themeVariables: {
+    primaryColor: '#dbeafe', primaryTextColor: '#1e3a8a',
+    primaryBorderColor: '#2563eb', lineColor: '#94a3b8',
+    secondaryColor: '#d1fae5', tertiaryColor: '#ede9fe',
+    fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 24 }
+});
+
+/* ═══ XP SYSTEM ═══ */
+let xp = 0;
+let scrollXpEarned = 0;  // tracks only scroll XP so retry restores exactly this amount
+const XP_MAX = 275;  // 5×30 scroll XP + 5×25 quiz XP = 275 total
+const earnedBadges = new Set();
+
+function addXP(amount, badgeId) {
+  // badgeId is only passed for scroll XP — use it to track scroll total separately
+  if (badgeId) scrollXpEarned = Math.min(scrollXpEarned + amount, 150);
+  xp = Math.min(xp + amount, XP_MAX);
+  document.getElementById('xpFill').style.width = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  if (badgeId && !earnedBadges.has(badgeId)) {
+    earnedBadges.add(badgeId);
+    const el = document.getElementById(badgeId);
+    if (el) el.classList.add('earned');
+  }
+  if (xp >= XP_MAX) showToast('🏆', 'QUEST COMPLETE! 🎊', 'Tu ban gaya ML Ninja! 275/275 XP!', '#b45309');
+}
+
+/* ═══ TOAST ═══ */
+function showToast(icon, title, msg, color) {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'gtoast';
+  t.innerHTML = `<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══ QUIZ SYSTEM ═══ */
+let quizTotal = 0;     // total questions
+let quizCorrect = 0;   // correct answers
+
+document.querySelectorAll('.quiz-box').forEach(box => {
+  quizTotal++;
+  const correct = box.dataset.correct;
+  const qxp = parseInt(box.dataset.xp) || 25;
+  let answered = false;
+
+  // Build explain divs as siblings AFTER each option (not inside)
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    const explain = opt.dataset.explain || '';
+    if (explain) {
+      const div = document.createElement('div');
+      div.className = 'quiz-explain';
+      div.dataset.forAns = opt.dataset.ans;
+      div.textContent = explain;
+      opt.parentNode.insertBefore(div, opt.nextSibling);
+    }
+  });
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      const ans = opt.dataset.ans;
+      const fb = box.querySelector('.quiz-feedback');
+      const isCorrect = ans === correct;
+
+      // Mark every option and reveal its explain div
+      box.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.add('answered-opt');
+        const explainDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+        if (o.dataset.ans === correct) {
+          o.classList.add('correct');
+          if (explainDiv) explainDiv.classList.add('show-correct');
+        } else if (o === opt && !isCorrect) {
+          o.classList.add('wrong');
+          if (explainDiv) explainDiv.classList.add('show-wrong');
+        } else {
+          o.classList.add('dimmed');
+          // Show the correct reveal for non-selected wrong options
+          if (o.dataset.ans === correct && explainDiv) explainDiv.classList.add('show-reveal');
+        }
+      });
+
+      if (isCorrect) {
+        quizCorrect++;
+        fb.className = 'quiz-feedback show win';
+        fb.innerHTML = '<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+        addXP(qxp);
+        showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+      } else {
+        fb.className = 'quiz-feedback show lose';
+        fb.innerHTML = '<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+        showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+      }
+
+      // Check if ALL quizzes answered → show final modal
+      const totalAnswered = document.querySelectorAll('.quiz-box').length;
+      const doneCount = Array.from(document.querySelectorAll('.quiz-box')).filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+      if (doneCount === totalAnswered) {
+        setTimeout(() => showFinalModal(), 1200);
+      }
+    });
+  });
+});
+
+/* ═══ SCROLL OBSERVER 1 — fade-up animation only ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      fadeObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+/* ═══ SCROLL OBSERVER 2 — XP awards on section reach ═══ */
+const sectionXP = {
+  's1': { xp: 30, badge: 'badge1', msg: '🔍 Data Analyst badge unlocked!' },
+  's3': { xp: 30, badge: 'badge2', msg: '🗺️ Planner badge unlocked!' },
+  's5': { xp: 30, badge: 'badge3', msg: '🎯 Framer badge unlocked!' },
+  's7': { xp: 30, badge: 'badge4', msg: '🧊 Tensor Master badge unlocked!' },
+  's9': { xp: 30, badge: 'badge5', msg: '🚀 ML Ninja badge unlocked!' },
+};
+
+const xpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (sectionXP[id] && !earnedBadges.has(sectionXP[id].badge)) {
+        const { xp: sx, badge, msg } = sectionXP[id];
+        addXP(sx, badge);
+        showToast('🏅', 'Badge Unlocked!', msg, '#7c3aed');
+      }
+      xpObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+/* Only observe the 5 XP-granting sections — not all sN elements */
+['s1','s3','s5','s7','s9'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) xpObserver.observe(el);
+});
+
+/* ═══ SMOOTH SCROLL ═══ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* ═══ MODAL BUTTON LISTENERS ═══
+   Attached here — AFTER the modal HTML exists in the DOM.
+   The earlier script block runs before the modal HTML is parsed,
+   so getElementById returns null there. Here it is guaranteed to exist. */
+function closeModal() {
+  document.getElementById('finalModal').classList.remove('open');
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalContinue').addEventListener('click', closeModal);
+
+document.getElementById('modalRetry').addEventListener('click', () => {
+  closeModal();
+  quizCorrect = 0;
+  // Restore to exactly the scroll XP earned so far — not a hardcoded value
+  xp = scrollXpEarned;
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(o => {
+      o.classList.remove('correct','wrong','dimmed','answered-opt');
+    });
+    box.querySelectorAll('.quiz-explain').forEach(ex => {
+      ex.classList.remove('show-correct','show-wrong','show-reveal');
+    });
+    const fb = box.querySelector('.quiz-feedback');
+    if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  });
+  initQuizzes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* Click outside the box (on the dark overlay) to close */
+document.getElementById('finalModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+
+</body>
+</html>

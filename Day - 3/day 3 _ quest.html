@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python EDA Quest — Exploratory Data Analysis Mastery!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — LIGHT GAMIFIED
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #f0f4ff;
+  --bg2:       #e8edf8;
+  --bg3:       #dde4f5;
+  --card:      #ffffff;
+  --card2:     #f5f7ff;
+  --border:    rgba(99,102,241,0.12);
+  --border2:   rgba(99,102,241,0.25);
+
+  --neon-blue:   #2563eb;
+  --neon-cyan:   #0891b2;
+  --neon-purple: #7c3aed;
+  --neon-pink:   #db2777;
+  --neon-green:  #16a34a;
+  --neon-yellow: #b45309;
+  --neon-orange: #c2410c;
+  --neon-red:    #dc2626;
+
+  --text:  #1e1b4b;
+  --muted: #4b5563;
+  --dim:   #9ca3af;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-blue:   0 4px 16px rgba(37,99,235,0.18), 0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple: 0 4px 16px rgba(124,58,237,0.18), 0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:   0 4px 16px rgba(8,145,178,0.18),  0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:  0 4px 16px rgba(22,163,74,0.18),  0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow: 0 4px 16px rgba(180,83,9,0.18),   0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:   0 4px 16px rgba(219,39,119,0.18), 0 1px 4px rgba(219,39,119,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.container-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative; z-index: 1;
+}
+
+/* ═══ XP BAR ═══ */
+.xp-strip {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(240,244,255,0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  padding: 0.65rem 0;
+}
+.xp-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.xp-label {
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+}
+.xp-bar-wrap {
+  flex: 1; min-width: 120px;
+  background: rgba(37,99,235,0.1);
+  border-radius: 50px; height: 10px;
+  border: 1px solid var(--border2); overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+  border-radius: 50px;
+  transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 10px rgba(37,99,235,0.35);
+  position: relative;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0;} 50%{opacity:1;} }
+.xp-score {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.9rem; color: var(--neon-yellow); white-space: nowrap;
+}
+.xp-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.xp-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 0.2rem 0.65rem; border-radius: 50px;
+  border: 1px solid; white-space: nowrap;
+  transition: 0.3s; opacity: 0.35;
+}
+.xp-badge.earned { opacity: 1; animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes badgePop { 0%{transform:scale(0);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+.xp-badge.b1 { border-color: var(--neon-blue);   color: var(--neon-blue);   }
+.xp-badge.b2 { border-color: var(--neon-cyan);   color: var(--neon-cyan);   }
+.xp-badge.b3 { border-color: var(--neon-purple); color: var(--neon-purple); }
+.xp-badge.b4 { border-color: var(--neon-green);  color: var(--neon-green);  }
+.xp-badge.b5 { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 6rem 0 5rem;
+  background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(8,145,178,0.07) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-orbit {
+  position: absolute; top: 50%; right: 8%;
+  transform: translateY(-50%);
+  width: 420px; height: 420px;
+  pointer-events: none;
+}
+.orbit-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-ring:nth-child(1) { width: 150px; height: 150px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 250px; height: 250px; animation: spin 20s linear infinite reverse; border-color: rgba(168,85,247,0.2); }
+.orbit-ring:nth-child(3) { width: 350px; height: 350px; animation: spin 30s linear infinite; border-color: rgba(6,182,212,0.15); }
+.orbit-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 50%; top: -4px; left: 50%; transform: translateX(-50%);
+}
+.orbit-ring:nth-child(1) .orbit-dot { background: var(--neon-blue);   box-shadow: var(--glow-blue);   }
+.orbit-ring:nth-child(2) .orbit-dot { background: var(--neon-purple); box-shadow: var(--glow-purple); }
+.orbit-ring:nth-child(3) .orbit-dot { background: var(--neon-cyan);   box-shadow: var(--glow-cyan);   }
+.orbit-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3rem; animation: float 4s ease-in-out infinite;
+}
+@keyframes spin  { from{transform:translate(-50%,-50%) rotate(0deg);}  to{transform:translate(-50%,-50%) rotate(360deg);} }
+@keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-12px);} }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px; padding: 0.3rem 1rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--neon-blue);
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-blue); box-shadow: var(--glow-blue);
+  animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+.hero h1 {
+  font-family: var(--font-head);
+  font-weight: 800; font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1; letter-spacing: -1.5px;
+  margin-bottom: 1.5rem;
+}
+.hero h1 .line1 { display: block; color: #1e1b4b; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 40%, var(--neon-purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 560px; margin-bottom: 2rem; line-height: 1.75; }
+.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-stat-item { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.8rem; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 0.8rem 2rem; border-radius: 50px; border: none;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  transition: 0.3s; animation: pulse-btn 2s infinite;
+}
+@keyframes pulse-btn { 0%,100%{box-shadow:0 4px 20px rgba(37,99,235,0.28);} 50%{box-shadow:0 4px 32px rgba(37,99,235,0.45);} }
+.hero-cta:hover { transform: translateY(-2px) scale(1.03); color: white; }
+
+/* ═══ QUEST MAP ═══ */
+.quest-map {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2rem; margin: 3rem 0;
+  position: relative; box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+}
+.quest-map::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.03));
+  pointer-events: none;
+}
+.quest-map-title {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 1.1rem; color: var(--neon-yellow);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+}
+.quest-map-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(234,179,8,0.3), transparent); }
+.quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
+.quest-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  text-decoration: none; color: var(--muted);
+  font-weight: 600; font-size: 0.88rem; transition: 0.25s;
+}
+.quest-item:hover {
+  background: rgba(37,99,235,0.07); border-color: rgba(37,99,235,0.3);
+  color: var(--neon-blue); transform: translateX(4px);
+}
+.quest-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+}
+
+/* ═══ LEVEL CARD ═══ */
+.level-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 2.5rem; margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.level-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 24px 24px 0 0;
+}
+.level-card.lvl-blue::before   { background: linear-gradient(90deg, var(--neon-blue),   var(--neon-cyan));   }
+.level-card.lvl-purple::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));   }
+.level-card.lvl-cyan::before   { background: linear-gradient(90deg, var(--neon-cyan),   var(--neon-green));  }
+.level-card.lvl-green::before  { background: linear-gradient(90deg, var(--neon-green),  var(--neon-cyan));   }
+.level-card.lvl-yellow::before { background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange)); }
+.level-card.lvl-pink::before   { background: linear-gradient(90deg, var(--neon-pink),   var(--neon-purple)); }
+.level-card.lvl-orange::before { background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow)); }
+.level-card:hover { box-shadow: 0 8px 32px rgba(37,99,235,0.12); }
+.level-card .corner-deco {
+  position: absolute; top: 1.2rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.25;
+}
+
+.lv-header { display: flex; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.8rem; }
+.lv-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; position: relative;
+}
+.lv-icon-wrap::after {
+  content: '';
+  position: absolute; inset: -3px; border-radius: 18px;
+  border: 1px solid; opacity: 0.4;
+}
+.ico-blue   { background: rgba(37,99,235,0.12);  color: var(--neon-blue);   } .ico-blue::after   { border-color: var(--neon-blue);   }
+.ico-purple { background: rgba(124,58,237,0.12); color: var(--neon-purple); } .ico-purple::after { border-color: var(--neon-purple); }
+.ico-cyan   { background: rgba(8,145,178,0.12);  color: var(--neon-cyan);   } .ico-cyan::after   { border-color: var(--neon-cyan);   }
+.ico-green  { background: rgba(22,163,74,0.12);  color: var(--neon-green);  } .ico-green::after  { border-color: var(--neon-green);  }
+.ico-yellow { background: rgba(180,83,9,0.12);   color: var(--neon-yellow); } .ico-yellow::after { border-color: var(--neon-yellow); }
+.ico-pink   { background: rgba(219,39,119,0.12); color: var(--neon-pink);   } .ico-pink::after   { border-color: var(--neon-pink);   }
+.ico-orange { background: rgba(194,65,12,0.12);  color: var(--neon-orange); } .ico-orange::after { border-color: var(--neon-orange); }
+.lv-meta { flex: 1; }
+.lv-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 0.35rem; }
+.lv-title { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; line-height: 1.2; color: var(--text); }
+.lv-xp {
+  margin-top: 0.4rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.25);
+  border-radius: 50px; padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700; color: var(--neon-yellow);
+}
+
+/* ═══ CALLOUT ═══ */
+.callout {
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0; border: 1px solid;
+  position: relative; overflow: hidden;
+}
+.callout::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.callout .ct { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.cb-blue   { background: rgba(37,99,235,0.06);  border-color: rgba(37,99,235,0.2);  } .cb-blue::before   { background: var(--neon-blue);   } .cb-blue   .ct { color: var(--neon-blue);   }
+.cb-purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); } .cb-purple::before { background: var(--neon-purple); } .cb-purple .ct { color: var(--neon-purple); }
+.cb-cyan   { background: rgba(8,145,178,0.06);  border-color: rgba(8,145,178,0.2);  } .cb-cyan::before   { background: var(--neon-cyan);   } .cb-cyan   .ct { color: var(--neon-cyan);   }
+.cb-green  { background: rgba(22,163,74,0.06);  border-color: rgba(22,163,74,0.2);  } .cb-green::before  { background: var(--neon-green);  } .cb-green  .ct { color: var(--neon-green);  }
+.cb-yellow { background: rgba(180,83,9,0.06);   border-color: rgba(180,83,9,0.2);   } .cb-yellow::before { background: var(--neon-yellow); } .cb-yellow .ct { color: var(--neon-yellow); }
+.cb-pink   { background: rgba(219,39,119,0.06); border-color: rgba(219,39,119,0.2); } .cb-pink::before   { background: var(--neon-pink);   } .cb-pink   .ct { color: var(--neon-pink);   }
+.cb-orange { background: rgba(194,65,12,0.06);  border-color: rgba(194,65,12,0.2);  } .cb-orange::before { background: var(--neon-orange); } .cb-orange .ct { color: var(--neon-orange); }
+
+/* ═══ STEP TIMELINE ═══ */
+.step-timeline { position: relative; padding-left: 2.5rem; }
+.step-timeline::before {
+  content: '';
+  position: absolute; left: 14px; top: 4px; bottom: 4px; width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-cyan));
+  opacity: 0.45; border-radius: 2px;
+}
+.step-item { position: relative; margin-bottom: 1.2rem; }
+.step-item::before {
+  content: attr(data-step);
+  position: absolute; left: -2.5rem; top: 0.15rem;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--card2); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.75rem;
+  color: var(--neon-blue);
+}
+.step-label { font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 0.3rem; }
+.step-body  { font-size: 0.9rem; color: var(--muted); }
+
+/* ═══ CODE BLOCK ═══ */
+.code-wrap {
+  background: #f8f9fc; border: 1px solid var(--border2);
+  border-radius: 14px; overflow: hidden; margin: 1.2rem 0;
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(37,99,235,0.06); padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+  color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase;
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 10px; height: 10px; border-radius: 50%; }
+.code-dot:nth-child(1){ background:#dc2626; }
+.code-dot:nth-child(2){ background:#b45309; }
+.code-dot:nth-child(3){ background:#16a34a; }
+.code-wrap pre { margin: 0; padding: 1.2rem 1.4rem; overflow-x: auto; background: transparent; }
+.code-wrap pre code { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; }
+.code-output {
+  background: rgba(22,163,74,0.06); border-top: 1px solid rgba(22,163,74,0.2);
+  padding: 0.7rem 1.2rem;
+  font-family: var(--font-mono); font-size: 0.82rem; color: #14532d;
+  line-height: 1.6;
+}
+
+/* ═══ EXAMPLE CARD ═══ */
+.ex-card {
+  border-radius: 14px; margin: 1.2rem 0;
+  border: 1px solid var(--border2); overflow: hidden;
+}
+.ex-head {
+  padding: 0.7rem 1.1rem;
+  font-weight: 700; font-size: 0.88rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.ex-body { padding: 1.1rem; }
+.ex-real  { border-color: rgba(37,99,235,0.3);  } .ex-real  .ex-head { background: rgba(37,99,235,0.07);  color: var(--neon-blue);   }
+.ex-tech  { border-color: rgba(124,58,237,0.3); } .ex-tech  .ex-head { background: rgba(124,58,237,0.07); color: var(--neon-purple); }
+.ex-warn  { border-color: rgba(220,38,38,0.3);  } .ex-warn  .ex-head { background: rgba(220,38,38,0.07);  color: var(--neon-red);    }
+.ex-tip   { border-color: rgba(22,163,74,0.3);  } .ex-tip   .ex-head { background: rgba(22,163,74,0.07);  color: var(--neon-green);  }
+.ex-cyan  { border-color: rgba(8,145,178,0.3);  } .ex-cyan  .ex-head { background: rgba(8,145,178,0.07);  color: var(--neon-cyan);   }
+.ex-orange{ border-color: rgba(194,65,12,0.3);  } .ex-orange .ex-head{ background: rgba(194,65,12,0.07);  color: var(--neon-orange); }
+
+/* ═══ TABLE ═══ */
+.gtbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.gtbl thead tr { background: rgba(37,99,235,0.07); }
+.gtbl th { padding: 0.75rem 1rem; font-family: var(--font-head); font-weight: 700; text-align: left; color: var(--text); border-bottom: 1.5px solid var(--border2); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.gtbl td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+.gtbl tr:last-child td { border-bottom: none; }
+.gtbl tr:hover td { background: rgba(37,99,235,0.03); }
+
+/* ═══ DIM CARD ═══ */
+.dim-card {
+  background: var(--card2); border: 1.5px solid;
+  border-radius: 16px; padding: 1.4rem; height: 100%;
+}
+.dim-rank    { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.dim-name    { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; margin-bottom: 0.3rem; }
+.dim-code    { font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.75; }
+.dim-desc    { font-size: 0.87rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.6; }
+.dim-example {
+  font-size: 0.82rem; padding: 0.6rem 0.9rem;
+  border: 1px solid; border-radius: 10px;
+  background: rgba(255,255,255,0.6); line-height: 1.8;
+}
+
+/* ═══ QUIZ ═══ */
+.quiz-box {
+  background: var(--card2); border: 1.5px solid var(--border2);
+  border-radius: 18px; padding: 1.6rem; margin-top: 2rem;
+}
+.quiz-q { font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; color: var(--text); margin-bottom: 1.1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+.quiz-opt {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  background: #ffffff; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; padding: 0.8rem 1rem;
+  cursor: pointer; font-size: 0.92rem; font-weight: 500; color: #374151;
+  transition: all 0.18s ease; user-select: none;
+}
+.quiz-opt:not(.answered-opt):hover { background: #f3f4f6; border-color: #9ca3af; color: #111827; transform: translateX(3px); }
+.quiz-opt.correct { background: #f0fdf4; border-color: #16a34a; color: #14532d; font-weight: 700; }
+.quiz-opt.correct .opt-letter { background: #16a34a; color: #fff; }
+.quiz-opt.wrong   { background: #fef2f2; border-color: #dc2626; color: #991b1b; opacity: 0.8; }
+.quiz-opt.wrong   .opt-letter { background: #dc2626; color: #fff; }
+.quiz-opt.dimmed  { opacity: 0.45; pointer-events: none; }
+.quiz-opt .opt-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #f3f4f6; color: #6b7280;
+  border: 1.5px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  flex-shrink: 0; transition: background 0.2s, color 0.2s;
+}
+.quiz-explain {
+  display: none; font-size: 0.84rem; font-weight: 500;
+  margin-top: -0.35rem; margin-bottom: 0.35rem;
+  padding: 0.5rem 0.85rem 0.5rem 1rem;
+  border-radius: 0 0 10px 10px; line-height: 1.55;
+  border-left: 3px solid transparent;
+}
+.quiz-explain.show-correct { display: block; background: rgba(22,163,74,0.07);  color: #166534; border-left-color: #16a34a; }
+.quiz-explain.show-wrong   { display: block; background: rgba(220,38,38,0.06);  color: #991b1b; border-left-color: #dc2626; }
+.quiz-explain.show-reveal  { display: block; background: rgba(37,99,235,0.06);  color: #1e40af; border-left-color: #2563eb; }
+.quiz-feedback {
+  display: none; margin-top: 1rem; padding: 0.85rem 1.1rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+  align-items: center; gap: 0.6rem;
+}
+.quiz-feedback.show { display: flex; animation: fadeIn 0.35s; }
+.quiz-feedback.win  { background: linear-gradient(135deg,#f0fdf4,#dcfce7); color: #14532d; border: 1px solid rgba(22,163,74,0.3); }
+.quiz-feedback.lose { background: linear-gradient(135deg,#fef2f2,#fee2e2); color: #991b1b; border: 1px solid rgba(220,38,38,0.2); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;} }
+
+/* ═══ STAT PILLS ═══ */
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border-radius: 50px; padding: 0.3rem 0.9rem;
+  font-weight: 700; font-size: 0.8rem; border: 1px solid;
+}
+.sp-blue   { background: rgba(37,99,235,0.08);  border-color: rgba(37,99,235,0.3);  color: var(--neon-blue);   }
+.sp-green  { background: rgba(22,163,74,0.08);  border-color: rgba(22,163,74,0.3);  color: var(--neon-green);  }
+.sp-yellow { background: rgba(180,83,9,0.08);   border-color: rgba(180,83,9,0.3);   color: var(--neon-yellow); }
+.sp-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--neon-purple); }
+.sp-cyan   { background: rgba(8,145,178,0.08);  border-color: rgba(8,145,178,0.3);  color: var(--neon-cyan);   }
+.sp-pink   { background: rgba(219,39,119,0.08); border-color: rgba(219,39,119,0.3); color: var(--neon-pink);   }
+.sp-orange { background: rgba(194,65,12,0.08);  border-color: rgba(194,65,12,0.3);  color: var(--neon-orange); }
+
+/* ═══ MERMAID ═══ */
+.mermaid-wrap {
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto;
+}
+
+/* ═══ INLINE CODE ═══ */
+.inline-code { font-family: var(--font-mono); font-size: 0.85em; background: rgba(99,102,241,0.1); color: var(--neon-purple); padding: 1px 6px; border-radius: 5px; }
+
+/* ═══ HIGHLIGHT ═══ */
+.hl      { background: rgba(180,83,9,0.1);   color: #92400e;         padding: 0 5px; border-radius: 4px; }
+.hl-blue { background: rgba(37,99,235,0.1);  color: var(--neon-blue);padding: 0 5px; border-radius: 4px; }
+.hl-green{ background: rgba(22,163,74,0.1);  color: var(--neon-green);padding: 0 5px; border-radius: 4px; }
+
+/* ═══ GLOW DIVIDER ═══ */
+.glow-div {
+  height: 2px; border-radius: 2px; margin: 2rem 0; opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-cyan), transparent);
+}
+
+/* ═══ CHART MINI (visual placeholder bars) ═══ */
+.mini-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0.5rem; background: rgba(37,99,235,0.04); border-radius: 12px; border: 1px solid var(--border); }
+.mini-bar { border-radius: 4px 4px 0 0; flex: 1; transition: opacity 0.3s; }
+.mini-bar:hover { opacity: 0.75; }
+
+/* ═══ FOOTER ═══ */
+.gfooter {
+  background: #e8edf8; border-top: 1px solid var(--border);
+  padding: 3rem 0; margin-top: 4rem; text-align: center;
+}
+.gfooter-logo {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-orbit { display: none; }
+  .level-card { padding: 1.5rem; }
+  .xp-badges { display: none; }
+}
+
+/* ═══ TOAST ═══ */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.gtoast {
+  background: #ffffff; border: 1px solid var(--border2);
+  border-radius: 14px; padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  backdrop-filter: blur(12px); font-weight: 700; font-size: 0.88rem;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: auto; min-width: 260px;
+  box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.gtoast.show { transform: none; }
+.gtoast-icon { font-size: 1.4rem; }
+
+/* ═══ MODAL ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15,23,42,0.55); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: #ffffff; border-radius: 28px; padding: 2.5rem 2.5rem 2rem;
+  max-width: 520px; width: 100%; position: relative; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(37,99,235,0.18), 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+  opacity: 0;
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+.modal-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: #f3f4f6; border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem; color: #6b7280;
+  display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.modal-close:hover { background: #e5e7eb; color: #374151; }
+.modal-trophy   { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+.modal-title    { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; text-align: center; color: var(--text); margin-bottom: 0.4rem; }
+.modal-subtitle { color: var(--muted); text-align: center; font-size: 0.92rem; margin-bottom: 1.5rem; }
+.score-ring-wrap { display: flex; justify-content: center; margin-bottom: 1.2rem; }
+.score-ring { position: relative; width: 120px; height: 120px; }
+.score-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: #e5e7eb; stroke-width: 10; }
+.ring-fill { fill: none; stroke: #2563eb; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-num  { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; color: var(--text); line-height: 1; }
+.ring-label{ font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.grade-card { border-radius: 14px; padding: 0.85rem 1.2rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem; border: 1.5px solid; }
+.grade-s { background: #fef9c3; border-color: #b45309; }
+.grade-a { background: #f0fdf4; border-color: #16a34a; }
+.grade-b { background: #eff6ff; border-color: #2563eb; }
+.grade-c { background: #f5f3ff; border-color: #7c3aed; }
+.grade-d { background: #fef2f2; border-color: #dc2626; }
+.grade-letter { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; }
+.grade-msg    { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+.modal-xp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8f9ff; border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 12px; padding: 0.75rem 1.1rem; margin-bottom: 1.4rem;
+}
+.modal-xp-row .mxp-label { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+.modal-xp-row .mxp-val   {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-btns { display: flex; gap: 0.75rem; }
+.modal-btn-retry {
+  flex: 1; padding: 0.8rem 1rem;
+  background: #f3f4f6; border: 1.5px solid #e5e7eb; border-radius: 12px;
+  cursor: pointer; font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #374151; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.modal-btn-retry:hover { background: #e5e7eb; border-color: #d1d5db; color: #111827; }
+.modal-btn-continue {
+  flex: 2; padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  border: none; border-radius: 12px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 700; font-size: 0.92rem;
+  color: #ffffff; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.modal-btn-continue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,0.4); }
+#confettiCanvas { position: fixed; inset: 0; z-index: 10001; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ XP STRIP ═══════════════════ -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 275 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">🔍 EDA Scout</span>
+        <span class="xp-badge b2" id="badge2">📊 Uni Master</span>
+        <span class="xp-badge b3" id="badge3">🔗 Bi Analyst</span>
+        <span class="xp-badge b4" id="badge4">🌐 Multi Wizard</span>
+        <span class="xp-badge b5" id="badge5">🤖 Profile Pro</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-solid fa-gamepad me-1"></i> Gamified Learning Quest</div>
+        <h1>
+          <span class="line1">Master Python</span>
+          <span class="line2">Exploratory Data Analysis</span>
+        </h1>
+        <p class="hero-sub">
+          5 boss levels. EDA se Pandas Profiling tak. Real India examples. Python code jo samajh aaye. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, aur data ke raaz kholo!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">275</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Insights</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">📊</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- ═══════════════════ QUEST MAP ═══════════════════ -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1"  class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> What is EDA?</a>
+    <a href="#s2"  class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> EDA — Tools & Workflow</a>
+    <a href="#s3"  class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Univariate Analysis</a>
+    <a href="#s4"  class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Univariate — Plots & Code</a>
+    <a href="#s5"  class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> Bivariate Analysis</a>
+    <a href="#s6"  class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> Bivariate — Plots & Code</a>
+    <a href="#s7"  class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Multivariate Analysis</a>
+    <a href="#s8"  class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Multivariate — Heatmaps & Pairplots</a>
+    <a href="#s9"  class="quest-item"><span class="quest-num" style="background:rgba(180,83,9,0.15);color:var(--neon-yellow);">L5</span> Pandas Profiling</a>
+    <a href="#s10" class="quest-item"><span class="quest-num" style="background:rgba(219,39,119,0.15);color:var(--neon-pink);">🏆</span> Final Summary & Roadmap</a>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1-A : WHAT IS EDA
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">What is Exploratory Data Analysis?</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Definition</div>
+    <strong>EDA (Exploratory Data Analysis)</strong> = data ko <span class="hl">samajhne ki process</span> — model banane se pehle patterns, anomalies, distributions aur relationships dhundhna.<br><br>
+    Real analogy: Doctor pehle <strong>patient ka full checkup</strong> karta hai — blood test, BP, temperature — phir diagnosis deta hai. EDA bhi waisa hi hai — pehle data ka checkup, phir ML model!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> The Golden Rule of Data Science</div>
+    <strong>"Never trust your data blindly!"</strong> — EDA is that critical first step which saves hours of debugging later.<br>
+    Data Scientists apna <span class="hl">60–70% time EDA mein lagate hain</span>. Bina EDA ke model banana = andha maarna!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-bullseye me-2" style="color:var(--neon-blue)"></i>EDA ke 5 Main Goals</h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">📐 Data ka Shape aur Structure samjho</div>
+      <div class="step-body">
+        Kitni rows? Kitne columns? Kaunse datatypes hain? Koi missing values toh nahi?<br>
+        <em style="color:var(--neon-blue)">Tools: df.shape, df.info(), df.dtypes, df.describe()</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">📊 Distribution samjho</div>
+      <div class="step-body">
+        Kya data normally distributed hai? Skewed hai? Outliers hain?<br>
+        <em style="color:var(--neon-blue)">Tools: Histograms, Boxplots, df['col'].skew()</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">🔗 Relationships dhundho</div>
+      <div class="step-body">
+        Kaunse features ek dusre se connected hain? Price aur Area ka kya relation?<br>
+        <em style="color:var(--neon-blue)">Tools: Scatter plots, Heatmaps, Correlation matrix</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">🚨 Anomalies aur Outliers pakdo</div>
+      <div class="step-body">
+        Ek ₹50 crore ka flat average distort kar raha hai? Age -5 hai kisi ka?<br>
+        <em style="color:var(--neon-blue)">Tools: Boxplots, IQR method, Z-score</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-label">💡 Hypotheses generate karo</div>
+      <div class="step-body">
+        "Lagta hai ki mumbai mein prices higher hain" — ye EDA se milta hai, phir model confirm karta hai!<br>
+        <em style="color:var(--neon-blue)">EDA = Question Generator. Model = Answer Machine.</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-3">
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check"></i> EDA Types — Teen Levels</div>
+        <span class="stat-pill sp-blue">Univariate</span> — Ek variable ek baar<br><br>
+        <span class="stat-pill sp-purple">Bivariate</span> — Do variables ke beech relation<br><br>
+        <span class="stat-pill sp-green">Multivariate</span> — Teen ya zyada variables saath mein
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-orange h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-indian-rupee-sign"></i> Real India Examples</div>
+        📦 <strong>Flipkart</strong> — Product ratings ka EDA<br>
+        🏠 <strong>MagicBricks</strong> — Property prices EDA<br>
+        🏏 <strong>IPL Data</strong> — Player stats EDA<br>
+        🏥 <strong>AIIMS</strong> — Patient data EDA
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 EDA (Exploratory Data Analysis) ka primary goal kya hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Model training EDA ke baad aata hai. EDA ka kaam hai model se pehle data ko achchi tarah samajhna."><span class="opt-letter">A</span>Machine Learning model train karna</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! EDA ka goal hai data ke patterns, distributions, anomalies aur relationships ko samajhna — taaki informed decisions liye ja sakein aur model better bane."><span class="opt-letter">B</span>Data ke patterns, anomalies aur relationships ko samajhna</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Data cleaning EDA ka ek hissa ho sakti hai, lekin ye EDA ka primary goal nahi hai. EDA mein exploration hota hai, sirf cleaning nahi."><span class="opt-letter">C</span>Missing values ko fill karna</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Data collection EDA se pehle hota hai. EDA tab hota hai jab data pehle se available ho."><span class="opt-letter">D</span>Nayi data collect karna</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 1-B: EDA TOOLS & WORKFLOW ── -->
+<div class="level-card lvl-blue fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-toolbox"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">EDA Tools, Setup & First Steps</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-brands fa-python"></i> EDA Python Toolkit</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Library</th><th>Kaam</th><th>Install</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--neon-blue)">pandas</strong></td><td>Data load, filter, group, describe</td><td><span class="inline-code">pip install pandas</span></td></tr>
+          <tr><td><strong style="color:var(--neon-orange)">matplotlib</strong></td><td>Basic plots — line, bar, histogram</td><td><span class="inline-code">pip install matplotlib</span></td></tr>
+          <tr><td><strong style="color:var(--neon-purple)">seaborn</strong></td><td>Statistical plots — beautiful & easy</td><td><span class="inline-code">pip install seaborn</span></td></tr>
+          <tr><td><strong style="color:var(--neon-green)">plotly</strong></td><td>Interactive charts — zoom, hover</td><td><span class="inline-code">pip install plotly</span></td></tr>
+          <tr><td><strong style="color:var(--neon-yellow)">ydata-profiling</strong></td><td>Automatic EDA report in one line!</td><td><span class="inline-code">pip install ydata-profiling</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-rocket"></i> EDA ka Pehla Step — Data Load & Quick Overview</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang">🐍 Python — EDA Setup</span>
+          <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+        </div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Style set karo
+sns.set_theme(style="whitegrid", palette="Set2")
+plt.rcParams['figure.figsize'] = (10, 6)
+
+# ─── Data Load ───
+df = pd.read_csv('ipl_2023.csv')
+
+# ─── Quick Overview ───
+print("Shape:", df.shape)               # (rows, columns)
+print("\nFirst 5 rows:")
+print(df.head())
+
+print("\nColumn Info:")
+print(df.info())                        # Dtypes + nulls
+
+print("\nStatistical Summary:")
+print(df.describe())                    # Mean, std, min, max
+
+print("\nMissing Values:")
+print(df.isnull().sum())               # Null counts per column
+
+print("\nDuplicate Rows:", df.duplicated().sum())</code></pre>
+        <div class="code-output">📋 Ye 5 commands = EDA ka pehla minute! Hamesha yahan se shuru karo — koi bhi dataset ho!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2-A : UNIVARIATE ANALYSIS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s3">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-chart-simple"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">Univariate Analysis</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Univariate kya hota hai?</div>
+    <strong>Uni = Ek | Variate = Variable</strong> — ek samay mein sirf <span class="hl">ek variable ka analysis</span>.<br><br>
+    Goal: Us variable ki distribution, central tendency (mean/median), spread (std), aur outliers samajhna.<br>
+    Real analogy: Ek student ke sirf <strong>Math marks</strong> dekhna — doosre subjects ignore karke!
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(8,145,178,0.3);">
+        <div class="dim-rank" style="color:var(--neon-cyan);">🔢</div>
+        <div class="dim-name" style="color:var(--neon-cyan);">Numerical Variables</div>
+        <div class="dim-code" style="color:var(--neon-cyan);">int, float columns</div>
+        <div class="dim-desc">
+          <strong>Central Tendency:</strong> Mean, Median, Mode<br>
+          <strong>Spread:</strong> Std Dev, Variance, Range, IQR<br>
+          <strong>Shape:</strong> Skewness, Kurtosis
+        </div>
+        <div class="dim-example" style="border-color:rgba(8,145,178,0.2); color:var(--muted);">
+          📊 Plots: Histogram, KDE, Boxplot<br>
+          🏏 Example: IPL runs scored per match<br>
+          🏠 Mumbai flat prices (₹ lakhs)
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(124,58,237,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">🔤</div>
+        <div class="dim-name" style="color:var(--neon-purple);">Categorical Variables</div>
+        <div class="dim-code" style="color:var(--neon-purple);">object, category columns</div>
+        <div class="dim-desc">
+          <strong>Frequency:</strong> value_counts()<br>
+          <strong>Proportion:</strong> normalize=True<br>
+          <strong>Unique Values:</strong> nunique()
+        </div>
+        <div class="dim-example" style="border-color:rgba(124,58,237,0.2); color:var(--muted);">
+          📊 Plots: Bar chart, Pie chart, Count plot<br>
+          🏏 Example: IPL team names<br>
+          🛒 Flipkart product categories
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow mt-4">
+    <div class="ct"><i class="fa-solid fa-shapes"></i> Distribution Shapes — Samajhna Zaroori Hai!</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Shape</th><th>Skewness</th><th>Matlab</th><th>Real Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Normal (Bell Curve)</strong></td><td><span class="stat-pill sp-green">≈ 0</span></td><td>Mean ≈ Median ≈ Mode</td><td>Log ₹ salaries of population</td></tr>
+          <tr><td><strong>Right Skewed</strong></td><td><span class="stat-pill sp-orange">skew &gt; 0</span></td><td>Kuch bahut bade values — mean right mein</td><td>Income distribution — kuch billionaires!</td></tr>
+          <tr><td><strong>Left Skewed</strong></td><td><span class="stat-pill sp-purple">skew &lt; 0</span></td><td>Kuch bahut chhote values — mean left mein</td><td>Exam marks jab sab ne achha kiya</td></tr>
+          <tr><td><strong>Bimodal</strong></td><td><span class="stat-pill sp-cyan">Two peaks</span></td><td>Do alag groups mixed hain</td><td>Flipkart prices: budget + premium</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 Univariate Analysis mein kitne variables ek saath analyze kiye jaate hain?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Nahi. Do variables ka analysis Bivariate Analysis kehlaata hai — scatter plot, correlation etc. Univariate mein sirf ek variable hota hai."><span class="opt-letter">A</span>Do variables</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Teen ya zyada variables ka analysis Multivariate Analysis hai — heatmap, pairplot, 3D plots. Univariate mein ek hi variable hota hai."><span class="opt-letter">B</span>Teen ya zyada variables</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! 'Uni' ka matlab ek. Univariate Analysis mein ek hi variable ko isolate karke uski distribution, mean, median, outliers aur shape samjhi jaati hai."><span class="opt-letter">C</span>Sirf ek variable</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Galat. Variable count fix hoti hai Univariate Analysis mein — hamesha ek. Dataset size se koi matlab nahi."><span class="opt-letter">D</span>Dataset size ke hisaab se decide hota hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 2-B: UNIVARIATE PLOTS ── -->
+<div class="level-card lvl-cyan fade-up" id="s4">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-chart-bar"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Skill Unlock</div>
+      <div class="lv-title">Univariate — Plots aur Python Code</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-chart-area"></i> Numerical — Histogram & KDE Plot</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('ipl_2023.csv')
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+# ─── Histogram ───
+axes[0].hist(df['runs_scored'], bins=20, color='#2563eb', edgecolor='white', alpha=0.85)
+axes[0].set_title('Runs Scored — Histogram')
+axes[0].set_xlabel('Runs'); axes[0].set_ylabel('Frequency')
+
+# ─── KDE Plot (Smooth distribution) ───
+sns.kdeplot(df['runs_scored'], ax=axes[1], color='#7c3aed', fill=True, alpha=0.4)
+axes[1].set_title('Runs Scored — KDE (Smooth Curve)')
+
+# ─── Box Plot (Outliers!) ───
+axes[2].boxplot(df['runs_scored'], patch_artist=True,
+                boxprops=dict(facecolor='#cffafe', color='#0891b2'),
+                medianprops=dict(color='#db2777', linewidth=2))
+axes[2].set_title('Runs Scored — Box Plot')
+
+plt.tight_layout()
+plt.show()
+
+# ─── Numerical Stats ───
+print(df['runs_scored'].describe())
+print(f"Skewness: {df['runs_scored'].skew():.2f}")
+print(f"Kurtosis: {df['runs_scored'].kurtosis():.2f}")</code></pre>
+        <div class="code-output">📊 Box plot mein: Box = IQR (25th–75th percentile) | Line = Median | Dots = Outliers! Ek plot mein poori story!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-chart-pie"></i> Categorical — Bar Chart & Value Counts</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('ecommerce_orders.csv')
+
+# ─── Value Counts ───
+print(df['product_category'].value_counts())
+print(df['product_category'].value_counts(normalize=True) * 100)  # %
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# ─── Bar Chart ───
+category_counts = df['product_category'].value_counts()
+axes[0].bar(category_counts.index, category_counts.values,
+            color=sns.color_palette("Set2", len(category_counts)))
+axes[0].set_title('Orders by Category')
+axes[0].set_xlabel('Category'); axes[0].set_ylabel('Count')
+axes[0].tick_params(axis='x', rotation=45)
+
+# ─── Seaborn Countplot (even easier!) ───
+sns.countplot(data=df, x='product_category',
+              palette='Set2', order=df['product_category'].value_counts().index,
+              ax=axes[1])
+axes[1].set_title('Seaborn Countplot — Same Data, Less Code!')
+axes[1].tick_params(axis='x', rotation=45)
+
+plt.tight_layout()
+plt.show()</code></pre>
+        <div class="code-output">💡 value_counts(normalize=True) se percentage milti hai — "Electronics = 35% orders" — business ke liye direct insight!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3-A : BIVARIATE ANALYSIS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s5">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-arrows-left-right"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">Bivariate Analysis</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Bivariate kya hota hai?</div>
+    <strong>Bi = Do | Variate = Variables</strong> — <span class="hl">do variables ke beech relationship</span> analyze karna.<br><br>
+    Goal: Kya ek variable doosre ko affect karta hai? Kitna strong hai ye relationship?<br>
+    Real analogy: <strong>Study hours aur marks</strong> ka relation — zyada padhe toh zyada marks? Ye bivariate hai!
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-table-cells me-2" style="color:var(--neon-purple)"></i>Bivariate Analysis — 3 Cases</h5>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(37,99,235,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue);">🔢🔢</div>
+        <div class="dim-name" style="color:var(--neon-blue);">Numerical vs Numerical</div>
+        <div class="dim-code" style="color:var(--neon-blue);">int/float ↔ int/float</div>
+        <div class="dim-desc">Do continuous numbers ke beech relationship. Correlation nikaalte hain.</div>
+        <div class="dim-example" style="border-color:rgba(37,99,235,0.2); color:var(--muted);">
+          📊 Plot: <strong>Scatter Plot, Line Plot</strong><br>
+          🏠 Area vs Price<br>
+          🏏 Batting avg vs Strike rate<br>
+          📐 Metric: Pearson Correlation
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(124,58,237,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">🔤🔢</div>
+        <div class="dim-name" style="color:var(--neon-purple);">Categorical vs Numerical</div>
+        <div class="dim-code" style="color:var(--neon-purple);">object ↔ int/float</div>
+        <div class="dim-desc">Category ke groups mein numerical variable ka distribution compare karo.</div>
+        <div class="dim-example" style="border-color:rgba(124,58,237,0.2); color:var(--muted);">
+          📊 Plot: <strong>Box Plot, Bar Plot, Violin</strong><br>
+          🏙️ City vs Property Price<br>
+          🏏 Team vs Runs Scored<br>
+          📐 Metric: Mean per group
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">🔤🔤</div>
+        <div class="dim-name" style="color:var(--neon-green);">Categorical vs Categorical</div>
+        <div class="dim-code" style="color:var(--neon-green);">object ↔ object</div>
+        <div class="dim-desc">Do categories ke beech frequency distribution compare karo.</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2); color:var(--muted);">
+          📊 Plot: <strong>Grouped Bar, Heatmap</strong><br>
+          🛒 Category vs Payment Mode<br>
+          🏙️ City vs Order Status<br>
+          📐 Metric: Chi-square test
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue mt-4">
+    <div class="ct"><i class="fa-solid fa-ruler"></i> Correlation — Relationship ki Strength</div>
+    Correlation coefficient <strong>r</strong> ranges from <span class="hl">-1 to +1</span>:<br><br>
+    <span class="stat-pill sp-green">r = +1</span> Perfect positive — ek badhta hai toh doosra bhi<br>
+    <span class="stat-pill sp-blue">r = 0</span> No relation — dono independent hain<br>
+    <span class="stat-pill sp-pink">r = -1</span> Perfect negative — ek badhta hai toh doosra ghatta hai<br><br>
+    🏠 <em>Mumbai: Area aur Price ka r = +0.82 → Strong positive correlation!</em>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="a" data-xp="25">
+    <div class="quiz-q">🤔 "City (Mumbai/Delhi/Pune) vs Property Price" — ye kaunsa Bivariate case hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Bilkul sahi! City = Categorical (object) aur Property Price = Numerical (float). Ye Categorical vs Numerical case hai — Box Plot ya Grouped Bar Plot best choice hai!"><span class="opt-letter">A</span>Categorical vs Numerical</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Galat. Numerical vs Numerical tab hota hai jab dono variables numbers hon (jaise area vs price). City ek category hai, number nahi."><span class="opt-letter">B</span>Numerical vs Numerical</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Categorical vs Categorical tab hota hai jab dono variables categories hon (jaise city vs payment mode). Price ek numerical variable hai."><span class="opt-letter">C</span>Categorical vs Categorical</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Bivariate mein sirf do variables hote hain, multivariate mein teen ya zyada. Ye ek city aur ek price — 2 variables = Bivariate."><span class="opt-letter">D</span>Multivariate Analysis</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 3-B: BIVARIATE PLOTS ── -->
+<div class="level-card lvl-purple fade-up" id="s6">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-chart-scatter"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Skill Unlock</div>
+      <div class="lv-title">Bivariate — Scatter, Box & Violin Plots</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-1"></i> Numerical vs Numerical — Scatter Plot & Correlation</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('mumbai_housing.csv')
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# ─── Scatter Plot ───
+axes[0].scatter(df['area_sqft'], df['price_lakhs'],
+                alpha=0.5, color='#2563eb', edgecolors='white', linewidth=0.5)
+axes[0].set_xlabel('Area (sq ft)')
+axes[0].set_ylabel('Price (₹ Lakhs)')
+axes[0].set_title('Area vs Price — Mumbai Flats')
+
+# ─── Seaborn regplot (scatter + regression line) ───
+sns.regplot(data=df, x='area_sqft', y='price_lakhs',
+            ax=axes[1], color='#7c3aed',
+            scatter_kws={'alpha': 0.4},
+            line_kws={'color': '#db2777', 'linewidth': 2})
+axes[1].set_title('Area vs Price — With Trend Line')
+
+plt.tight_layout(); plt.show()
+
+# ─── Correlation value ───
+corr = df['area_sqft'].corr(df['price_lakhs'])
+print(f"Pearson Correlation: {corr:.3f}")   # 0.82 → Strong positive!</code></pre>
+        <div class="code-output">📈 regplot = scatter + linear trend line ek saath! Positive slope = positive correlation. Real Mumbai data mein r ≈ 0.75!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-2"></i> Categorical vs Numerical — Box & Violin Plot</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('ipl_2023.csv')
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# ─── Box Plot — City vs Price ───
+sns.boxplot(data=df, x='team', y='runs_scored',
+            palette='Set2', ax=axes[0])
+axes[0].set_title('Team vs Runs Scored — Box Plot')
+axes[0].tick_params(axis='x', rotation=45)
+
+# ─── Violin Plot (distribution ka shape bhi dikhta hai!) ───
+sns.violinplot(data=df, x='team', y='runs_scored',
+               palette='Set3', ax=axes[1], inner='box')
+axes[1].set_title('Team vs Runs Scored — Violin Plot')
+axes[1].tick_params(axis='x', rotation=45)
+
+plt.tight_layout(); plt.show()
+
+# ─── Mean per group ───
+print(df.groupby('team')['runs_scored'].mean().sort_values(ascending=False))</code></pre>
+        <div class="code-output">🎻 Violin Plot = Box Plot + KDE (distribution ka shape). Mumbai Indians wide violin = varied scores. CSK narrow = consistent!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 4-A : MULTIVARIATE ANALYSIS
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s7">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-cube"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">Multivariate Analysis</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Multivariate kya hota hai?</div>
+    <strong>Multi = Teen ya zyada | Variate = Variables</strong> — ek saath <span class="hl">teen ya zyada variables ka analysis</span>.<br><br>
+    Goal: Complex interactions samajhna jo sirf ek ya do variables dekhne se nahi milte.<br>
+    Real analogy: Student ke <strong>marks + attendance + study hours + part-time job</strong> — sab saath mein!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Multivariate kyun zaroori hai?</div>
+    Univariate/Bivariate mein <strong>Simpson's Paradox</strong> hota hai — overall trend aur group-wise trend ulta ho sakta hai!<br>
+    Example: Overall hospital mein mortality rate high hai. But jab severity of illness control karein toh acha hospital better perform karta hai!<br>
+    <span class="hl">Multivariate analysis = confounding variables dhundhna!</span>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;"><i class="fa-solid fa-network-wired me-2" style="color:var(--neon-green)"></i>Multivariate Techniques</h5>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">🔥</div>
+        <div class="dim-name" style="color:var(--neon-green);">Heatmap (Correlation Matrix)</div>
+        <div class="dim-code" style="color:var(--neon-green);">sns.heatmap(df.corr())</div>
+        <div class="dim-desc">Saare numerical columns ke beech correlations ek hi view mein. Dark color = strong relation.</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2); color:var(--muted);">
+          🏠 Housing: Area, Rooms, Floors, Price<br>
+          Ek plot mein sab relations!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(8,145,178,0.3);">
+        <div class="dim-rank" style="color:var(--neon-cyan);">🔲</div>
+        <div class="dim-name" style="color:var(--neon-cyan);">Pair Plot</div>
+        <div class="dim-code" style="color:var(--neon-cyan);">sns.pairplot(df)</div>
+        <div class="dim-desc">Har variable ko har doosre variable ke saath scatter plot. Diagonal pe distribution!</div>
+        <div class="dim-example" style="border-color:rgba(8,145,178,0.2); color:var(--muted);">
+          🌸 Iris dataset classic example<br>
+          🏏 IPL batting stats comparison
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(124,58,237,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">🎨</div>
+        <div class="dim-name" style="color:var(--neon-purple);">Scatter (Color + Size Encoding)</div>
+        <div class="dim-code" style="color:var(--neon-purple);">hue=, size=</div>
+        <div class="dim-desc">Scatter plot mein 3rd variable = color, 4th variable = dot size. 4 variables ek chart mein!</div>
+        <div class="dim-example" style="border-color:rgba(124,58,237,0.2); color:var(--muted);">
+          Area vs Price (color=City, size=Rooms)<br>
+          🏠 Char variables ek chart mein!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="dim-card" style="border-color:rgba(219,39,119,0.3);">
+        <div class="dim-rank" style="color:var(--neon-pink);">📦</div>
+        <div class="dim-name" style="color:var(--neon-pink);">FacetGrid / subplots</div>
+        <div class="dim-code" style="color:var(--neon-pink);">sns.FacetGrid(df, col=, row=)</div>
+        <div class="dim-desc">Har category ke liye alag plot — same layout mein. Compare categories easily!</div>
+        <div class="dim-example" style="border-color:rgba(219,39,119,0.2); color:var(--muted);">
+          🏙️ Har city ke liye price distribution<br>
+          📅 Har year ke liye sales trend
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="d" data-xp="25">
+    <div class="quiz-q">🤔 Correlation Heatmap mein <span class="inline-code">annot=True</span> parameter ka kya kaam hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Nahi. annot=True ka color se koi sambandh nahi. Color palette alag parameter se control hoti hai (cmap=)."><span class="opt-letter">A</span>Heatmap ka color change karta hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. Figure ka size figsize= se control hota hai. annot sirf numbers display karne ke liye hai."><span class="opt-letter">B</span>Plot ka size adjust karta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Missing values heatmap ka alag concept hai. annot=True har cell mein correlation number print karta hai."><span class="opt-letter">C</span>Missing values ko highlight karta hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Bilkul sahi! annot=True se har cell ke andar uski actual correlation value (e.g., 0.82, -0.31) print ho jaati hai — sirf color dekhne ki zaroorat nahi, exact number bhi milta hai!"><span class="opt-letter">D</span>Har cell mein correlation value number print karta hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 4-B: MULTIVARIATE PLOTS ── -->
+<div class="level-card lvl-green fade-up" id="s8">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-fire"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Skill Unlock</div>
+      <div class="lv-title">Heatmaps, Pairplots & Advanced Multivariate</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-fire"></i> Correlation Heatmap — Sab Relations Ek Nazar Mein</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('mumbai_housing.csv')
+
+# ─── Correlation Matrix ───
+corr_matrix = df.select_dtypes(include='number').corr()
+print(corr_matrix)
+
+# ─── Heatmap ───
+plt.figure(figsize=(10, 8))
+mask = np.triu(np.ones_like(corr_matrix, dtype=bool))  # Upper triangle chhupa do
+
+sns.heatmap(
+    corr_matrix,
+    annot=True,          # Numbers dikhao
+    fmt='.2f',           # 2 decimal places
+    cmap='coolwarm',     # Red = positive, Blue = negative
+    mask=mask,           # Upper triangle hide
+    vmin=-1, vmax=1,     # Scale fix
+    linewidths=0.5,
+    square=True,
+    cbar_kws={'shrink': 0.8}
+)
+plt.title('Correlation Heatmap — Mumbai Housing Data', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# ─── Top correlations dhundho ───
+corr_pairs = corr_matrix.unstack().sort_values(ascending=False)
+corr_pairs = corr_pairs[corr_pairs != 1.0]   # Self-correlation hata do
+print("\nTop Positive Correlations:")
+print(corr_pairs.head(5))</code></pre>
+        <div class="code-output">🔥 mask=np.triu() se upper triangle hide ho jaata hai — duplicate info nahi dikhti! coolwarm colormap: Red = positive, Blue = negative correlation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-grid-2"></i> Pair Plot — Har Variable vs Har Variable</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('ipl_batting_stats.csv')
+
+# ─── Basic Pairplot ───
+sns.pairplot(df[['runs', 'strike_rate', 'boundaries', 'innings']])
+plt.suptitle('IPL Batting Stats — Pair Plot', y=1.02, fontsize=14)
+plt.show()
+
+# ─── Advanced: Color by category ───
+sns.pairplot(
+    df[['runs', 'strike_rate', 'boundaries', 'innings', 'team']],
+    hue='team',              # Har team ka alag color
+    diag_kind='kde',         # Diagonal pe KDE plot
+    plot_kws={'alpha': 0.5}, # Transparency
+    palette='Set1'
+)
+plt.suptitle('IPL Stats by Team — Pair Plot', y=1.02)
+plt.show()
+
+# ─── 4-variable scatter (color + size) ───
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(
+    df['area_sqft'], df['price_lakhs'],
+    c=df['bedrooms'],        # 3rd variable = color
+    s=df['floor'] * 10,     # 4th variable = size
+    alpha=0.6, cmap='viridis', edgecolors='white', linewidth=0.5
+)
+plt.colorbar(scatter, label='Bedrooms')
+plt.xlabel('Area (sq ft)'); plt.ylabel('Price (₹ Lakhs)')
+plt.title('4 Variables in One Chart!')
+plt.show()</code></pre>
+        <div class="code-output">🌈 hue= parameter se ek extra dimension milti hai! Pairplot mein hue='team' → har team ka alag color → easily compare karo kaun outlier hai!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 5 : PANDAS PROFILING
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-yellow fade-up" id="s9">
+  <div class="corner-deco">LEVEL 5</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 5 · Boss Topic</div>
+      <div class="lv-title">Pandas Profiling (ydata-profiling)</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Pandas Profiling kya hai?</div>
+    <strong>Pandas Profiling</strong> (ab <span class="hl">ydata-profiling</span> naam se) = <strong>ek line mein poora EDA report!</strong><br><br>
+    Manually histogram banao, missing values check karo, correlation heatmap banao — sab tedious kaam ek line mein automatically ho jaata hai.<br>
+    Output: Ek beautiful interactive <strong>HTML report</strong> — download karo, share karo, present karo!
+  </div>
+
+  <div class="callout cb-orange">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Library Name Change!</div>
+    Pehle <span class="inline-code">pandas-profiling</span> tha — ab officially <span class="inline-code">ydata-profiling</span> ho gaya hai.<br>
+    Install: <span class="inline-code">pip install ydata-profiling</span><br>
+    Import: <span class="inline-code">from ydata_profiling import ProfileReport</span>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="ex-card ex-real">
+    <div class="ex-head"><i class="fa-solid fa-magic"></i> Complete Profiling Report — 3 Lines!</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+from ydata_profiling import ProfileReport
+
+# ─── Data Load ───
+df = pd.read_csv('ipl_2023.csv')
+
+# ─── Poora EDA report ek line mein! ───
+profile = ProfileReport(
+    df,
+    title="IPL 2023 — Full EDA Report",
+    explorative=True      # Extra deep analysis
+)
+
+# ─── HTML file mein save karo ───
+profile.to_file("ipl_eda_report.html")
+print("Report saved! Browser mein kholo.")
+
+# ─── Jupyter Notebook mein directly dikhao ───
+profile.to_notebook_iframe()
+
+# ─── Minimal report (bade datasets ke liye faster) ───
+profile_minimal = ProfileReport(df, minimal=True)
+profile_minimal.to_file("quick_report.html")</code></pre>
+        <div class="code-output">⚡ Ek 10,000 row dataset ka full report = 30–60 seconds. Manual EDA = 2–3 hours. Time saved = Magical!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-list-check"></i> Report mein kya kya hota hai?</div>
+    <div class="ex-body">
+      <div class="table-responsive">
+        <table class="gtbl">
+          <thead><tr><th>Section</th><th>Kya milega</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td><strong>📋 Overview</strong></td><td>Rows, columns, types, missing%, duplicate%</td><td>First glance summary</td></tr>
+            <tr><td><strong>📊 Variables</strong></td><td>Har column ka histogram, stats, missing count, unique values</td><td>Univariate automatically!</td></tr>
+            <tr><td><strong>🔗 Interactions</strong></td><td>Scatter plots — select any two variables</td><td>Bivariate exploration</td></tr>
+            <tr><td><strong>🔥 Correlations</strong></td><td>Pearson, Spearman, Kendall — multiple heatmaps</td><td>Multivariate relationships</td></tr>
+            <tr><td><strong>❌ Missing Values</strong></td><td>Matrix, bar chart, heatmap of nulls</td><td>Missing data patterns</td></tr>
+            <tr><td><strong>⚠️ Alerts</strong></td><td>High correlation warnings, skewness alerts, zeros</td><td>Data quality flags</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tip">
+    <div class="ex-head"><i class="fa-solid fa-lightbulb"></i> Advanced Options — Customize Your Report</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">from ydata_profiling import ProfileReport
+import pandas as pd
+
+df = pd.read_csv('ecommerce.csv')
+
+# ─── Custom Configuration ───
+profile = ProfileReport(
+    df,
+    title="Ecommerce EDA — Detailed Report",
+
+    # Missing values ka detailed analysis
+    missing_diagrams={
+        "bar": True,
+        "matrix": True,
+        "heatmap": True
+    },
+
+    # Duplicate rows check karo
+    duplicates={"head": 10},
+
+    # Correlation types specify karo
+    correlations={
+        "pearson": {"calculate": True},
+        "spearman": {"calculate": True},
+        "kendall": {"calculate": False},
+        "cramers": {"calculate": True}   # Categorical ke liye!
+    },
+
+    # Large dataset ke liye sample lo
+    samples={"head": 20, "tail": 20},
+
+    # Report theme
+    html={"style": {"primary_color": "#2563eb"}},
+
+    # Dark mode!
+    dark_mode=False
+)
+
+profile.to_file("custom_report.html")
+
+# ─── Do datasets compare karo (drift detection!) ───
+train_df = pd.read_csv('train.csv')
+test_df  = pd.read_csv('test.csv')
+
+train_report = ProfileReport(train_df, title="Train Data")
+test_report  = ProfileReport(test_df,  title="Test Data")
+
+# Side-by-side comparison!
+comparison = train_report.compare(test_report)
+comparison.to_file("train_vs_test.html")</code></pre>
+        <div class="code-output">🚀 compare() function = Data Drift Detection! Train vs Test data distribution mein fark dhundho — production ML mein bahut zaroori!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple mt-3">
+    <div class="ct"><i class="fa-solid fa-scale-balanced"></i> Pandas Profiling vs Manual EDA — Kab kya use karein?</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Factor</th><th style="color:#93c5fd">Manual EDA</th><th style="color:#86efac">Pandas Profiling</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Speed</strong></td><td>2–3 hours</td><td>1–2 minutes ✅</td></tr>
+          <tr><td><strong>Customization</strong></td><td>Fully custom ✅</td><td>Limited options</td></tr>
+          <tr><td><strong>Large Data (&gt;1M rows)</strong></td><td>Controlled ✅</td><td>Slow / RAM issues</td></tr>
+          <tr><td><strong>First Impression</strong></td><td>Tedious</td><td>Instant ✅</td></tr>
+          <tr><td><strong>Presentation</strong></td><td>Needs extra work</td><td>HTML ready to share ✅</td></tr>
+          <tr><td><strong>Best For</strong></td><td>Production DS work</td><td>Quick exploration, hackathons ✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- QUIZ 5 -->
+  <div class="quiz-box" data-quiz="5" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 ydata-profiling mein <span class="inline-code">minimal=True</span> parameter kyun use karte hain?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Nahi. Dark mode ke liye dark_mode=True parameter hai. minimal=True ka kaam kuch aur hai."><span class="opt-letter">A</span>Report ka dark mode enable karne ke liye</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! minimal=True se bade datasets (1M+ rows) ke liye report generation fast hoti hai — kuch heavy computations skip ho jaate hain. RAM aur time dono bachte hain!"><span class="opt-letter">B</span>Bade datasets pe faster report generate karne ke liye</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Correlation heatmap by default on rahta hai. Disable karne ke liye correlations parameter configure karna hoga."><span class="opt-letter">C</span>Correlation heatmap disable karne ke liye</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. HTML export sabhi modes mein to_file() se hoti hai. minimal=True performance optimization ke liye hai."><span class="opt-letter">D</span>HTML ki jagah PDF export karne ke liye</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     FINAL: SUMMARY + ROADMAP
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s10" style="background:linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.04), #ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary & Your EDA Roadmap</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Tools</th><th>Real Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>What is EDA?</strong></td><td>Data ko samjho pehle model banao</td><td>df.info(), describe(), isnull()</td><td>Har DS project ka Step 1</td></tr>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>EDA Workflow</strong></td><td>Setup → Load → Explore</td><td>pandas, matplotlib, seaborn</td><td>IPL, Housing, Ecommerce</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>Univariate</strong></td><td>Ek variable ka analysis</td><td>hist(), boxplot(), value_counts()</td><td>Runs scored distribution</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>Univariate Plots</strong></td><td>Histogram, KDE, Bar Chart</td><td>matplotlib, sns.countplot()</td><td>Product category analysis</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>Bivariate</strong></td><td>Do variables ka relation</td><td>scatter, corr(), boxplot</td><td>Area vs Price, Team vs Runs</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>Bivariate Plots</strong></td><td>Scatter, regplot, Violin</td><td>sns.regplot(), violinplot()</td><td>Mumbai flat prices trend</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Multivariate</strong></td><td>3+ variables saath mein</td><td>heatmap(), pairplot(), hue=</td><td>Housing 4-variable analysis</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Heatmaps & Pairplots</strong></td><td>Full correlation matrix</td><td>sns.heatmap(df.corr(), annot=True)</td><td>Feature selection for ML</td></tr>
+        <tr><td><span class="stat-pill sp-yellow">L5</span> <strong>Pandas Profiling</strong></td><td>Automatic EDA — 1 line!</td><td>ProfileReport, to_file(), compare()</td><td>Hackathons, quick analysis</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph TD
+    LOAD["📂 Load Data"] --> UNI["📊 Univariate Analysis"]
+    UNI --> BI["🔗 Bivariate Analysis"]
+    BI --> MULTI["🌐 Multivariate Analysis"]
+    MULTI --> PROFILE["🤖 Pandas Profiling"]
+    UNI --> DIST["Shape & Distribution"]
+    BI --> CORR["Correlation & Relationships"]
+    MULTI --> HEAT["Heatmaps & Pairplots"]
+    PROFILE --> REPORT["📄 HTML Report"]
+    DIST --> CLEAN["🧹 Data Cleaning"]
+    CORR --> CLEAN
+    HEAT --> CLEAN
+    REPORT --> CLEAN
+    CLEAN --> ML["🚀 ML Modeling"]
+    style LOAD fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:12
+    style UNI fill:#cffafe,stroke:#0891b2,color:#164e63,rx:12
+    style BI fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:12
+    style MULTI fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    style PROFILE fill:#fef9c3,stroke:#b45309,color:#713f12,rx:12
+    style DIST fill:#e0f2fe,stroke:#0891b2,color:#164e63,rx:10
+    style CORR fill:#f3e8ff,stroke:#9333ea,color:#4a1d96,rx:10
+    style HEAT fill:#d1fae5,stroke:#059669,color:#064e3b,rx:10
+    style REPORT fill:#fef9c3,stroke:#b45309,color:#78350f,rx:10
+    style CLEAN fill:#fee2e2,stroke:#dc2626,color:#991b1b,rx:12
+    style ML fill:#fce7f3,stroke:#db2777,color:#831843,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Libraries — Zaroor Seekho</div>
+        <strong style="color:var(--neon-blue)">pandas</strong> — EDA ka backbone<br>
+        <strong style="color:var(--neon-orange)">matplotlib</strong> — Custom plots ka control<br>
+        <strong style="color:var(--neon-purple)">seaborn</strong> — Statistical plots, easy syntax<br>
+        <strong style="color:var(--neon-green)">plotly</strong> — Interactive charts for dashboards<br>
+        <strong style="color:var(--neon-yellow)">ydata-profiling</strong> — Automatic EDA magic
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein?</div>
+        🎨 <strong>Plotly / Dash</strong> — Interactive dashboards<br>
+        🔬 <strong>Statistical Tests</strong> — t-test, ANOVA, Chi-square<br>
+        🏗️ <strong>Feature Engineering</strong> — EDA se new features<br>
+        📉 <strong>PCA / t-SNE</strong> — High-dimensional EDA<br>
+        🤖 <strong>AutoML EDA</strong> — SweetViz, D-Tale, Lux
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>EDA</strong> = Data Science ka doctor — diagnose karo pehle, treat karo baad mein<br>
+    → <strong>Univariate</strong> = Ek ek variable ko samjho — distribution, outliers, skewness<br>
+    → <strong>Bivariate</strong> = Do variables ka relation — scatter, correlation, grouped plots<br>
+    → <strong>Multivariate</strong> = Badi picture dekhna — heatmap, pairplot, Simpson's paradox<br>
+    → <strong>Pandas Profiling</strong> = Jab time kam ho — ek line mein poora EDA!<br><br>
+    <strong style="color:var(--neon-pink)">EDA master kar liya toh koi bhi dataset tumhe confuse nahi kar sakta — Data Scientist ban gaye tum! 📊🚀</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-solid fa-chart-line me-2"></i>Python EDA Quest</div>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.5rem;">EDA · Univariate · Bivariate · Multivariate · Pandas Profiling | Gamified Tutorial</p>
+    <p style="color:var(--dim); font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking Data Science learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════ MODAL ═══════════════════ -->
+<canvas id="confettiCanvas"></canvas>
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare 5 quizzes complete kar liye!</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/5</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-retry" id="modalRetry"><i class="fa-solid fa-rotate-right"></i> Retry All</button>
+      <button class="modal-btn-continue" id="modalContinue"><i class="fa-solid fa-trophy"></i> Awesome, Continue!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ FINAL MODAL ═══ */
+function showFinalModal() {
+  const total = quizTotal, correct = quizCorrect;
+  const pct = total > 0 ? correct / total : 0;
+  const quizXP = correct * 25;
+  const grades = [
+    { min: 1.0,  cls: 'grade-s', letter: 'S 🌟', msg: 'Zabardast! Sab 5/5 correct! EDA Grandmaster! 📊' },
+    { min: 0.8,  cls: 'grade-a', letter: 'A 🎯', msg: 'Bahut badhiya! Almost perfect performance!' },
+    { min: 0.6,  cls: 'grade-b', letter: 'B 📘', msg: 'Accha kiya! Kuch topics dobara review karo.' },
+    { min: 0.4,  cls: 'grade-c', letter: 'C 💪', msg: 'Theek hai! Concepts ko aur practice karo.' },
+    { min: 0.0,  cls: 'grade-d', letter: 'D 📚', msg: 'Aur mehnat karo! Tutorial dobara padho.' },
+  ];
+  const g = grades.find(gr => pct >= gr.min);
+  document.getElementById('ringNum').textContent = correct + '/' + total;
+  document.getElementById('modalXpVal').textContent = quizXP + ' XP';
+  const gradeCard = document.getElementById('gradeCard');
+  gradeCard.className = 'grade-card ' + g.cls;
+  document.getElementById('gradeLetter').textContent = g.letter;
+  document.getElementById('gradeMsg').textContent = g.msg;
+  if (pct === 1.0) {
+    document.getElementById('modalTrophy').textContent = '🏆';
+    document.getElementById('modalTitle').textContent = '🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent = 'Wah! Saare ' + total + '/' + total + ' sahi! Tum EDA Grandmaster ho!';
+  } else if (pct >= 0.6) {
+    document.getElementById('modalTrophy').textContent = '🎯';
+    document.getElementById('modalTitle').textContent = 'Quest Complete!';
+    document.getElementById('modalSubtitle').textContent = correct + ' out of ' + total + ' correct. Kafi accha kiya!';
+  } else if (pct >= 0.4) {
+    document.getElementById('modalTrophy').textContent = '💪';
+    document.getElementById('modalTitle').textContent = 'Quest Attempt Done!';
+    document.getElementById('modalSubtitle').textContent = 'Concepts review karo aur phir try karo!';
+  } else {
+    document.getElementById('modalTrophy').textContent = '📚';
+    document.getElementById('modalTitle').textContent = 'Keep Trying!';
+    document.getElementById('modalSubtitle').textContent = 'Tutorial dobara padho aur retry karo!';
+  }
+  const circumference = 327, offset = circumference * (1 - pct);
+  const ringColors = {'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626'};
+  const ringEl = document.getElementById('ringFill');
+  ringEl.style.stroke = ringColors[g.cls] || '#2563eb';
+  ringEl.style.transition = 'none'; ringEl.style.strokeDashoffset = '327';
+  setTimeout(() => { ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)'; ringEl.style.strokeDashoffset = offset; }, 80);
+  document.getElementById('finalModal').classList.add('open');
+  if (pct >= 0.6) launchConfetti(pct);
+}
+
+function launchConfetti(pct) {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const count = Math.floor(80 + pct * 140);
+  const colors = ['#2563eb','#7c3aed','#db2777','#16a34a','#b45309','#0891b2','#f59e0b'];
+  const pieces = Array.from({length: count}, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * -canvas.height * 0.6,
+    w: Math.random() * 10 + 5, h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx: (Math.random() - 0.5) * 4, vy: Math.random() * 4 + 2,
+    rot: Math.random() * 360, vrot: (Math.random() - 0.5) * 9, alpha: 1,
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+    pieces.forEach(p => {
+      if (p.y > canvas.height + 20) return; alive = true;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if (p.y > canvas.height * 0.65) p.alpha -= 0.02;
+      p.alpha = Math.max(0, p.alpha);
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+    });
+    frame++; if (alive && frame < 260) requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
+  })();
+}
+
+function initQuizzes() {
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(opt => { const n = opt.cloneNode(true); opt.parentNode.replaceChild(n, opt); });
+    const correct = box.dataset.correct, qxp = parseInt(box.dataset.xp) || 25;
+    let answered = false;
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return; answered = true;
+        const isCorrect = opt.dataset.ans === correct;
+        const fb = box.querySelector('.quiz-feedback');
+        box.querySelectorAll('.quiz-opt').forEach(o => {
+          o.classList.add('answered-opt');
+          const exDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+          if (o.dataset.ans === correct) { o.classList.add('correct'); if (exDiv) exDiv.classList.add('show-correct'); }
+          else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (exDiv) exDiv.classList.add('show-wrong'); }
+          else { o.classList.add('dimmed'); }
+        });
+        if (isCorrect) {
+          quizCorrect++;
+          fb.className = 'quiz-feedback show win';
+          fb.innerHTML = '<span style="font-size:1.3rem">🎉</span>&nbsp; Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+          addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+        } else {
+          fb.className = 'quiz-feedback show lose';
+          fb.innerHTML = '<span style="font-size:1.3rem">💡</span>&nbsp; Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+          showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+        }
+        const doneCount = Array.from(document.querySelectorAll('.quiz-box')).filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+        if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+      });
+    });
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, theme: 'base',
+  themeVariables: {
+    primaryColor: '#dbeafe', primaryTextColor: '#1e3a8a',
+    primaryBorderColor: '#2563eb', lineColor: '#94a3b8',
+    secondaryColor: '#d1fae5', tertiaryColor: '#ede9fe',
+    fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 24 }
+});
+
+/* ═══ XP SYSTEM ═══ */
+let xp = 0, scrollXpEarned = 0;
+const XP_MAX = 275;  // 5×30 scroll XP + 5×25 quiz XP = 275
+const earnedBadges = new Set();
+
+function addXP(amount, badgeId) {
+  if (badgeId) scrollXpEarned = Math.min(scrollXpEarned + amount, 150);
+  xp = Math.min(xp + amount, XP_MAX);
+  document.getElementById('xpFill').style.width = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  if (badgeId && !earnedBadges.has(badgeId)) {
+    earnedBadges.add(badgeId);
+    const el = document.getElementById(badgeId);
+    if (el) el.classList.add('earned');
+  }
+  if (xp >= XP_MAX) showToast('🏆', 'QUEST COMPLETE! 🎊', 'EDA Grandmaster ban gaye! 275/275 XP!', '#b45309');
+}
+
+function showToast(icon, title, msg, color) {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'gtoast';
+  t.innerHTML = `<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══ QUIZ SYSTEM ═══ */
+let quizTotal = 0, quizCorrect = 0;
+
+document.querySelectorAll('.quiz-box').forEach(box => {
+  quizTotal++;
+  const correct = box.dataset.correct;
+  const qxp = parseInt(box.dataset.xp) || 25;
+  let answered = false;
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    const explain = opt.dataset.explain || '';
+    if (explain) {
+      const div = document.createElement('div');
+      div.className = 'quiz-explain'; div.dataset.forAns = opt.dataset.ans; div.textContent = explain;
+      opt.parentNode.insertBefore(div, opt.nextSibling);
+    }
+  });
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return; answered = true;
+      const ans = opt.dataset.ans, fb = box.querySelector('.quiz-feedback');
+      const isCorrect = ans === correct;
+      box.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.add('answered-opt');
+        const explainDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+        if (o.dataset.ans === correct) { o.classList.add('correct'); if (explainDiv) explainDiv.classList.add('show-correct'); }
+        else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (explainDiv) explainDiv.classList.add('show-wrong'); }
+        else { o.classList.add('dimmed'); if (o.dataset.ans === correct && explainDiv) explainDiv.classList.add('show-reveal'); }
+      });
+      if (isCorrect) {
+        quizCorrect++;
+        fb.className = 'quiz-feedback show win';
+        fb.innerHTML = '<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+        addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+      } else {
+        fb.className = 'quiz-feedback show lose';
+        fb.innerHTML = '<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+        showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+      }
+      const totalAnswered = document.querySelectorAll('.quiz-box').length;
+      const doneCount = Array.from(document.querySelectorAll('.quiz-box')).filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+      if (doneCount === totalAnswered) setTimeout(showFinalModal, 1200);
+    });
+  });
+});
+
+/* ═══ SCROLL FADE-UP ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+/* ═══ SCROLL XP ═══ */
+const sectionXP = {
+  's1': { xp: 30, badge: 'badge1', msg: '🔍 EDA Scout badge unlocked!' },
+  's3': { xp: 30, badge: 'badge2', msg: '📊 Uni Master badge unlocked!' },
+  's5': { xp: 30, badge: 'badge3', msg: '🔗 Bi Analyst badge unlocked!' },
+  's7': { xp: 30, badge: 'badge4', msg: '🌐 Multi Wizard badge unlocked!' },
+  's9': { xp: 30, badge: 'badge5', msg: '🤖 Profile Pro badge unlocked!' },
+};
+const xpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (sectionXP[id] && !earnedBadges.has(sectionXP[id].badge)) {
+        const { xp: sx, badge, msg } = sectionXP[id];
+        addXP(sx, badge); showToast('🏅', 'Badge Unlocked!', msg, '#7c3aed');
+      }
+      xpObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+['s1','s3','s5','s7','s9'].forEach(id => { const el = document.getElementById(id); if (el) xpObserver.observe(el); });
+
+/* ═══ SMOOTH SCROLL ═══ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* ═══ MODAL BUTTONS ═══ */
+function closeModal() { document.getElementById('finalModal').classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalContinue').addEventListener('click', closeModal);
+document.getElementById('modalRetry').addEventListener('click', () => {
+  closeModal(); quizCorrect = 0;
+  xp = scrollXpEarned;
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong','dimmed','answered-opt'));
+    box.querySelectorAll('.quiz-explain').forEach(ex => ex.classList.remove('show-correct','show-wrong','show-reveal'));
+    const fb = box.querySelector('.quiz-feedback');
+    if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  });
+  initQuizzes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.getElementById('finalModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+</script>
+
+</body>
+</html>
