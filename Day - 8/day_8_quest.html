@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Data Quest — Percentile Method &amp; Winsorization!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#f0f4ff; --bg2:#e8edf8; --bg3:#dde4f5;
+  --card:#ffffff; --card2:#f5f7ff;
+  --border:rgba(99,102,241,0.12); --border2:rgba(99,102,241,0.25);
+  --neon-blue:#2563eb; --neon-cyan:#0891b2; --neon-purple:#7c3aed;
+  --neon-pink:#db2777; --neon-green:#16a34a; --neon-yellow:#b45309;
+  --neon-orange:#c2410c; --neon-red:#dc2626;
+  --text:#1e1b4b; --muted:#4b5563; --dim:#9ca3af;
+  --font-head:'Syne',sans-serif; --font-body:'Plus Jakarta Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --glow-blue:0 4px 16px rgba(37,99,235,0.18),0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple:0 4px 16px rgba(124,58,237,0.18),0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:0 4px 16px rgba(8,145,178,0.18),0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:0 4px 16px rgba(22,163,74,0.18),0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow:0 4px 16px rgba(180,83,9,0.18),0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:0 4px 16px rgba(219,39,119,0.18),0 1px 4px rgba(219,39,119,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.8;font-size:16px;overflow-x:hidden;}
+::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--neon-cyan);border-radius:3px;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);
+  background-size:50px 50px;}
+.container-main{max-width:1280px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1;}
+
+/* XP BAR */
+.xp-strip{position:sticky;top:0;z-index:1000;background:rgba(240,244,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);box-shadow:0 2px 12px rgba(37,99,235,0.08);padding:0.65rem 0;}
+.xp-inner{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.xp-label{font-family:var(--font-head);font-weight:800;font-size:0.8rem;color:var(--neon-yellow);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;}
+.xp-bar-wrap{flex:1;min-width:120px;background:rgba(37,99,235,0.1);border-radius:50px;height:10px;border:1px solid var(--border2);overflow:hidden;}
+.xp-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-blue),var(--neon-purple));border-radius:50px;transition:width 1s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 10px rgba(8,145,178,0.35);position:relative;}
+.xp-bar-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4));animation:shimmer 2s infinite;}
+@keyframes shimmer{0%,100%{opacity:0;}50%{opacity:1;}}
+.xp-score{font-family:var(--font-head);font-weight:800;font-size:0.9rem;color:var(--neon-yellow);white-space:nowrap;}
+.xp-badges{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.xp-badge{font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:50px;border:1px solid;white-space:nowrap;transition:0.3s;opacity:0.35;}
+.xp-badge.earned{opacity:1;animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes badgePop{0%{transform:scale(0);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.xp-badge.b1{border-color:var(--neon-cyan);color:var(--neon-cyan);}
+.xp-badge.b2{border-color:var(--neon-blue);color:var(--neon-blue);}
+.xp-badge.b3{border-color:var(--neon-green);color:var(--neon-green);}
+.xp-badge.b4{border-color:var(--neon-purple);color:var(--neon-purple);}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:6rem 0 5rem;
+  background:radial-gradient(ellipse at 20% 50%,rgba(8,145,178,0.12) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(124,58,237,0.10) 0%,transparent 55%),
+             radial-gradient(ellipse at 60% 80%,rgba(22,163,74,0.07) 0%,transparent 50%),var(--bg);}
+.hero-orbit{position:absolute;top:50%;right:8%;transform:translateY(-50%);width:420px;height:420px;pointer-events:none;}
+.orbit-ring{position:absolute;border-radius:50%;border:1px solid rgba(8,145,178,0.25);top:50%;left:50%;transform:translate(-50%,-50%);}
+.orbit-ring:nth-child(1){width:150px;height:150px;animation:spin 12s linear infinite;}
+.orbit-ring:nth-child(2){width:250px;height:250px;animation:spin 20s linear infinite reverse;border-color:rgba(124,58,237,0.2);}
+.orbit-ring:nth-child(3){width:350px;height:350px;animation:spin 30s linear infinite;border-color:rgba(22,163,74,0.15);}
+.orbit-dot{position:absolute;width:8px;height:8px;border-radius:50%;top:-4px;left:50%;transform:translateX(-50%);}
+.orbit-ring:nth-child(1) .orbit-dot{background:var(--neon-cyan);box-shadow:var(--glow-cyan);}
+.orbit-ring:nth-child(2) .orbit-dot{background:var(--neon-purple);box-shadow:var(--glow-purple);}
+.orbit-ring:nth-child(3) .orbit-dot{background:var(--neon-green);box-shadow:var(--glow-green);}
+.orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;animation:float 4s ease-in-out infinite;}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
+@keyframes float{0%,100%{transform:translate(-50%,-50%) translateY(0);}50%{transform:translate(-50%,-50%) translateY(-12px);}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(8,145,178,0.12);border:1px solid rgba(8,145,178,0.3);border-radius:50px;padding:0.3rem 1rem;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:1.5rem;}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--neon-cyan);box-shadow:var(--glow-cyan);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.hero h1{font-family:var(--font-head);font-weight:800;font-size:clamp(2.4rem,5vw,4rem);line-height:1.1;letter-spacing:-1.5px;margin-bottom:1.5rem;}
+.hero h1 .line1{display:block;color:#1e1b4b;}
+.hero h1 .line2{display:block;background:linear-gradient(135deg,var(--neon-cyan) 0%,var(--neon-blue) 50%,var(--neon-purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:560px;margin-bottom:2rem;line-height:1.75;}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.hero-stat-item{text-align:center;}
+.hero-stat-num{font-family:var(--font-head);font-weight:800;font-size:1.8rem;line-height:1;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-stat-label{font-size:0.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:0.2rem;}
+.hero-cta{display:inline-flex;align-items:center;gap:0.6rem;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));color:white;font-weight:700;font-size:0.95rem;padding:0.8rem 2rem;border-radius:50px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(8,145,178,0.3);transition:0.3s;animation:pulse-btn 2s infinite;}
+@keyframes pulse-btn{0%,100%{box-shadow:0 4px 20px rgba(8,145,178,0.28);}50%{box-shadow:0 4px 32px rgba(8,145,178,0.45);}}
+.hero-cta:hover{transform:translateY(-2px) scale(1.03);color:white;}
+
+/* QUEST MAP */
+.quest-map{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:2rem;margin:3rem 0;position:relative;box-shadow:0 4px 24px rgba(37,99,235,0.07);}
+.quest-map::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(8,145,178,0.03),rgba(124,58,237,0.03));pointer-events:none;}
+.quest-map-title{font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--neon-yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem;}
+.quest-map-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(234,179,8,0.3),transparent);}
+.quest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0.75rem;}
+.quest-item{display:flex;align-items:center;gap:0.75rem;background:#f8f9ff;border:1px solid var(--border);border-radius:12px;padding:0.75rem 1rem;text-decoration:none;color:var(--muted);font-weight:600;font-size:0.88rem;transition:0.25s;}
+.quest-item:hover{background:rgba(8,145,178,0.06);border-color:rgba(8,145,178,0.3);color:var(--neon-cyan);transform:translateX(4px);}
+.quest-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:0.78rem;flex-shrink:0;}
+
+/* LEVEL CARD */
+.level-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem;margin-bottom:2.5rem;position:relative;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+.level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:24px 24px 0 0;}
+.level-card.lvl-cyan::before{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-green));}
+.level-card.lvl-blue::before{background:linear-gradient(90deg,var(--neon-blue),var(--neon-cyan));}
+.level-card.lvl-purple::before{background:linear-gradient(90deg,var(--neon-purple),var(--neon-pink));}
+.level-card.lvl-green::before{background:linear-gradient(90deg,var(--neon-green),var(--neon-cyan));}
+.level-card.lvl-yellow::before{background:linear-gradient(90deg,var(--neon-yellow),var(--neon-orange));}
+.level-card.lvl-orange::before{background:linear-gradient(90deg,var(--neon-orange),var(--neon-yellow));}
+.level-card.lvl-pink::before{background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple));}
+.level-card.lvl-red::before{background:linear-gradient(90deg,var(--neon-red),var(--neon-orange));}
+.level-card:hover{box-shadow:0 8px 32px rgba(37,99,235,0.12);}
+.level-card .corner-deco{position:absolute;top:1.2rem;right:1.5rem;font-family:var(--font-head);font-weight:800;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;opacity:0.25;}
+.lv-header{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.8rem;}
+.lv-icon-wrap{width:60px;height:60px;border-radius:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;position:relative;}
+.lv-icon-wrap::after{content:'';position:absolute;inset:-3px;border-radius:18px;border:1px solid;opacity:0.4;}
+.ico-cyan{background:rgba(8,145,178,0.12);color:var(--neon-cyan);}.ico-cyan::after{border-color:var(--neon-cyan);}
+.ico-blue{background:rgba(37,99,235,0.12);color:var(--neon-blue);}.ico-blue::after{border-color:var(--neon-blue);}
+.ico-purple{background:rgba(124,58,237,0.12);color:var(--neon-purple);}.ico-purple::after{border-color:var(--neon-purple);}
+.ico-green{background:rgba(22,163,74,0.12);color:var(--neon-green);}.ico-green::after{border-color:var(--neon-green);}
+.ico-yellow{background:rgba(180,83,9,0.12);color:var(--neon-yellow);}.ico-yellow::after{border-color:var(--neon-yellow);}
+.ico-orange{background:rgba(194,65,12,0.12);color:var(--neon-orange);}.ico-orange::after{border-color:var(--neon-orange);}
+.ico-pink{background:rgba(219,39,119,0.12);color:var(--neon-pink);}.ico-pink::after{border-color:var(--neon-pink);}
+.ico-red{background:rgba(220,38,38,0.12);color:var(--neon-red);}.ico-red::after{border-color:var(--neon-red);}
+.lv-meta{flex:1;}
+.lv-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:0.35rem;}
+.lv-title{font-family:var(--font-head);font-weight:800;font-size:1.6rem;line-height:1.2;color:var(--text);}
+.lv-xp{margin-top:0.4rem;display:inline-flex;align-items:center;gap:0.4rem;background:rgba(180,83,9,0.08);border:1px solid rgba(180,83,9,0.25);border-radius:50px;padding:0.2rem 0.75rem;font-size:0.75rem;font-weight:700;color:var(--neon-yellow);}
+
+/* CALLOUT */
+.callout{border-radius:14px;padding:1.2rem 1.4rem;margin:1.2rem 0;border:1px solid;position:relative;overflow:hidden;}
+.callout::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+.callout .ct{font-weight:800;font-size:0.95rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;}
+.cb-cyan{background:rgba(8,145,178,0.06);border-color:rgba(8,145,178,0.2);}.cb-cyan::before{background:var(--neon-cyan);}.cb-cyan .ct{color:var(--neon-cyan);}
+.cb-blue{background:rgba(37,99,235,0.06);border-color:rgba(37,99,235,0.2);}.cb-blue::before{background:var(--neon-blue);}.cb-blue .ct{color:var(--neon-blue);}
+.cb-purple{background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.2);}.cb-purple::before{background:var(--neon-purple);}.cb-purple .ct{color:var(--neon-purple);}
+.cb-green{background:rgba(22,163,74,0.06);border-color:rgba(22,163,74,0.2);}.cb-green::before{background:var(--neon-green);}.cb-green .ct{color:var(--neon-green);}
+.cb-yellow{background:rgba(180,83,9,0.06);border-color:rgba(180,83,9,0.2);}.cb-yellow::before{background:var(--neon-yellow);}.cb-yellow .ct{color:var(--neon-yellow);}
+.cb-orange{background:rgba(194,65,12,0.06);border-color:rgba(194,65,12,0.2);}.cb-orange::before{background:var(--neon-orange);}.cb-orange .ct{color:var(--neon-orange);}
+.cb-pink{background:rgba(219,39,119,0.06);border-color:rgba(219,39,119,0.2);}.cb-pink::before{background:var(--neon-pink);}.cb-pink .ct{color:var(--neon-pink);}
+.cb-red{background:rgba(220,38,38,0.06);border-color:rgba(220,38,38,0.2);}.cb-red::before{background:var(--neon-red);}.cb-red .ct{color:var(--neon-red);}
+
+/* STEP TIMELINE */
+.step-timeline{position:relative;padding-left:2.8rem;}
+.step-timeline::before{content:'';position:absolute;left:15px;top:4px;bottom:4px;width:2px;background:linear-gradient(180deg,var(--neon-cyan),var(--neon-blue),var(--neon-purple));opacity:0.45;border-radius:2px;}
+.step-item{position:relative;margin-bottom:1.3rem;background:#f8f9ff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.3rem;box-shadow:0 2px 8px rgba(37,99,235,0.05);transition:0.25s;}
+.step-item:hover{border-color:var(--border2);background:#eef1ff;}
+.step-item::before{content:attr(data-step);position:absolute;left:-2.8rem;top:1rem;width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid var(--neon-cyan);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:0.78rem;color:var(--neon-cyan);box-shadow:0 2px 8px rgba(8,145,178,0.2);}
+.step-label{font-weight:700;color:var(--text);font-size:0.98rem;margin-bottom:0.35rem;}
+.step-body{color:var(--muted);font-size:0.92rem;line-height:1.7;}
+
+/* ACH CARD */
+.ach-card{background:#ffffff;border:1px solid var(--border);border-radius:18px;padding:1.5rem;height:100%;transition:0.3s;text-align:center;position:relative;overflow:hidden;}
+.ach-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;opacity:0;transition:opacity 0.3s;}
+.ach-card:hover{transform:translateY(-6px);border-color:var(--border2);}
+.ach-card:hover::after{opacity:1;}
+.ach-card.ac-cyan::after{background:var(--neon-cyan);}.ach-card.ac-cyan:hover{box-shadow:0 16px 48px rgba(8,145,178,0.2);}
+.ach-card.ac-blue::after{background:var(--neon-blue);}.ach-card.ac-blue:hover{box-shadow:0 16px 48px rgba(37,99,235,0.2);}
+.ach-card.ac-green::after{background:var(--neon-green);}.ach-card.ac-green:hover{box-shadow:0 16px 48px rgba(22,163,74,0.2);}
+.ach-card.ac-purple::after{background:var(--neon-purple);}.ach-card.ac-purple:hover{box-shadow:0 10px 28px rgba(124,58,237,0.15);}
+.ach-card.ac-orange::after{background:var(--neon-orange);}.ach-card.ac-orange:hover{box-shadow:0 10px 28px rgba(194,65,12,0.15);}
+.ach-card.ac-yellow::after{background:var(--neon-yellow);}.ach-card.ac-yellow:hover{box-shadow:0 10px 28px rgba(180,83,9,0.15);}
+.ach-icon{font-size:2.2rem;margin-bottom:0.75rem;display:block;}
+.ach-title{font-family:var(--font-head);font-weight:800;font-size:1rem;margin-bottom:0.5rem;}
+.ach-desc{font-size:0.88rem;color:var(--muted);line-height:1.65;}
+
+/* CODE BLOCK */
+.code-wrap{background:#f8f9fc;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin:1.2rem 0;}
+.code-header{display:flex;align-items:center;justify-content:space-between;background:rgba(8,145,178,0.06);padding:0.6rem 1.1rem;border-bottom:1px solid var(--border);}
+.code-lang{font-family:var(--font-mono);font-size:0.75rem;font-weight:600;color:var(--neon-cyan);letter-spacing:1px;text-transform:uppercase;}
+.code-dots{display:flex;gap:5px;}
+.code-dot{width:10px;height:10px;border-radius:50%;}
+.code-dot:nth-child(1){background:#dc2626;}.code-dot:nth-child(2){background:#b45309;}.code-dot:nth-child(3){background:#16a34a;}
+.code-wrap pre{margin:0;padding:1.2rem 1.4rem;overflow-x:auto;background:transparent;}
+.code-wrap pre code{font-family:var(--font-mono);font-size:0.85rem;line-height:1.7;}
+pre[class*="language-"]{border-radius:0!important;font-family:var(--font-mono)!important;font-size:0.85rem!important;margin:0!important;border:none!important;background:transparent!important;}
+.code-output{background:rgba(22,163,74,0.06);border-top:1px solid rgba(22,163,74,0.2);padding:0.7rem 1.2rem;font-family:var(--font-mono);font-size:0.82rem;color:#14532d;line-height:1.7;}
+
+/* EX CARD */
+.ex-card{border-radius:16px;overflow:hidden;margin:1.4rem 0;border:1px solid;}
+.ex-card .ex-head{padding:0.85rem 1.4rem;font-weight:800;font-size:0.92rem;display:flex;align-items:center;gap:0.6rem;}
+.ex-card .ex-body{padding:1.4rem;background:#fafbff;}
+.ex-card.ex-story{border-color:rgba(22,163,74,0.25);}.ex-card.ex-story .ex-head{background:rgba(22,163,74,0.08);color:#166534;}
+.ex-card.ex-tech{border-color:rgba(124,58,237,0.25);}.ex-card.ex-tech .ex-head{background:rgba(124,58,237,0.08);color:#5b21b6;}
+.ex-card.ex-tip{border-color:rgba(8,145,178,0.25);}.ex-card.ex-tip .ex-head{background:rgba(8,145,178,0.08);color:#0c4a6e;}
+.ex-card.ex-warn{border-color:rgba(220,38,38,0.25);}.ex-card.ex-warn .ex-head{background:rgba(220,38,38,0.08);color:#991b1b;}
+.ex-card.ex-orange{border-color:rgba(194,65,12,0.25);}.ex-card.ex-orange .ex-head{background:rgba(194,65,12,0.08);color:#7c2d12;}
+
+/* TABLE */
+.gtbl{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.gtbl thead th{background:rgba(8,145,178,0.08);color:var(--neon-cyan);font-family:var(--font-head);font-weight:700;padding:0.9rem 1rem;text-align:left;border-bottom:1px solid rgba(8,145,178,0.15);font-size:0.85rem;letter-spacing:0.5px;}
+.gtbl tbody td{padding:0.75rem 1rem;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.92rem;vertical-align:top;}
+.gtbl tbody tr:last-child td{border-bottom:none;}
+.gtbl tbody tr:hover td{background:rgba(8,145,178,0.03);color:var(--text);}
+.gtbl tbody td strong{color:var(--text);}
+
+/* DIM CARD */
+.dim-card{background:#ffffff;border:1px solid var(--border);border-radius:18px;padding:1.5rem;height:100%;transition:0.3s;position:relative;overflow:hidden;}
+.dim-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(37,99,235,0.1);}
+.dim-rank{font-family:var(--font-head);font-weight:800;font-size:2.5rem;line-height:1;margin-bottom:0.25rem;}
+.dim-name{font-weight:700;font-size:1rem;margin-bottom:0.8rem;}
+.dim-code{background:#f1f5f9;border-radius:10px;padding:0.65rem 0.9rem;font-family:var(--font-mono);font-size:0.82rem;border:1px solid rgba(99,102,241,0.15);margin-bottom:0.8rem;}
+.dim-desc{font-size:0.88rem;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;}
+.dim-example{font-size:0.82rem;padding:0.5rem 0.75rem;border-radius:8px;border:1px solid;font-style:italic;}
+
+/* STAT PILLS */
+.stat-pill{display:inline-flex;align-items:center;gap:0.4rem;border-radius:50px;padding:0.3rem 0.9rem;font-weight:700;font-size:0.8rem;border:1px solid;}
+.sp-cyan{background:rgba(8,145,178,0.08);border-color:rgba(8,145,178,0.3);color:var(--neon-cyan);}
+.sp-blue{background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.3);color:var(--neon-blue);}
+.sp-green{background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.3);color:var(--neon-green);}
+.sp-purple{background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.3);color:var(--neon-purple);}
+.sp-yellow{background:rgba(180,83,9,0.08);border-color:rgba(180,83,9,0.3);color:var(--neon-yellow);}
+.sp-orange{background:rgba(194,65,12,0.08);border-color:rgba(194,65,12,0.3);color:var(--neon-orange);}
+.sp-pink{background:rgba(219,39,119,0.08);border-color:rgba(219,39,119,0.3);color:var(--neon-pink);}
+.sp-red{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.3);color:var(--neon-red);}
+
+/* INLINE CODE */
+.inline-code{background:rgba(8,145,178,0.08);color:#0e7490;padding:0.1rem 0.45rem;border-radius:6px;font-family:var(--font-mono);font-size:0.88em;border:1px solid rgba(8,145,178,0.25);}
+
+/* HIGHLIGHT */
+.hl{background:rgba(180,83,9,0.1);color:#92400e;padding:0 5px;border-radius:4px;}
+.hl-cyan{background:rgba(8,145,178,0.1);color:var(--neon-cyan);padding:0 5px;border-radius:4px;}
+.hl-green{background:rgba(22,163,74,0.1);color:var(--neon-green);padding:0 5px;border-radius:4px;}
+.hl-red{background:rgba(220,38,38,0.1);color:var(--neon-red);padding:0 5px;border-radius:4px;}
+
+/* GLOW DIVIDER */
+.glow-div{height:2px;border-radius:2px;margin:2rem 0;opacity:0.4;background:linear-gradient(90deg,transparent,var(--neon-cyan),var(--neon-blue),var(--neon-purple),transparent);}
+
+/* MERMAID */
+.mermaid-wrap{background:#f8f9ff;border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin:1.5rem 0;text-align:center;overflow-x:auto;box-shadow:0 2px 12px rgba(37,99,235,0.06);}
+
+/* QUIZ */
+.quiz-box{background:#fffbf0;border:1px solid rgba(180,83,9,0.18);border-radius:20px;padding:1.6rem;margin:1.8rem 0;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(180,83,9,0.07);}
+.quiz-box::before{content:'⚡ QUICK CHALLENGE';position:absolute;top:0;right:0;background:linear-gradient(135deg,#b45309,#c2410c);color:#fff;font-family:var(--font-head);font-weight:800;font-size:0.62rem;letter-spacing:2px;padding:0.32rem 0.9rem;border-radius:0 20px 0 12px;}
+.quiz-q{font-weight:700;color:#1c1917;margin-bottom:1.1rem;font-size:1.02rem;line-height:1.55;}
+.quiz-options{display:flex;flex-direction:column;gap:0.55rem;}
+.quiz-opt{background:#ffffff;border:1.5px solid #e5e7eb;border-radius:12px;padding:0.75rem 1.1rem;cursor:pointer;font-size:0.93rem;color:#374151;transition:background 0.15s,border-color 0.15s,transform 0.12s;font-weight:500;display:flex;align-items:center;gap:0.85rem;user-select:none;}
+.quiz-opt:not(.answered-opt):hover{background:#f3f4f6;border-color:#9ca3af;color:#111827;transform:translateX(3px);}
+.quiz-opt.correct{background:#f0fdf4;border-color:#16a34a;color:#14532d;font-weight:700;}
+.quiz-opt.correct .opt-letter{background:#16a34a;color:#fff;}
+.quiz-opt.wrong{background:#fef2f2;border-color:#dc2626;color:#991b1b;opacity:0.8;}
+.quiz-opt.wrong .opt-letter{background:#dc2626;color:#fff;}
+.quiz-opt.dimmed{opacity:0.45;pointer-events:none;}
+.quiz-opt .opt-letter{width:28px;height:28px;border-radius:8px;background:#f3f4f6;color:#6b7280;border:1.5px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:0.8rem;flex-shrink:0;transition:background 0.2s,color 0.2s;}
+.quiz-explain{display:none;font-size:0.84rem;font-weight:500;margin-top:-0.35rem;margin-bottom:0.35rem;padding:0.5rem 0.85rem 0.5rem 1rem;border-radius:0 0 10px 10px;line-height:1.55;border-left:3px solid transparent;}
+.quiz-explain.show-correct{display:block;background:rgba(22,163,74,0.07);color:#166534;border-left-color:#16a34a;}
+.quiz-explain.show-wrong{display:block;background:rgba(220,38,38,0.06);color:#991b1b;border-left-color:#dc2626;}
+.quiz-explain.show-reveal{display:block;background:rgba(37,99,235,0.06);color:#1e40af;border-left-color:#2563eb;}
+.quiz-feedback{display:none;margin-top:1rem;padding:0.85rem 1.1rem;border-radius:12px;font-weight:700;font-size:0.95rem;align-items:center;gap:0.6rem;}
+.quiz-feedback.show{display:flex;animation:fadeIn 0.35s;}
+.quiz-feedback.win{background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#14532d;border:1px solid rgba(22,163,74,0.3);}
+.quiz-feedback.lose{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#991b1b;border:1px solid rgba(220,38,38,0.2);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* FOOTER */
+.gfooter{background:#e8edf8;border-top:1px solid var(--border);padding:3rem 0;margin-top:4rem;text-align:center;}
+.gfooter-logo{font-family:var(--font-head);font-weight:800;font-size:1.4rem;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;}
+
+/* ANIMATIONS */
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade-up.visible{opacity:1;transform:none;}
+
+/* RESPONSIVE */
+@media(max-width:768px){.hero h1{font-size:2rem;}.hero-orbit{display:none;}.level-card{padding:1.5rem;}.xp-badges{display:none;}}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;}
+.gtoast{background:#ffffff;border:1px solid var(--border2);border-radius:14px;padding:0.85rem 1.2rem;display:flex;align-items:center;gap:0.75rem;backdrop-filter:blur(12px);font-weight:700;font-size:0.88rem;transform:translateX(120%);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:auto;min-width:260px;box-shadow:0 8px 32px rgba(37,99,235,0.15);}
+.gtoast.show{transform:none;}
+.gtoast-icon{font-size:1.4rem;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,0.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity 0.4s ease;}
+.modal-overlay.open{opacity:1;pointer-events:auto;}
+.modal-box{background:#ffffff;border-radius:28px;padding:2.5rem 2.5rem 2rem;max-width:520px;width:100%;position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(37,99,235,0.18),0 4px 20px rgba(0,0,0,0.1);transform:scale(0.85) translateY(20px);transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1),opacity 0.4s ease;opacity:0;}
+.modal-overlay.open .modal-box{transform:scale(1) translateY(0);opacity:1;}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-blue),var(--neon-purple));}
+.modal-close{position:absolute;top:1rem;right:1rem;background:#f3f4f6;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:0.9rem;color:#6b7280;display:flex;align-items:center;justify-content:center;transition:0.2s;}
+.modal-close:hover{background:#e5e7eb;color:#374151;}
+.modal-trophy{font-size:3rem;text-align:center;margin-bottom:0.5rem;}
+.modal-title{font-family:var(--font-head);font-weight:800;font-size:1.6rem;text-align:center;color:var(--text);margin-bottom:0.4rem;}
+.modal-subtitle{color:var(--muted);text-align:center;font-size:0.92rem;margin-bottom:1.5rem;}
+.score-ring-wrap{display:flex;justify-content:center;margin-bottom:1.2rem;}
+.score-ring{position:relative;width:120px;height:120px;}
+.score-ring svg{width:120px;height:120px;transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:#e5e7eb;stroke-width:10;}
+.ring-fill{fill:none;stroke:#0891b2;stroke-width:10;stroke-linecap:round;stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-num{font-family:var(--font-head);font-weight:800;font-size:1.4rem;color:var(--text);line-height:1;}
+.ring-label{font-size:0.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;}
+.grade-card{border-radius:14px;padding:0.85rem 1.2rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;border:1.5px solid;}
+.grade-s{background:#fef9c3;border-color:#b45309;}.grade-a{background:#f0fdf4;border-color:#16a34a;}.grade-b{background:#eff6ff;border-color:#2563eb;}.grade-c{background:#f5f3ff;border-color:#7c3aed;}.grade-d{background:#fef2f2;border-color:#dc2626;}
+.grade-letter{font-family:var(--font-head);font-weight:800;font-size:1.6rem;}
+.grade-msg{font-size:0.9rem;color:var(--muted);font-weight:600;}
+.modal-xp-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9ff;border:1px solid rgba(37,99,235,0.15);border-radius:12px;padding:0.75rem 1.1rem;margin-bottom:1.4rem;}
+.modal-xp-row .mxp-label{font-size:0.85rem;color:#6b7280;font-weight:600;}
+.modal-xp-row .mxp-val{font-family:var(--font-head);font-weight:800;font-size:1.1rem;background:linear-gradient(135deg,#0891b2,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.modal-btns{display:flex;gap:0.75rem;}
+.modal-btn-retry{flex:1;padding:0.8rem 1rem;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:12px;cursor:pointer;font-family:var(--font-head);font-weight:700;font-size:0.92rem;color:#374151;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:0.5rem;}
+.modal-btn-retry:hover{background:#e5e7eb;border-color:#d1d5db;color:#111827;}
+.modal-btn-continue{flex:2;padding:0.8rem 1rem;background:linear-gradient(135deg,#0891b2,#7c3aed);border:none;border-radius:12px;cursor:pointer;font-family:var(--font-head);font-weight:700;font-size:0.92rem;color:#ffffff;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:0.5rem;box-shadow:0 4px 16px rgba(8,145,178,0.3);}
+.modal-btn-continue:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(8,145,178,0.4);}
+#confettiCanvas{position:fixed;inset:0;z-index:10001;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- XP STRIP -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 220 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">📏 Percentile Pro</span>
+        <span class="xp-badge b2" id="badge2">✂️ Capper Expert</span>
+        <span class="xp-badge b3" id="badge3">🧊 Winsor Master</span>
+        <span class="xp-badge b4" id="badge4">🏆 Data Surgeon</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-solid fa-gamepad me-1"></i> Gamified Learning Quest</div>
+        <h1>
+          <span class="line1">Tame Outliers Smartly</span>
+          <span class="line2">Percentile &amp; Winsorization</span>
+        </h1>
+        <p class="hero-sub">
+          4 boss levels. Percentile Method se lekar Winsorization tak. Real India examples. Python code jo actually kaam karta hai. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, aur data ko professionally handle karo!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">220</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">4</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Clean Data</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">✂️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- QUEST MAP -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L1</span> Percentile Method — Kya Hai?</a>
+    <a href="#s2" class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L1</span> Percentile — Step-by-Step &amp; Code</a>
+    <a href="#s3" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L2</span> Winsorization — Kya Hai?</a>
+    <a href="#s4" class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L2</span> Winsorization — Python Code</a>
+    <a href="#s5" class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L3</span> Remove vs Cap — Kab Kya?</a>
+    <a href="#s6" class="quest-item"><span class="quest-num" style="background:rgba(180,83,9,0.15);color:var(--neon-yellow);">L4</span> Sab Methods ka Comparison</a>
+    <a href="#s7" class="quest-item"><span class="quest-num" style="background:rgba(219,39,119,0.15);color:var(--neon-pink);">🏆</span> Final Summary &amp; Roadmap</a>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 1-A : PERCENTILE METHOD — KYA HAI?
+█████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-percent"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">Percentile Method — Data ke Extremes Pakdo!</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Idea — Ek Line Mein</div>
+    <strong>Percentile Method</strong> = data ki <span class="hl-cyan">ek defined percentage range se bahar</span> jaane wali values ko outlier consider karo.<br><br>
+    Simplest idea: "Sirf beech ka 90% ya 95% data rakho — sabse neeche aur sabse upar ke extreme values hata do!"
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-question-circle"></i> Percentile Kya Hota Hai? — Refresher</div>
+    Sochte hain 100 log line mein khade hain — height se sort kiye hue.<br><br>
+    → <strong>10th percentile</strong> = 10th person → usse neeche ke 10% log hain<br>
+    → <strong>90th percentile</strong> = 90th person → usse neeche ke 90% log hain<br>
+    → <strong>50th percentile</strong> = 50th person = <em>median</em><br><br>
+    Percentile Method mein hum typically <strong>bottom 5% aur top 5%</strong> ko outliers consider karte hain — yaani 5th percentile se neeche aur 95th percentile se upar.
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;">
+    <i class="fa-solid fa-india me-2" style="color:var(--neon-cyan)"></i>India Example — HDFC Bank Loan Amounts
+  </h5>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(220,38,38,0.3);">
+        <div class="dim-rank" style="color:var(--neon-red);">❌</div>
+        <div class="dim-name" style="color:var(--neon-red);">Problem</div>
+        <div class="dim-code">Loan data: ₹1L to ₹500Cr</div>
+        <div class="dim-desc">Zyaadatar loans ₹5L–₹50L range mein hain. Kuch extremely chhote (₹5000 — test entry?) aur kuch bahut bade (₹500Cr — corporate, outlier!) hain.</div>
+        <div class="dim-example" style="border-color:rgba(220,38,38,0.2);color:var(--muted);">
+          These extremes distort the model
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(180,83,9,0.3);">
+        <div class="dim-rank" style="color:var(--neon-yellow);">📊</div>
+        <div class="dim-name" style="color:var(--neon-yellow);">Percentile Boundaries</div>
+        <div class="dim-code">5th %ile = ₹3.2L<br>95th %ile = ₹48L</div>
+        <div class="dim-desc">In boundaries ke bahar waali values outliers hain. Data ka 90% normal range = ₹3.2L se ₹48L ke beech.</div>
+        <div class="dim-example" style="border-color:rgba(180,83,9,0.2);color:var(--muted);">
+          Clear, data-driven boundaries!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border-color:rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">✅</div>
+        <div class="dim-name" style="color:var(--neon-green);">After Cleaning</div>
+        <div class="dim-code">Only ₹3.2L–₹48L retained</div>
+        <div class="dim-desc">Model ab realistic loan range pe train hoga — nahi too ₹5000 test entry aur ₹500Cr corporate deal confuse karenge retail loan model ko!</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2);color:var(--muted);">
+          Clean, focused dataset!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-3">
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check-double"></i> Percentile Method ke Fayde</div>
+        ✅ Samajhna bilkul simple — "top aur bottom X% hata do"<br>
+        ✅ Koi complex formula nahi chahiye<br>
+        ✅ Any distribution pe kaam karta hai (normal ya skewed)<br>
+        ✅ Ek line Python code se implement hota hai<br>
+        ✅ Har dataset mein kuch na kuch remove hoga — predictable behavior
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-red h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Percentile Method ki Limitations</div>
+        ❌ <strong>Hamesha kuch data remove hoga</strong> — chahe outliers na hon bhi<br>
+        ❌ Threshold (5%, 1%, 10%) arbitrary hai — domain knowledge chahiye<br>
+        ❌ Chhote datasets mein zyada data loss<br>
+        ❌ Real valid extreme values bhi delete ho sakti hain<br>
+        ❌ Information permanently lost — undo nahi ho sakta
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 Ek dataset mein 1000 employees ke salaries hain. Percentile method se 5th aur 95th percentile use karo. Kitne records remove honge approximately?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Sirf outliers remove hote hain — ye count fixed nahi hota. Percentile method exactly 5% bottom aur 5% top remove karta hai regardless of how extreme they are."><span class="opt-letter">A</span>Sirf 2–3 records — jo clearly wrong hain</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! 5th percentile = bottom 5% = 50 records. 95th percentile = top 5% = 50 records. Total ≈ 100 records (10%) remove honge. Ye Percentile Method ki ek key property hai — hamesha ek fixed percentage remove hoti hai, chahe outliers hon ya na hon!"><span class="opt-letter">B</span>Approximately 100 records (10%) — bottom 50 aur top 50</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. Percentile method Z-Score se alag hai — ye statistics-based nahi hai. Ye simply ek fixed percentage remove karta hai. 5th aur 95th percentile use karne se exactly ~10% data jaayega."><span class="opt-letter">C</span>Depends on Z-Score threshold</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Galat. Percentile method har baar kuch data remove karta hai — ye guaranteed hai. Agar 5th aur 95th percentile use karo toh ~10% hamesha remove hoga."><span class="opt-letter">D</span>Koi bhi nahi — sirf extreme cases mein kuch hatega</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 1-B : PERCENTILE — STEP-BY-STEP + CODE
+█████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-code"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">Percentile Method — Step-by-Step &amp; Python Code</div>
+    </div>
+  </div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;">
+    <i class="fa-solid fa-list-ol me-2" style="color:var(--neon-blue)"></i>Step-by-Step Logic
+  </h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">📊 Data Lo aur Column Choose Karo</div>
+      <div class="step-body">
+        Pehle decide karo kaunse column pe outlier removal chahiye.<br>
+        Har numerical column ke liye alag se apply karo — ek saath nahi!<br>
+        <em style="color:var(--dim);">Example: Salary column pe 5–95 percentile, Age column pe 1–99 percentile (loose boundaries)</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">📐 Lower aur Upper Bound Calculate Karo</div>
+      <div class="step-body">
+        <strong>Lower Bound</strong> = <span class="inline-code">df['col'].quantile(0.05)</span> &nbsp;→ 5th percentile value<br>
+        <strong>Upper Bound</strong> = <span class="inline-code">df['col'].quantile(0.95)</span> &nbsp;→ 95th percentile value<br>
+        <em style="color:var(--dim);">Ye actual data values hain — not formula-based boundaries</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">🔍 Outlier Mask Banao</div>
+      <div class="step-body">
+        Lower bound se neeche ya upper bound se upar waali rows = outliers<br>
+        <span class="inline-code">mask = (df['col'] &lt; lower) | (df['col'] &gt; upper)</span><br>
+        <em style="color:var(--dim);">mask mein True = outlier row, False = normal row</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">✂️ Outliers Remove Karo (ya Cap Karo)</div>
+      <div class="step-body">
+        <strong>Remove:</strong> <span class="inline-code">df_clean = df[~mask]</span> → outlier rows hata do<br>
+        <strong>Cap (Clamp):</strong> <span class="inline-code">df['col'].clip(lower, upper)</span> → extreme values ko boundary pe rakh do<br>
+        <em style="color:var(--dim);">clip() = Winsorization! Next level mein detail mein seekhenge.</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tip mt-3">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> Percentile Method — Complete Python Code</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — Percentile Method</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Inline Dataset: HDFC-style Loan Applications ───
+data = {
+    'applicant': ['Rahul','Priya','Suresh','Meena','Kiran',
+                  'Deepak','Anita','Vikram','Pooja','Arjun',
+                  'Sunita','Ravi','Neha','Amit','Divya'],
+    'loan_amt_lakh': [5.5, 8.2, 12.0, 0.05, 42.0,   # 0.05 = test entry, likely error
+                      18.5, 25.0, 6.8, 380.0, 15.2,  # 380 = corporate loan, outlier
+                      9.4, 22.0, 11.5, 7.3, 0.03],   # 0.03 = another bad entry
+    'monthly_income_k': [45, 72, 95, 30, 180,
+                         110, 140, 55, 420, 88,
+                         62, 125, 80, 58, 25],
+    'cibil_score': [720, 750, 680, 600, 790,
+                    760, 800, 710, 850, 730,
+                    690, 775, 745, 700, 620],
+}
+df = pd.DataFrame(data)
+
+print("Original Dataset:")
+print(df[['applicant', 'loan_amt_lakh']].to_string())
+print(f"\nTotal rows: {len(df)}")
+print(f"Loan Amount Stats:\n{df['loan_amt_lakh'].describe().round(2)}")
+
+# ══════════════════════════════════════════
+# STEP 1: Percentile Boundaries Calculate Karo
+# ══════════════════════════════════════════
+lower_pct = 0.05   # 5th percentile
+upper_pct = 0.95   # 95th percentile
+
+lower_bound = df['loan_amt_lakh'].quantile(lower_pct)
+upper_bound = df['loan_amt_lakh'].quantile(upper_pct)
+
+print(f"\n--- Percentile Boundaries ---")
+print(f"5th  Percentile (Lower Bound): ₹{lower_bound:.2f}L")
+print(f"95th Percentile (Upper Bound): ₹{upper_bound:.2f}L")
+print(f"Normal range: ₹{lower_bound:.2f}L to ₹{upper_bound:.2f}L")
+
+# ══════════════════════════════════════════
+# STEP 2: Outliers Identify Karo
+# ══════════════════════════════════════════
+outlier_mask = (
+    (df['loan_amt_lakh'] < lower_bound) |
+    (df['loan_amt_lakh'] > upper_bound)
+)
+
+print(f"\n--- Outliers Detected ---")
+print(df[outlier_mask][['applicant', 'loan_amt_lakh']])
+print(f"Total outliers: {outlier_mask.sum()}")
+
+# ══════════════════════════════════════════
+# STEP 3: Clean Data — Outliers Remove Karo
+# ══════════════════════════════════════════
+df_clean = df[~outlier_mask].copy()
+
+print(f"\n--- Results ---")
+print(f"Rows before: {len(df)} | Rows after: {len(df_clean)}")
+print(f"\nLoan Amt Mean BEFORE: ₹{df['loan_amt_lakh'].mean():.2f}L")
+print(f"Loan Amt Mean AFTER:  ₹{df_clean['loan_amt_lakh'].mean():.2f}L")
+print(f"\nLoan Amt Max BEFORE: ₹{df['loan_amt_lakh'].max():.2f}L")
+print(f"Loan Amt Max AFTER:  ₹{df_clean['loan_amt_lakh'].max():.2f}L")</code></pre>
+        <div class="code-output">📏 Before: Mean ≈ ₹37.5L (380 ne inflate kiya!), Max = ₹380L. After: Mean ≈ ₹14.2L (realistic!), Max ≈ ₹42L. Percentile method ne 0.05L aur 0.03L (test entries) aur 380L (corporate) sabko hata diya!</div>
+      </div>
+    </div>
+  </div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin:1.5rem 0 0.8rem;">
+    <i class="fa-solid fa-table me-2" style="color:var(--neon-blue)"></i>Code Explanation Table
+  </h5>
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Code</th><th>Matlab (Meaning)</th></tr></thead>
+      <tbody>
+        <tr><td><span class="inline-code">quantile(0.05)</span></td><td>5th percentile value nikalo — bottom 5% ka upper boundary</td></tr>
+        <tr><td><span class="inline-code">quantile(0.95)</span></td><td>95th percentile value nikalo — top 5% ka lower boundary</td></tr>
+        <tr><td><span class="inline-code">(df[col] &lt; lower) | (df[col] &gt; upper)</span></td><td>Outlier boolean mask — True = outlier row</td></tr>
+        <tr><td><span class="inline-code">df[~outlier_mask]</span></td><td>~ = NOT — sirf non-outlier rows rakho</td></tr>
+        <tr><td><span class="inline-code">.describe()</span></td><td>min, max, mean, Q1, Q3 ek saath check karo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 2-A : WINSORIZATION — KYA HAI?
+█████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s3">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-compress-arrows-alt"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">Winsorization — Outliers Hatao Nahi, Tame Karo!</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Idea — Ek Line Mein</div>
+    <strong>Winsorization</strong> = outlier values ko <span class="hl">delete mat karo — unhe boundary pe cap (limit) kar do!</span><br><br>
+    Agar 95th percentile = ₹48L hai aur kisi ki salary ₹380L hai → uski salary ₹380L se ₹48L kar do. Row delete nahi hogi — sirf extreme value replace hogi!
+  </div>
+
+  <div class="glow-div"></div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.2rem;">
+    <i class="fa-solid fa-scale-balanced me-2" style="color:var(--neon-purple)"></i>Delete vs Winsorize — Difference Samjho
+  </h5>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="callout cb-red h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-trash"></i> Outlier Delete Karna (Removal)</div>
+        Original: <span class="inline-code">[30, 35, 38, 40, 42, <strong style="color:var(--neon-red);">500</strong>]</span><br><br>
+        After removal: <span class="inline-code">[30, 35, 38, 40, 42]</span><br><br>
+        → Row completely gayi — dataset chhota hua<br>
+        → Agar row mein aur bhi useful features tha, woh bhi gaya<br>
+        → Chhote datasets mein bahut nuksaan
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-purple h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-compress"></i> Winsorization (Capping)</div>
+        Original: <span class="inline-code">[30, 35, 38, 40, 42, <strong style="color:var(--neon-purple);">500</strong>]</span><br><br>
+        95th percentile = 42. After Winsorize: <span class="inline-code">[30, 35, 38, 40, 42, <strong style="color:var(--neon-green);">42</strong>]</span><br><br>
+        → Row bachi rahi — dataset same size<br>
+        → Doosre features preserved hain<br>
+        → Outlier ka extreme effect neutralize hua
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-green mt-3">
+    <div class="ct"><i class="fa-solid fa-india"></i> Real India Example — Zomato Delivery Time</div>
+    Zomato ke 10,000 delivery records hain. 50 records mein delivery time &gt; 3 hours hai (accident, weather, wrong address).<br><br>
+    <strong>Agar delete karo:</strong> 50 rows hata do — in riders ka data, area ka data, weather ka data sab chala jaayega<br>
+    <strong>Agar Winsorize karo:</strong> 95th percentile = 55 min → 3+ hour wali deliveries ko 55 min set karo. Row bachi, data preserved, extreme effect neutralize!<br><br>
+    <em style="color:var(--dim);">Banking, insurance, retail — in industries mein data loss costly hota hai. Isliye Winsorization prefer karte hain.</em>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-4">
+      <div class="ach-card ac-purple">
+        <span class="ach-icon">📊</span>
+        <div class="ach-title">Dataset Size Preserved</div>
+        <div class="ach-desc">Rows delete nahi hoti. Saara data analysis, ML training ke liye available rehta hai — especially important for small datasets.</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-blue">
+        <span class="ach-icon">🔗</span>
+        <div class="ach-title">Other Features Intact</div>
+        <div class="ach-desc">Ek column ka outlier sirf woh column fix hota hai. Usi row ke doosre valuable features (age, city, product) safe rehte hain.</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ach-card ac-green">
+        <span class="ach-icon">📉</span>
+        <div class="ach-title">Distribution Shape</div>
+        <div class="ach-desc">Winsorization ke baad distribution ka shape roughly preserve hota hai — sirf tails compress hote hain. Mean aur variance realistic ho jaate hain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 Delivery times: [22, 25, 28, 30, 27, 240]. 95th percentile = 30 hai. Winsorization ke baad 240 ki value kya hogi?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Winsorization mein rows delete nahi hoti — sirf extreme values ko boundary pe replace kiya jaata hai. Delete karna Removal method hai, Winsorization nahi."><span class="opt-letter">A</span>240 wali row delete ho jaayegi</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. Winsorization average se replace nahi karta — ye outlier imputation nahi hai. Winsorization mean ya median use nahi karta. Ye sirf boundary pe cap karta hai."><span class="opt-letter">B</span>240 ko mean se replace karenge</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! Winsorization exactly yahi karta hai — 95th percentile = 30 hai, toh 240 jo ki 30 se bahut zyada hai, use exactly 30 se replace kar diya jaayega. Row bachi rahegi, sirf 240 → 30 ho jaayega. clip(lower, upper) se ye ek line mein hota hai!"><span class="opt-letter">C</span>240 ko 30 (95th percentile) se replace karenge — row bachi rahegi</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Winsorization 240 ko NaN se replace nahi karta — woh missing value imputation hota. Winsorization mein specific boundary value se replace hota hai."><span class="opt-letter">D</span>240 ko NaN se replace karenge</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 2-B : WINSORIZATION — PYTHON CODE
+█████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s4">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-code"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Skill Unlock</div>
+      <div class="lv-title">Winsorization — Python Code (3 Ways)</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-brands fa-python"></i> Winsorization — pandas .clip() se Seedha karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — Winsorization</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from scipy.stats import mstats   # Method 3 ke liye
+
+# ─── Inline Dataset: Zomato Delivery Data ───
+data = {
+    'rider':         ['Raju','Suresh','Amit','Pooja','Kiran',
+                      'Deepak','Meena','Arjun','Sunita','Vikram',
+                      'Priya','Rohit','Anita','Manoj','Kavya'],
+    'delivery_min':  [28, 32, 240, 29, 31,      # 240 = accident/outlier
+                      27, 185, 30, 26, 33,       # 185 = another outlier
+                      29, 28, 31, 270, 27],      # 270 = extreme outlier
+    'rating':        [4.5, 4.2, 3.8, 4.6, 4.4,
+                      4.7, 3.5, 4.3, 4.8, 4.1,
+                      4.6, 4.4, 4.3, 3.2, 4.7],
+}
+df = pd.DataFrame(data)
+
+print("Original delivery_min column:")
+print(df['delivery_min'].tolist())
+print(f"Mean: {df['delivery_min'].mean():.1f} min")
+print(f"Max:  {df['delivery_min'].max()} min")
+
+# ══════════════════════════════════════════
+# METHOD 1: pandas clip() — Sabse Simple!
+# ══════════════════════════════════════════
+lower = df['delivery_min'].quantile(0.05)   # 5th percentile
+upper = df['delivery_min'].quantile(0.95)   # 95th percentile
+
+print(f"\n5th  percentile: {lower:.1f} min")
+print(f"95th percentile: {upper:.1f} min")
+
+# clip() = Winsorization! Values ko boundaries pe clamp karta hai
+df['delivery_winsorized'] = df['delivery_min'].clip(lower=lower, upper=upper)
+
+print("\nAfter Winsorization (clip):")
+print(df['delivery_winsorized'].tolist())
+print(f"Mean after: {df['delivery_winsorized'].mean():.1f} min")
+print(f"Max after:  {df['delivery_winsorized'].max():.1f} min")
+# 240, 185, 270 sab → upper boundary pe cap ho gaye!
+
+# ══════════════════════════════════════════
+# METHOD 2: numpy clip() — Same result
+# ══════════════════════════════════════════
+df['delivery_np_clip'] = np.clip(df['delivery_min'], lower, upper)
+# df['delivery_winsorized'] aur df['delivery_np_clip'] same honge!
+
+# ══════════════════════════════════════════
+# METHOD 3: scipy winsorize() — Direct
+# ══════════════════════════════════════════
+from scipy.stats.mstats import winsorize
+df['delivery_scipy'] = winsorize(
+    df['delivery_min'],
+    limits=[0.05, 0.05]   # bottom 5% aur top 5% winsorize karo
+)
+print("\nDataset size BEFORE:", len(df))
+print("Dataset size AFTER:", len(df))   # Same! Rows nahi gayi!
+print("\nComparison — first 5 rows:")
+print(df[['rider','delivery_min','delivery_winsorized']].head())</code></pre>
+        <div class="code-output">✂️ Winsorization Result: 240 → 33.0, 185 → 33.0, 270 → 33.0 (sab upper bound pe cap!). Mean: 96.5 → 30.7 min. Size: 15 rows → 15 rows (koi loss nahi!). clip() = Winsorization ka simplest implementation!</div>
+      </div>
+    </div>
+  </div>
+
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin:1.5rem 0 0.8rem;">
+    <i class="fa-solid fa-table me-2" style="color:var(--neon-purple)"></i>3 Methods ka Quick Comparison
+  </h5>
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Method</th><th>Syntax</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>pandas .clip()</strong></td><td><span class="inline-code">df[col].clip(lower, upper)</span></td><td>Everyday use — simplest, most readable</td></tr>
+        <tr><td><strong>numpy .clip()</strong></td><td><span class="inline-code">np.clip(arr, lower, upper)</span></td><td>NumPy arrays ke liye, pandas bhi</td></tr>
+        <tr><td><strong>scipy winsorize()</strong></td><td><span class="inline-code">winsorize(arr, limits=[0.05, 0.05])</span></td><td>Direct percentage specify karna ho</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="a" data-xp="25">
+    <div class="quiz-q">🤔 pandas mein Winsorization karne ke liye kaunsa function use karte hain aur kya hota hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Bilkul sahi! df[col].clip(lower=L, upper=U) exactly Winsorization karta hai — L se neeche jaane waali values L ho jaati hain aur U se upar jaane waali values U ho jaati hain. Row delete nahi hoti, sirf extreme values boundary pe cap ho jaati hain. Ek line mein poora Winsorization done!"><span class="opt-letter">A</span>.clip(lower, upper) — values ko boundaries pe cap karta hai, rows delete nahi karta</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Galat. .dropna() missing values (NaN) remove karta hai, outliers nahi. Winsorization ke liye .clip() use karo."><span class="opt-letter">B</span>.dropna() — outlier rows ko hata deta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Nahi. .fillna() missing values (NaN) fill karta hai. Outliers NaN nahi hote — woh actual values hain jo sirf bahut extreme hain. Winsorization ke liye .clip() use karo."><span class="opt-letter">C</span>.fillna() — outliers ko mean se replace karta hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. .replace() specific values ko dusri values se replace karta hai. Iske liye values pehle se pata honi chahiye. Winsorization dynamic boundaries pe kaam karta hai — .clip() best choice hai."><span class="opt-letter">D</span>.replace() — outlier values ko 0 se replace karta hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 3 : REMOVE VS CAP — KAB KYA?
+█████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s5">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-scale-balanced"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">Outlier Remove karo ya Cap karo? — Decision Guide</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Golden Rule</div>
+    <strong>Remove</strong> = Jab row hi galat ho (data entry error, sensor fault, wrong value) — poori row ka koi value nahi<br>
+    <strong>Winsorize (Cap)</strong> = Jab row valid ho lekin sirf ek value extreme ho — baki features useful hain
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table class="gtbl">
+      <thead><tr><th>Situation</th><th>Remove karo?</th><th>Winsorize karo?</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Age = −5 ya 200</td><td><span class="stat-pill sp-red">✅ Remove</span></td><td><span class="stat-pill sp-red">❌ Don't Cap</span></td><td>Clearly impossible value — row galat hai</td></tr>
+        <tr><td>Salary = ₹50Cr (CEO level)</td><td><span class="stat-pill sp-yellow">⚠️ Maybe</span></td><td><span class="stat-pill sp-green">✅ Winsorize</span></td><td>Valid person, just extreme — cap karo</td></tr>
+        <tr><td>Delivery time = 3000 min</td><td><span class="stat-pill sp-red">✅ Remove</span></td><td><span class="stat-pill sp-red">❌ Don't Cap</span></td><td>Clearly wrong data — system error</td></tr>
+        <tr><td>IPL score = 280 (superhuman but valid!)</td><td><span class="stat-pill sp-red">❌ Don't Remove</span></td><td><span class="stat-pill sp-green">✅ Winsorize</span></td><td>Real event — cap karo toh distribution clean</td></tr>
+        <tr><td>Chhota dataset (100 rows)</td><td><span class="stat-pill sp-red">❌ Avoid</span></td><td><span class="stat-pill sp-green">✅ Prefer</span></td><td>Data loss costly in small datasets</td></tr>
+        <tr><td>Medical test result (extreme but real)</td><td><span class="stat-pill sp-red">❌ Never Remove</span></td><td><span class="stat-pill sp-green">✅ Winsorize</span></td><td>Real patient data — never delete medical info!</td></tr>
+        <tr><td>Fraud detection dataset</td><td><span class="stat-pill sp-red">❌ Never Remove</span></td><td><span class="stat-pill sp-yellow">⚠️ Careful</span></td><td>Outliers = fraud signals — preserve them!</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row g-3 mt-3">
+    <div class="col-md-6">
+      <div class="callout cb-cyan h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-percent"></i> Percentile Method kab use karein</div>
+        ✅ Quick EDA ke liye — fast aur simple<br>
+        ✅ Clearly bad data entries hain (negative age, etc.)<br>
+        ✅ Large dataset hai (1000+ rows) → loss affordable<br>
+        ✅ Row mein baaki features bhi suspect hain<br>
+        ✅ Strict data quality standards chahiye
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-purple h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-compress"></i> Winsorization kab use karein</div>
+        ✅ Dataset chhota hai (data loss avoid karo)<br>
+        ✅ Row ke baki features valuable hain<br>
+        ✅ Financial / medical data — rows delete nahi karte<br>
+        ✅ Outlier valid but extreme hai (CEO salary)<br>
+        ✅ ML model training ke liye distribution smooth karna ho
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     LEVEL 4 : ALL METHODS COMPARISON
+█████████████████████████████████████ -->
+<div class="level-card lvl-yellow fade-up" id="s6">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-table-list"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">Saare Outlier Methods ek Jagah — Complete Comparison</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Method</th><th>Kaise Kaam Karta Hai</th><th>Data Remove Hota Hai?</th><th>Best For</th><th>Main Limitation</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="stat-pill sp-red">Z-Score</span></td>
+          <td>Mean se 3 SD door = outlier</td>
+          <td><span class="stat-pill sp-red">Haan — rows delete</span></td>
+          <td>Normal distribution data</td>
+          <td>Outliers khud mean/SD badal dete hain</td>
+        </tr>
+        <tr>
+          <td><span class="stat-pill sp-blue">IQR</span></td>
+          <td>Q1−1.5×IQR to Q3+1.5×IQR fence</td>
+          <td><span class="stat-pill sp-red">Haan — rows delete</span></td>
+          <td>Skewed data, any distribution</td>
+          <td>1.5 multiplier arbitrary hai</td>
+        </tr>
+        <tr>
+          <td><span class="stat-pill sp-cyan">Percentile</span></td>
+          <td>Bottom X% aur Top X% hata do</td>
+          <td><span class="stat-pill sp-red">Haan — rows delete</span></td>
+          <td>Quick EDA, any distribution</td>
+          <td>Hamesha kuch data remove hoga</td>
+        </tr>
+        <tr>
+          <td><span class="stat-pill sp-purple">Winsorization</span></td>
+          <td>Extreme values ko boundary pe cap karo</td>
+          <td><span class="stat-pill sp-green">Nahi — rows bachi rahti hain</span></td>
+          <td>Chhota data, valid extreme values</td>
+          <td>Information modify hoti hai (replace)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout cb-yellow mt-4">
+    <div class="ct"><i class="fa-solid fa-brain"></i> Practical Decision Framework — Interview Mein Bhi Kaam Aayega!</div>
+    <div class="step-timeline mt-2">
+      <div class="step-item" data-step="1">
+        <div class="step-label">📊 Pehle Distribution Dekho</div>
+        <div class="step-body">histogram ya box plot banao. Normal dikhta hai → Z-Score consider karo. Skewed dikhta hai → IQR ya Percentile.</div>
+      </div>
+      <div class="step-item" data-step="2">
+        <div class="step-label">🔍 Outlier Valid Hai Ya Error?</div>
+        <div class="step-body">Domain knowledge use karo. Negative age → clearly error → remove. ₹500Cr loan → valid CEO loan → winsorize ya keep.</div>
+      </div>
+      <div class="step-item" data-step="3">
+        <div class="step-label">📦 Dataset Size Check Karo</div>
+        <div class="step-body">100 rows mein 5 remove karna = 5% loss. 1 lakh rows mein 5 remove karna = negligible. Chhote dataset pe winsorize prefer karo.</div>
+      </div>
+      <div class="step-item" data-step="4">
+        <div class="step-label">🎯 Task Dekho — Fraud Detection?</div>
+        <div class="step-body">Agar outlier hi target hai (fraud, anomaly detection), toh KABHI remove ya cap mat karo — outliers = signal hain!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="d" data-xp="25">
+    <div class="quiz-q">🤔 Ek hospital ka patient data hai (500 rows). Blood pressure column mein kuch readings bahut high hain — valid patients hain jinhe hypertension hai. Kaunsa approach best hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Bilkul galat! Medical data mein rows kabhi delete nahi karte sirf isliye ki reading extreme hai. Hypertension patients ka data valid hai — inhe remove karna biased model banayega jo extreme cases handle nahi kar payega."><span class="opt-letter">A</span>Z-Score se high BP wali rows delete karo</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Galat. Medical data mein IQR se rows delete karna bhi risky hai — valid high BP patients ka data permanently lose ho jaayega. Dataset 500 rows ka hai toh loss bhi significant hoga."><span class="opt-letter">B</span>IQR method se outlier rows remove karo</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Mean se replace karna imputation hai, outlier handling nahi. Medical readings ko mean se replace karna medically incorrect hoga — ek severe hypertension patient ki reading 120 (normal) se replace ho jaayegi."><span class="opt-letter">C</span>Outlier values ko mean BP se replace karo</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Bilkul sahi! Ye ideal approach hai. Reasons: (1) Patients valid hain — rows delete karna wrong. (2) Chhota dataset (500 rows) — data loss costly. (3) Extreme BP values valid medical readings hain. Winsorization se rows bachti hain, aur extreme values 95th percentile pe cap ho jaati hain — distribution realistic rehti hai ML ke liye!"><span class="opt-letter">D</span>Winsorization — 95th percentile pe cap karo, rows delete mat karo</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████
+     FINAL SUMMARY
+█████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s7" style="background:linear-gradient(135deg,rgba(8,145,178,0.04),rgba(124,58,237,0.04),#ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary &amp; Outlier Handling Roadmap</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Function</th><th>Remember This</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-cyan">L1</span> <strong>Percentile Method</strong></td><td>Bottom/Top X% remove karo</td><td><span class="inline-code">quantile(0.05/0.95)</span></td><td>Hamesha kuch data jaayega — guaranteed</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L2</span> <strong>Winsorization</strong></td><td>Extremes ko cap karo, delete nahi</td><td><span class="inline-code">.clip(lower, upper)</span></td><td>Dataset size preserved — rows safe</td></tr>
+        <tr><td><span class="stat-pill sp-green">L3</span> <strong>Remove vs Cap</strong></td><td>Error = Remove, Valid extreme = Cap</td><td>Domain knowledge first!</td><td>Medical/fraud data mein never remove</td></tr>
+        <tr><td><span class="stat-pill sp-yellow">L4</span> <strong>Method Selection</strong></td><td>Distribution + validity + dataset size dekho</td><td>Visualize first!</td><td>No single best method — context matters</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    A["🎯 Outlier Handling Start"] --> B{Outlier valid hai ya error?}
+    B -->|Clearly galat data| C["🗑️ Remove — Z-Score / IQR / Percentile"]
+    B -->|Valid but extreme value| D["✂️ Winsorize — clip to boundary"]
+    C --> E{Dataset kitna bada hai?}
+    E -->|Large 1000+ rows| F["📐 Z-Score agar Normal\n📦 IQR agar Skewed\n📏 Percentile for quick EDA"]
+    E -->|Small less than 200 rows| G["⚠️ Careful! Consider Winsorize instead"]
+    D --> H["pandas .clip(lower, upper)\nOR scipy winsorize()"]
+    F --> I["✅ Clean Dataset Ready!"]
+    G --> I
+    H --> I
+    style A fill:#cffafe,stroke:#0891b2,color:#164e63,rx:12
+    style B fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95,rx:12
+    style C fill:#fee2e2,stroke:#dc2626,color:#991b1b,rx:10
+    style D fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style E fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style F fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style G fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style H fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style I fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Functions — Zaroor Yaad Rakhho</div>
+        <strong style="color:var(--neon-cyan)">quantile(0.05 / 0.95)</strong> — percentile boundaries nikalo<br>
+        <strong style="color:var(--neon-purple)">.clip(lower, upper)</strong> — Winsorization ek line mein<br>
+        <strong style="color:var(--neon-blue)">np.clip(arr, lo, hi)</strong> — NumPy version<br>
+        <strong style="color:var(--neon-green)">winsorize(arr, limits=[.05,.05])</strong> — scipy version<br>
+        <strong style="color:var(--neon-yellow)">.describe()</strong> — before/after comparison karo
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein? (Next Quest!)</div>
+        🤖 <strong>Isolation Forest</strong> — ML-based outlier detection<br>
+        📍 <strong>LOF (Local Outlier Factor)</strong> — density-based method<br>
+        🔵 <strong>DBSCAN</strong> — clustering se outliers pakdo<br>
+        📊 <strong>Box Plot + Scatter Plot</strong> — visual outlier detection<br>
+        🏗️ <strong>Feature Engineering</strong> — outlier ke baad better ML
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>Percentile Method</strong> = Simple aur fast — "bottom/top X% hata do" — quick EDA ke liye perfect!<br>
+    → <strong>Winsorization</strong> = Smarter approach — "extreme values ko cap karo, data preserve karo!"<br>
+    → <strong>Remove vs Cap</strong> = Error = remove, Valid extreme = cap — domain knowledge se decide karo!<br>
+    → <strong>Hamesha visualize pehle</strong> — box plot dikhao toh method khud samajh aa jaati hai!<br><br>
+    <strong style="color:var(--neon-pink)">Percentile aur Winsorization seekh liye — ab tum outliers ko professionally handle kar sakte ho — Certified Data Surgeon ban gaye! ✂️🚀</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- FOOTER -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-solid fa-scissors me-2"></i>Python Percentile &amp; Winsorization Quest</div>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0.5rem;">Outlier Detection using Percentile Method · Winsorization Technique | Gamified Tutorial</p>
+    <p style="color:var(--dim);font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking Data Science learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MODAL -->
+<canvas id="confettiCanvas"></canvas>
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare 4 quizzes complete kar liye!</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/4</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-retry"    id="modalRetry"><i class="fa-solid fa-rotate-right"></i> Retry All</button>
+      <button class="modal-btn-continue" id="modalContinue"><i class="fa-solid fa-trophy"></i> Awesome, Continue!</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* FINAL MODAL */
+function showFinalModal() {
+  const total=quizTotal,correct=quizCorrect,pct=total>0?correct/total:0,quizXP=correct*25;
+  const grades=[
+    {min:1.0,cls:'grade-s',letter:'S 🌟',msg:'Zabardast! Sab 4/4 correct! Data Surgeon ban gaye! ✂️'},
+    {min:0.75,cls:'grade-a',letter:'A 🎯',msg:'Bahut badhiya! Almost perfect performance!'},
+    {min:0.5,cls:'grade-b',letter:'B 📘',msg:'Accha kiya! Kuch topics dobara review karo.'},
+    {min:0.25,cls:'grade-c',letter:'C 💪',msg:'Theek hai! Concepts ko aur practice karo.'},
+    {min:0.0,cls:'grade-d',letter:'D 📚',msg:'Aur mehnat karo! Tutorial dobara padho.'},
+  ];
+  const g=grades.find(gr=>pct>=gr.min);
+  document.getElementById('ringNum').textContent=correct+'/'+total;
+  document.getElementById('modalXpVal').textContent=quizXP+' XP';
+  const gc=document.getElementById('gradeCard');gc.className='grade-card '+g.cls;
+  document.getElementById('gradeLetter').textContent=g.letter;
+  document.getElementById('gradeMsg').textContent=g.msg;
+  if(pct===1.0){
+    document.getElementById('modalTrophy').textContent='🏆';
+    document.getElementById('modalTitle').textContent='🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent='Wah! Saare '+total+'/'+total+' sahi! Certified Data Surgeon!';
+  }else if(pct>=0.5){
+    document.getElementById('modalTrophy').textContent='🎯';
+    document.getElementById('modalTitle').textContent='Quest Complete!';
+    document.getElementById('modalSubtitle').textContent=correct+' out of '+total+' correct. Kafi accha kiya!';
+  }else{
+    document.getElementById('modalTrophy').textContent='📚';
+    document.getElementById('modalTitle').textContent='Keep Trying!';
+    document.getElementById('modalSubtitle').textContent='Tutorial dobara padho aur retry karo!';
+  }
+  const circumference=327,offset=circumference*(1-pct);
+  const ringColors={'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626'};
+  const ringEl=document.getElementById('ringFill');
+  ringEl.style.stroke=ringColors[g.cls]||'#0891b2';
+  ringEl.style.transition='none';ringEl.style.strokeDashoffset='327';
+  setTimeout(()=>{ringEl.style.transition='stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';ringEl.style.strokeDashoffset=offset;},80);
+  document.getElementById('finalModal').classList.add('open');
+  if(pct>=0.5)launchConfetti(pct);
+}
+
+function launchConfetti(pct){
+  const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const count=Math.floor(80+pct*140);
+  const colors=['#0891b2','#7c3aed','#2563eb','#16a34a','#b45309','#db2777','#f59e0b'];
+  const pieces=Array.from({length:count},()=>({x:Math.random()*canvas.width,y:Math.random()*-canvas.height*0.6,w:Math.random()*10+5,h:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-0.5)*4,vy:Math.random()*4+2,rot:Math.random()*360,vrot:(Math.random()-0.5)*9,alpha:1}));
+  let frame=0;
+  (function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);let alive=false;
+    pieces.forEach(p=>{
+      if(p.y>canvas.height+20)return;alive=true;
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vrot;
+      if(p.y>canvas.height*0.65)p.alpha-=0.02;
+      p.alpha=Math.max(0,p.alpha);
+      ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+    });
+    frame++;
+    if(alive&&frame<260)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  })();
+}
+
+function initQuizzes(){
+  document.querySelectorAll('.quiz-box').forEach(box=>{
+    box.querySelectorAll('.quiz-opt').forEach(opt=>{const n=opt.cloneNode(true);opt.parentNode.replaceChild(n,opt);});
+    const correct=box.dataset.correct,qxp=parseInt(box.dataset.xp)||25;
+    let answered=false;
+    box.querySelectorAll('.quiz-opt').forEach(opt=>{
+      opt.addEventListener('click',()=>{
+        if(answered)return;answered=true;
+        const isCorrect=opt.dataset.ans===correct,fb=box.querySelector('.quiz-feedback');
+        box.querySelectorAll('.quiz-opt').forEach(o=>{
+          o.classList.add('answered-opt');
+          const exDiv=box.querySelector('.quiz-explain[data-for-ans="'+o.dataset.ans+'"]');
+          if(o.dataset.ans===correct){o.classList.add('correct');if(exDiv)exDiv.classList.add('show-correct');}
+          else if(o===opt&&!isCorrect){o.classList.add('wrong');if(exDiv)exDiv.classList.add('show-wrong');}
+          else{o.classList.add('dimmed');}
+        });
+        if(isCorrect){quizCorrect++;fb.className='quiz-feedback show win';fb.innerHTML='<span style="font-size:1.3rem">🎉</span>&nbsp;Zabardast! Sahi jawab! <strong>+'+qxp+' XP</strong> earned!';addXP(qxp);showToast('⚡','+'+qxp+' XP!','Bilkul sahi jawab!','#16a34a');}
+        else{fb.className='quiz-feedback show lose';fb.innerHTML='<span style="font-size:1.3rem">💡</span>&nbsp;Galat! Sahi jawab highlight ho gaya — concept dobara padho!';showToast('💡','Galat!','Sahi jawab dekho aur concept review karo.','#dc2626');}
+        const doneCount=Array.from(document.querySelectorAll('.quiz-box')).filter(b=>b.querySelector('.quiz-opt.answered-opt')).length;
+        if(doneCount===quizTotal)setTimeout(showFinalModal,1200);
+      });
+    });
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#cffafe',primaryTextColor:'#164e63',primaryBorderColor:'#0891b2',lineColor:'#94a3b8',secondaryColor:'#d1fae5',tertiaryColor:'#ede9fe',fontFamily:'Plus Jakarta Sans, sans-serif',fontSize:'13px'},flowchart:{curve:'basis',padding:24}});
+
+let xp=0,scrollXpEarned=0;
+const XP_MAX=220;  // 4×30 scroll + 4×25 quiz = 220
+const earnedBadges=new Set();
+
+function addXP(amount,badgeId){
+  if(badgeId)scrollXpEarned=Math.min(scrollXpEarned+amount,120);
+  xp=Math.min(xp+amount,XP_MAX);
+  document.getElementById('xpFill').style.width=(xp/XP_MAX*100)+'%';
+  document.getElementById('xpScore').textContent=xp+' / '+XP_MAX+' XP';
+  if(badgeId&&!earnedBadges.has(badgeId)){earnedBadges.add(badgeId);const el=document.getElementById(badgeId);if(el)el.classList.add('earned');}
+  if(xp>=XP_MAX)showToast('🏆','QUEST COMPLETE! 🎊','Certified Data Surgeon! 220/220 XP!','#b45309');
+}
+
+function showToast(icon,title,msg,color){
+  const container=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className='gtoast';
+  t.innerHTML=`<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),50);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3500);
+}
+
+let quizTotal=0,quizCorrect=0;
+
+document.querySelectorAll('.quiz-box').forEach(box=>{
+  quizTotal++;
+  const correct=box.dataset.correct,qxp=parseInt(box.dataset.xp)||25;
+  let answered=false;
+  box.querySelectorAll('.quiz-opt').forEach(opt=>{
+    const explain=opt.dataset.explain||'';
+    if(explain){const div=document.createElement('div');div.className='quiz-explain';div.dataset.forAns=opt.dataset.ans;div.textContent=explain;opt.parentNode.insertBefore(div,opt.nextSibling);}
+  });
+  box.querySelectorAll('.quiz-opt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      if(answered)return;answered=true;
+      const ans=opt.dataset.ans,fb=box.querySelector('.quiz-feedback'),isCorrect=ans===correct;
+      box.querySelectorAll('.quiz-opt').forEach(o=>{
+        o.classList.add('answered-opt');
+        const explainDiv=box.querySelector('.quiz-explain[data-for-ans="'+o.dataset.ans+'"]');
+        if(o.dataset.ans===correct){o.classList.add('correct');if(explainDiv)explainDiv.classList.add('show-correct');}
+        else if(o===opt&&!isCorrect){o.classList.add('wrong');if(explainDiv)explainDiv.classList.add('show-wrong');}
+        else{o.classList.add('dimmed');if(o.dataset.ans===correct&&explainDiv)explainDiv.classList.add('show-reveal');}
+      });
+      if(isCorrect){quizCorrect++;fb.className='quiz-feedback show win';fb.innerHTML='<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+'+qxp+' XP</strong> earned!';addXP(qxp);showToast('⚡','+'+qxp+' XP!','Bilkul sahi jawab!','#16a34a');}
+      else{fb.className='quiz-feedback show lose';fb.innerHTML='<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';showToast('💡','Galat!','Sahi jawab dekho aur concept review karo.','#dc2626');}
+      const doneCount=Array.from(document.querySelectorAll('.quiz-box')).filter(b=>b.querySelector('.quiz-opt.answered-opt')).length;
+      if(doneCount===quizTotal)setTimeout(showFinalModal,1200);
+    });
+  });
+});
+
+const fadeObserver=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');fadeObserver.unobserve(e.target);}});},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>fadeObserver.observe(el));
+
+const sectionXP={
+  's1':{xp:30,badge:'badge1',msg:'📏 Percentile Pro badge unlocked!'},
+  's3':{xp:30,badge:'badge2',msg:'✂️ Capper Expert badge unlocked!'},
+  's5':{xp:30,badge:'badge3',msg:'🧊 Winsor Master badge unlocked!'},
+  's6':{xp:30,badge:'badge4',msg:'🏆 Data Surgeon badge unlocked!'},
+};
+const xpObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const id=e.target.id;
+      if(sectionXP[id]&&!earnedBadges.has(sectionXP[id].badge)){const{xp:sx,badge,msg}=sectionXP[id];addXP(sx,badge);showToast('🏅','Badge Unlocked!',msg,'#7c3aed');}
+      xpObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+['s1','s3','s5','s6'].forEach(id=>{const el=document.getElementById(id);if(el)xpObserver.observe(el);});
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});});
+
+function closeModal(){document.getElementById('finalModal').classList.remove('open');}
+document.getElementById('modalClose').addEventListener('click',closeModal);
+document.getElementById('modalContinue').addEventListener('click',closeModal);
+document.getElementById('modalRetry').addEventListener('click',()=>{
+  closeModal();quizCorrect=0;xp=scrollXpEarned;
+  document.getElementById('xpFill').style.width=(xp/XP_MAX*100)+'%';
+  document.getElementById('xpScore').textContent=xp+' / '+XP_MAX+' XP';
+  document.querySelectorAll('.quiz-box').forEach(box=>{
+    box.querySelectorAll('.quiz-opt').forEach(o=>o.classList.remove('correct','wrong','dimmed','answered-opt'));
+    box.querySelectorAll('.quiz-explain').forEach(ex=>ex.classList.remove('show-correct','show-wrong','show-reveal'));
+    const fb=box.querySelector('.quiz-feedback');if(fb){fb.className='quiz-feedback';fb.innerHTML='';}
+  });
+  initQuizzes();window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('finalModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+</script>
+
+</body>
+</html>
