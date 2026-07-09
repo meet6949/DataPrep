@@ -178,4 +178,4 @@ Data Analyst Project — Data Preprocessing & Feature Engineering practice.
 ## My Video link 
 
 
-https://drive.google.com/file/d/1CEeb0zkJ8sNC3WeXempbWPgjTyvP6b5Y/view?usp=drive_link
+https://drive.google.com/file/d/1CEeb0zkJ8sNC3WeXempbWPgjTyvP6b5Y/view?usp=sharing
