@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Missing Values Quest — Imputation Mastery!</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — LIGHT GAMIFIED
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #f0f4ff;
+  --bg2:       #e8edf8;
+  --bg3:       #dde4f5;
+  --card:      #ffffff;
+  --card2:     #f5f7ff;
+  --border:    rgba(99,102,241,0.12);
+  --border2:   rgba(99,102,241,0.25);
+
+  --neon-blue:   #2563eb;
+  --neon-cyan:   #0891b2;
+  --neon-purple: #7c3aed;
+  --neon-pink:   #db2777;
+  --neon-green:  #16a34a;
+  --neon-yellow: #b45309;
+  --neon-orange: #c2410c;
+  --neon-red:    #dc2626;
+
+  --text:  #1e1b4b;
+  --muted: #4b5563;
+  --dim:   #9ca3af;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-blue:   0 4px 16px rgba(37,99,235,0.18), 0 1px 4px rgba(37,99,235,0.10);
+  --glow-purple: 0 4px 16px rgba(124,58,237,0.18), 0 1px 4px rgba(124,58,237,0.10);
+  --glow-cyan:   0 4px 16px rgba(8,145,178,0.18),  0 1px 4px rgba(8,145,178,0.10);
+  --glow-green:  0 4px 16px rgba(22,163,74,0.18),  0 1px 4px rgba(22,163,74,0.10);
+  --glow-yellow: 0 4px 16px rgba(180,83,9,0.18),   0 1px 4px rgba(180,83,9,0.10);
+  --glow-pink:   0 4px 16px rgba(219,39,119,0.18), 0 1px 4px rgba(219,39,119,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.container-main {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 1.5rem; position: relative; z-index: 1;
+}
+
+/* ═══ XP BAR ═══ */
+.xp-strip {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(240,244,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  padding: 0.65rem 0;
+}
+.xp-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.xp-label {
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+}
+.xp-bar-wrap {
+  flex: 1; min-width: 120px; background: rgba(37,99,235,0.1);
+  border-radius: 50px; height: 10px; border: 1px solid var(--border2); overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan), var(--neon-purple));
+  border-radius: 50px; transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 10px rgba(37,99,235,0.35); position: relative;
+}
+.xp-bar-fill::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0;} 50%{opacity:1;} }
+.xp-score {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.9rem; color: var(--neon-yellow); white-space: nowrap;
+}
+.xp-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.xp-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.65rem;
+  border-radius: 50px; border: 1px solid; white-space: nowrap;
+  transition: 0.3s; opacity: 0.35;
+}
+.xp-badge.earned { opacity: 1; animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes badgePop { 0%{transform:scale(0);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+.xp-badge.b1 { border-color: var(--neon-blue);   color: var(--neon-blue);   }
+.xp-badge.b2 { border-color: var(--neon-cyan);   color: var(--neon-cyan);   }
+.xp-badge.b3 { border-color: var(--neon-purple); color: var(--neon-purple); }
+.xp-badge.b4 { border-color: var(--neon-green);  color: var(--neon-green);  }
+.xp-badge.b5 { border-color: var(--neon-orange); color: var(--neon-orange); }
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative; overflow: hidden; padding: 6rem 0 5rem;
+  background: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.10) 0%, transparent 55%),
+              radial-gradient(ellipse at 60% 80%, rgba(8,145,178,0.07) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-orbit {
+  position: absolute; top: 50%; right: 8%; transform: translateY(-50%);
+  width: 420px; height: 420px; pointer-events: none;
+}
+.orbit-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-ring:nth-child(1) { width: 150px; height: 150px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 250px; height: 250px; animation: spin 20s linear infinite reverse; border-color: rgba(168,85,247,0.2); }
+.orbit-ring:nth-child(3) { width: 350px; height: 350px; animation: spin 30s linear infinite; border-color: rgba(6,182,212,0.15); }
+.orbit-dot {
+  position: absolute; width: 8px; height: 8px;
+  border-radius: 50%; top: -4px; left: 50%; transform: translateX(-50%);
+}
+.orbit-ring:nth-child(1) .orbit-dot { background: var(--neon-blue);   box-shadow: var(--glow-blue); }
+.orbit-ring:nth-child(2) .orbit-dot { background: var(--neon-purple); box-shadow: var(--glow-purple); }
+.orbit-ring:nth-child(3) .orbit-dot { background: var(--neon-cyan);   box-shadow: var(--glow-cyan); }
+.orbit-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 3rem; animation: float 4s ease-in-out infinite;
+}
+@keyframes spin  { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+@keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-12px);} }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px; padding: 0.3rem 1rem;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--neon-blue); margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-blue); box-shadow: var(--glow-blue); animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+.hero h1 {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 1.5rem;
+}
+.hero h1 .line1 { display: block; color: #1e1b4b; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-cyan) 40%, var(--neon-purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 560px; margin-bottom: 2rem; line-height: 1.75; }
+.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-stat-item { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.8rem; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 0.8rem 2rem; border-radius: 50px; border: none;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+  transition: 0.3s; animation: pulse-btn 2s infinite;
+}
+@keyframes pulse-btn { 0%,100%{box-shadow:0 4px 20px rgba(37,99,235,0.28);} 50%{box-shadow:0 4px 32px rgba(37,99,235,0.45);} }
+.hero-cta:hover { transform: translateY(-2px) scale(1.03); color: white; }
+
+/* ═══ QUEST MAP ═══ */
+.quest-map {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2rem; margin: 3rem 0;
+  position: relative; box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+}
+.quest-map::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.03));
+  pointer-events: none;
+}
+.quest-map-title {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  color: var(--neon-yellow); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+}
+.quest-map-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(234,179,8,0.3), transparent); }
+.quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
+.quest-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  text-decoration: none; color: var(--muted);
+  font-weight: 600; font-size: 0.88rem; transition: 0.25s;
+}
+.quest-item:hover {
+  background: rgba(37,99,235,0.07); border-color: rgba(37,99,235,0.3);
+  color: var(--neon-blue); transform: translateX(4px);
+}
+.quest-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+}
+
+/* ═══ LEVEL CARD ═══ */
+.level-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 2.5rem; margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.level-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; border-radius: 24px 24px 0 0;
+}
+.level-card.lvl-blue::before   { background: linear-gradient(90deg, var(--neon-blue),   var(--neon-cyan));   }
+.level-card.lvl-purple::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));   }
+.level-card.lvl-cyan::before   { background: linear-gradient(90deg, var(--neon-cyan),   var(--neon-green));  }
+.level-card.lvl-green::before  { background: linear-gradient(90deg, var(--neon-green),  var(--neon-cyan));   }
+.level-card.lvl-yellow::before { background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange)); }
+.level-card.lvl-pink::before   { background: linear-gradient(90deg, var(--neon-pink),   var(--neon-purple)); }
+.level-card.lvl-orange::before { background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow)); }
+.level-card:hover { box-shadow: 0 8px 32px rgba(37,99,235,0.12); }
+.level-card .corner-deco {
+  position: absolute; top: 1.2rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.25;
+}
+.lv-header { display: flex; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.8rem; }
+.lv-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; position: relative;
+}
+.lv-icon-wrap::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 18px;
+  border: 1px solid; opacity: 0.4;
+}
+.ico-blue   { background: rgba(37,99,235,0.12);  color: var(--neon-blue);   } .ico-blue::after   { border-color: var(--neon-blue);   }
+.ico-purple { background: rgba(124,58,237,0.12); color: var(--neon-purple); } .ico-purple::after { border-color: var(--neon-purple); }
+.ico-cyan   { background: rgba(8,145,178,0.12);  color: var(--neon-cyan);   } .ico-cyan::after   { border-color: var(--neon-cyan);   }
+.ico-green  { background: rgba(22,163,74,0.12);  color: var(--neon-green);  } .ico-green::after  { border-color: var(--neon-green);  }
+.ico-yellow { background: rgba(180,83,9,0.12);   color: var(--neon-yellow); } .ico-yellow::after { border-color: var(--neon-yellow); }
+.ico-pink   { background: rgba(219,39,119,0.12); color: var(--neon-pink);   } .ico-pink::after   { border-color: var(--neon-pink);   }
+.ico-orange { background: rgba(194,65,12,0.12);  color: var(--neon-orange); } .ico-orange::after { border-color: var(--neon-orange); }
+.lv-meta { flex: 1; }
+.lv-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 0.35rem; }
+.lv-title { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; line-height: 1.2; color: var(--text); }
+.lv-xp {
+  margin-top: 0.4rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.25);
+  border-radius: 50px; padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; font-weight: 700; color: var(--neon-yellow);
+}
+
+/* ═══ CALLOUT ═══ */
+.callout {
+  border-radius: 14px; padding: 1.2rem 1.4rem;
+  margin: 1.2rem 0; border: 1px solid; position: relative; overflow: hidden;
+}
+.callout::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.callout .ct { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.cb-blue   { background: rgba(37,99,235,0.06);  border-color: rgba(37,99,235,0.2);  } .cb-blue::before   { background: var(--neon-blue);   } .cb-blue   .ct { color: var(--neon-blue);   }
+.cb-purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); } .cb-purple::before { background: var(--neon-purple); } .cb-purple .ct { color: var(--neon-purple); }
+.cb-cyan   { background: rgba(8,145,178,0.06);  border-color: rgba(8,145,178,0.2);  } .cb-cyan::before   { background: var(--neon-cyan);   } .cb-cyan   .ct { color: var(--neon-cyan);   }
+.cb-green  { background: rgba(22,163,74,0.06);  border-color: rgba(22,163,74,0.2);  } .cb-green::before  { background: var(--neon-green);  } .cb-green  .ct { color: var(--neon-green);  }
+.cb-yellow { background: rgba(180,83,9,0.06);   border-color: rgba(180,83,9,0.2);   } .cb-yellow::before { background: var(--neon-yellow); } .cb-yellow .ct { color: var(--neon-yellow); }
+.cb-pink   { background: rgba(219,39,119,0.06); border-color: rgba(219,39,119,0.2); } .cb-pink::before   { background: var(--neon-pink);   } .cb-pink   .ct { color: var(--neon-pink);   }
+.cb-orange { background: rgba(194,65,12,0.06);  border-color: rgba(194,65,12,0.2);  } .cb-orange::before { background: var(--neon-orange); } .cb-orange .ct { color: var(--neon-orange); }
+
+/* ═══ STEP TIMELINE ═══ */
+.step-timeline { position: relative; padding-left: 2.8rem; }
+.step-timeline::before {
+  content: ''; position: absolute; left: 15px; top: 4px; bottom: 4px; width: 2px;
+  background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-cyan));
+  opacity: 0.45; border-radius: 2px;
+}
+.step-item {
+  position: relative; margin-bottom: 1.3rem;
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 14px; padding: 1rem 1.2rem 1rem 1.2rem;
+  transition: 0.25s; box-shadow: 0 2px 8px rgba(37,99,235,0.05);
+}
+.step-item:hover { border-color: var(--border2); background: #eef1ff; }
+.step-item::before {
+  content: attr(data-step);
+  position: absolute; left: -2.8rem; top: 1rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #ffffff; border: 2px solid var(--neon-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.78rem;
+  color: var(--neon-blue); box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+}
+.step-label { font-weight: 700; color: var(--text); font-size: 0.98rem; margin-bottom: 0.35rem; }
+.step-body  { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
+
+/* ═══ ACH CARD ═══ */
+.ach-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; text-align: center; position: relative; overflow: hidden;
+}
+.ach-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; opacity: 0; transition: opacity 0.3s;
+}
+.ach-card:hover { transform: translateY(-6px); border-color: var(--border2); box-shadow: 0 10px 30px rgba(37,99,235,0.10); }
+.ach-card:hover::after { opacity: 1; }
+.ach-card.ac-blue::after   { background: var(--neon-blue);   } .ach-card.ac-blue:hover   { box-shadow: 0 16px 48px rgba(59,130,246,0.2); }
+.ach-card.ac-purple::after { background: var(--neon-purple); } .ach-card.ac-purple:hover { box-shadow: 0 10px 28px rgba(124,58,237,0.15); }
+.ach-card.ac-cyan::after   { background: var(--neon-cyan);   } .ach-card.ac-cyan:hover   { box-shadow: 0 16px 48px rgba(6,182,212,0.2); }
+.ach-card.ac-green::after  { background: var(--neon-green);  } .ach-card.ac-green:hover  { box-shadow: 0 16px 48px rgba(34,197,94,0.2); }
+.ach-card.ac-yellow::after { background: var(--neon-yellow); } .ach-card.ac-yellow:hover { box-shadow: 0 10px 28px rgba(180,83,9,0.15); }
+.ach-card.ac-pink::after   { background: var(--neon-pink);   } .ach-card.ac-pink:hover   { box-shadow: 0 16px 48px rgba(236,72,153,0.2); }
+.ach-card.ac-orange::after { background: var(--neon-orange); } .ach-card.ac-orange:hover { box-shadow: 0 10px 28px rgba(194,65,12,0.15); }
+.ach-icon  { font-size: 2.2rem; margin-bottom: 0.75rem; display: block; }
+.ach-title { font-family: var(--font-head); font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem; }
+.ach-desc  { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+/* ═══ CODE BLOCK ═══ */
+.code-wrap {
+  background: #f8f9fc; border: 1px solid var(--border2);
+  border-radius: 14px; overflow: hidden; margin: 1.2rem 0;
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(37,99,235,0.06); padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase; }
+.code-dots { display: flex; gap: 5px; }
+.code-dot  { width: 10px; height: 10px; border-radius: 50%; }
+.code-dot:nth-child(1){ background:#dc2626; } .code-dot:nth-child(2){ background:#b45309; } .code-dot:nth-child(3){ background:#16a34a; }
+.code-wrap pre { margin: 0; padding: 1.2rem 1.4rem; overflow-x: auto; background: transparent; }
+.code-wrap pre code { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.7; }
+pre[class*="language-"] {
+  border-radius: 0 !important; font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important; margin: 0 !important; border: none !important;
+  background: transparent !important;
+}
+.code-output {
+  background: rgba(22,163,74,0.06); border-top: 1px solid rgba(22,163,74,0.2);
+  padding: 0.7rem 1.2rem; font-family: var(--font-mono);
+  font-size: 0.82rem; color: #14532d; line-height: 1.7;
+}
+
+/* ═══ EX CARD ═══ */
+.ex-card { border-radius: 16px; overflow: hidden; margin: 1.4rem 0; border: 1px solid; }
+.ex-card .ex-head { padding: 0.85rem 1.4rem; font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; gap: 0.6rem; }
+.ex-card .ex-body { padding: 1.4rem; background: #fafbff; }
+.ex-card.ex-story { border-color: rgba(22,163,74,0.25); } .ex-card.ex-story .ex-head { background: rgba(22,163,74,0.08); color: #166534; }
+.ex-card.ex-tech  { border-color: rgba(124,58,237,0.25); } .ex-card.ex-tech  .ex-head { background: rgba(124,58,237,0.08); color: #5b21b6; }
+.ex-card.ex-warn  { border-color: rgba(220,38,38,0.25);  } .ex-card.ex-warn  .ex-head { background: rgba(220,38,38,0.08);  color: #991b1b; }
+.ex-card.ex-tip   { border-color: rgba(8,145,178,0.25);  } .ex-card.ex-tip   .ex-head { background: rgba(8,145,178,0.08);  color: #0c4a6e; }
+.ex-card.ex-orange{ border-color: rgba(194,65,12,0.25);  } .ex-card.ex-orange .ex-head{ background: rgba(194,65,12,0.08);  color: #7c2d12; }
+
+/* ═══ TABLE ═══ */
+.gtbl { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+.gtbl thead th { background: rgba(37,99,235,0.08); color: var(--neon-blue); font-family: var(--font-head); font-weight: 700; padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid rgba(37,99,235,0.15); font-size: 0.85rem; letter-spacing: 0.5px; }
+.gtbl tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.92rem; vertical-align: top; }
+.gtbl tbody tr:last-child td { border-bottom: none; }
+.gtbl tbody tr:hover td { background: rgba(37,99,235,0.04); color: var(--text); }
+.gtbl tbody td strong { color: var(--text); }
+
+/* ═══ DIM CARD ═══ */
+.dim-card {
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.5rem; height: 100%;
+  transition: 0.3s; position: relative; overflow: hidden;
+}
+.dim-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(37,99,235,0.1); }
+.dim-rank { font-family: var(--font-head); font-weight: 800; font-size: 2.5rem; line-height: 1; margin-bottom: 0.25rem; }
+.dim-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.8rem; }
+.dim-code { background: #f1f5f9; border-radius: 10px; padding: 0.65rem 0.9rem; font-family: var(--font-mono); font-size: 0.82rem; border: 1px solid rgba(99,102,241,0.15); margin-bottom: 0.8rem; }
+.dim-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.6; }
+.dim-example { font-size: 0.82rem; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid; font-style: italic; }
+
+/* ═══ STAT PILLS ═══ */
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border-radius: 50px; padding: 0.3rem 0.9rem;
+  font-weight: 700; font-size: 0.8rem; border: 1px solid;
+}
+.sp-blue   { background: rgba(37,99,235,0.08);  border-color: rgba(37,99,235,0.3);  color: var(--neon-blue);   }
+.sp-green  { background: rgba(22,163,74,0.08);  border-color: rgba(22,163,74,0.3);  color: var(--neon-green);  }
+.sp-yellow { background: rgba(180,83,9,0.08);   border-color: rgba(180,83,9,0.3);   color: var(--neon-yellow); }
+.sp-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--neon-purple); }
+.sp-cyan   { background: rgba(8,145,178,0.08);  border-color: rgba(8,145,178,0.3);  color: var(--neon-cyan);   }
+.sp-pink   { background: rgba(219,39,119,0.08); border-color: rgba(219,39,119,0.3); color: var(--neon-pink);   }
+.sp-orange { background: rgba(194,65,12,0.08);  border-color: rgba(194,65,12,0.3);  color: var(--neon-orange); }
+.sp-red    { background: rgba(220,38,38,0.08);  border-color: rgba(220,38,38,0.3);  color: var(--neon-red);    }
+
+/* ═══ INLINE CODE ═══ */
+.inline-code { background: rgba(8,145,178,0.08); color: #0e7490; padding: 0.1rem 0.45rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.88em; border: 1px solid rgba(37,99,235,0.25); }
+
+/* ═══ HIGHLIGHT ═══ */
+.hl      { background: rgba(180,83,9,0.1);   color: #92400e;          padding: 0 5px; border-radius: 4px; }
+.hl-blue { background: rgba(37,99,235,0.1);  color: var(--neon-blue); padding: 0 5px; border-radius: 4px; }
+.hl-red  { background: rgba(220,38,38,0.1);  color: var(--neon-red);  padding: 0 5px; border-radius: 4px; }
+
+/* ═══ GLOW DIVIDER ═══ */
+.glow-div {
+  height: 2px; border-radius: 2px; margin: 2rem 0; opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), var(--neon-cyan), transparent);
+}
+
+/* ═══ MERMAID ═══ */
+.mermaid-wrap {
+  background: #f8f9ff; border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0;
+  text-align: center; overflow-x: auto; box-shadow: 0 2px 12px rgba(37,99,235,0.06);
+}
+
+/* ═══ QUIZ ═══ */
+.quiz-box {
+  background: #fffbf0; border: 1px solid rgba(180,83,9,0.18);
+  border-radius: 20px; padding: 1.6rem; margin: 1.8rem 0;
+  position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(180,83,9,0.07);
+}
+.quiz-box::before {
+  content: '⚡ QUICK CHALLENGE'; position: absolute; top: 0; right: 0;
+  background: linear-gradient(135deg, #b45309, #c2410c);
+  color: #fff; font-family: var(--font-head); font-weight: 800;
+  font-size: 0.62rem; letter-spacing: 2px; padding: 0.32rem 0.9rem; border-radius: 0 20px 0 12px;
+}
+.quiz-q { font-weight: 700; color: #1c1917; margin-bottom: 1.1rem; font-size: 1.02rem; line-height: 1.55; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+.quiz-opt {
+  background: #ffffff; border: 1.5px solid #e5e7eb; border-radius: 12px;
+  padding: 0.75rem 1.1rem; cursor: pointer; font-size: 0.93rem; color: #374151;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  font-weight: 500; display: flex; align-items: center; gap: 0.85rem; user-select: none;
+}
+.quiz-opt:not(.answered-opt):hover { background: #f3f4f6; border-color: #9ca3af; color: #111827; transform: translateX(3px); }
+.quiz-opt.correct { background: #f0fdf4; border-color: #16a34a; color: #14532d; font-weight: 700; }
+.quiz-opt.correct .opt-letter { background: #16a34a; color: #fff; }
+.quiz-opt.wrong   { background: #fef2f2; border-color: #dc2626; color: #991b1b; opacity: 0.8; }
+.quiz-opt.wrong   .opt-letter { background: #dc2626; color: #fff; }
+.quiz-opt.dimmed  { opacity: 0.45; pointer-events: none; }
+.quiz-opt .opt-letter {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #f3f4f6; color: #6b7280; border: 1.5px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-weight: 800; font-size: 0.8rem;
+  flex-shrink: 0; transition: background 0.2s, color 0.2s;
+}
+.quiz-explain {
+  display: none; font-size: 0.84rem; font-weight: 500;
+  margin-top: -0.35rem; margin-bottom: 0.35rem;
+  padding: 0.5rem 0.85rem 0.5rem 1rem;
+  border-radius: 0 0 10px 10px; line-height: 1.55; border-left: 3px solid transparent;
+}
+.quiz-explain.show-correct { display: block; background: rgba(22,163,74,0.07);  color: #166534; border-left-color: #16a34a; }
+.quiz-explain.show-wrong   { display: block; background: rgba(220,38,38,0.06);  color: #991b1b; border-left-color: #dc2626; }
+.quiz-explain.show-reveal  { display: block; background: rgba(37,99,235,0.06);  color: #1e40af; border-left-color: #2563eb; }
+.quiz-feedback {
+  display: none; margin-top: 1rem; padding: 0.85rem 1.1rem;
+  border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+  align-items: center; gap: 0.6rem;
+}
+.quiz-feedback.show { display: flex; animation: fadeIn 0.35s; }
+.quiz-feedback.win  { background: linear-gradient(135deg,#f0fdf4,#dcfce7); color: #14532d; border: 1px solid rgba(22,163,74,0.3); }
+.quiz-feedback.lose { background: linear-gradient(135deg,#fef2f2,#fee2e2); color: #991b1b; border: 1px solid rgba(220,38,38,0.2); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;} }
+
+/* ═══ FOOTER ═══ */
+.gfooter {
+  background: #e8edf8; border-top: 1px solid var(--border);
+  padding: 3rem 0; margin-top: 4rem; text-align: center;
+}
+.gfooter-logo {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.visible { opacity: 1; transform: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-orbit { display: none; }
+  .level-card { padding: 1.5rem; }
+  .xp-badges { display: none; }
+}
+
+/* ═══ TOAST ═══ */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.gtoast {
+  background: #ffffff; border: 1px solid var(--border2);
+  border-radius: 14px; padding: 0.85rem 1.2rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  backdrop-filter: blur(12px); font-weight: 700; font-size: 0.88rem;
+  transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: auto; min-width: 260px; box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.gtoast.show { transform: none; }
+.gtoast-icon { font-size: 1.4rem; }
+
+/* ═══ MODAL ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15,23,42,0.55); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: #ffffff; border-radius: 28px; padding: 2.5rem 2.5rem 2rem;
+  max-width: 520px; width: 100%; position: relative; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(37,99,235,0.18), 0 4px 20px rgba(0,0,0,0.1);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease; opacity: 0;
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+.modal-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem; background: #f3f4f6; border: none;
+  border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem;
+  color: #6b7280; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.modal-close:hover { background: #e5e7eb; color: #374151; }
+.modal-trophy   { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+.modal-title    { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; text-align: center; color: var(--text); margin-bottom: 0.4rem; }
+.modal-subtitle { color: var(--muted); text-align: center; font-size: 0.92rem; margin-bottom: 1.5rem; }
+.score-ring-wrap { display: flex; justify-content: center; margin-bottom: 1.2rem; }
+.score-ring { position: relative; width: 120px; height: 120px; }
+.score-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: #e5e7eb; stroke-width: 10; }
+.ring-fill { fill: none; stroke: #2563eb; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-num  { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; color: var(--text); line-height: 1; }
+.ring-label{ font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.grade-card { border-radius: 14px; padding: 0.85rem 1.2rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem; border: 1.5px solid; }
+.grade-s { background: #fef9c3; border-color: #b45309; }
+.grade-a { background: #f0fdf4; border-color: #16a34a; }
+.grade-b { background: #eff6ff; border-color: #2563eb; }
+.grade-c { background: #f5f3ff; border-color: #7c3aed; }
+.grade-d { background: #fef2f2; border-color: #dc2626; }
+.grade-letter { font-family: var(--font-head); font-weight: 800; font-size: 1.6rem; }
+.grade-msg    { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+.modal-xp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8f9ff; border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 12px; padding: 0.75rem 1.1rem; margin-bottom: 1.4rem;
+}
+.modal-xp-row .mxp-label { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+.modal-xp-row .mxp-val   {
+  font-family: var(--font-head); font-weight: 800; font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-btns { display: flex; gap: 0.75rem; }
+.modal-btn-retry {
+  flex: 1; padding: 0.8rem 1rem; background: #f3f4f6; border: 1.5px solid #e5e7eb;
+  border-radius: 12px; cursor: pointer; font-family: var(--font-head); font-weight: 700;
+  font-size: 0.92rem; color: #374151; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.modal-btn-retry:hover { background: #e5e7eb; border-color: #d1d5db; color: #111827; }
+.modal-btn-continue {
+  flex: 2; padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #7c3aed); border: none;
+  border-radius: 12px; cursor: pointer; font-family: var(--font-head);
+  font-weight: 700; font-size: 0.92rem; color: #ffffff; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+.modal-btn-continue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,0.4); }
+#confettiCanvas { position: fixed; inset: 0; z-index: 10001; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ XP STRIP ═══════════════════ -->
+<div class="xp-strip">
+  <div class="container-main">
+    <div class="xp-inner">
+      <span class="xp-label">⚡ XP</span>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill"></div></div>
+      <span class="xp-score" id="xpScore">0 / 275 XP</span>
+      <div class="xp-badges">
+        <span class="xp-badge b1" id="badge1">🕳️ Null Hunter</span>
+        <span class="xp-badge b2" id="badge2">🔢 Num Fixer</span>
+        <span class="xp-badge b3" id="badge3">🔤 Cat Fixer</span>
+        <span class="xp-badge b4" id="badge4">🏆 Imputer Pro</span>
+        <span class="xp-badge b5" id="badge5">⏩ Time Fixer</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="container-main">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow"><i class="fa-solid fa-gamepad me-1"></i> Gamified Learning Quest</div>
+        <h1>
+          <span class="line1">Conquer Missing Data</span>
+          <span class="line2">Imputation Mastery</span>
+        </h1>
+        <p class="hero-sub">
+          5 boss levels. Missing values se lekar ffill/bfill tak. Real India examples. Python code jo actually kaam karta hai. <strong style="color:var(--text)">Earn XP</strong>, unlock badges, aur data ko complete banao!
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Boss Levels</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">275</div><div class="hero-stat-label">Total XP</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">5</div><div class="hero-stat-label">Badges</div></div>
+          <div class="hero-stat-item"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Clean Data</div></div>
+        </div>
+        <a href="#s1" class="hero-cta"><i class="fa-solid fa-play me-1"></i> Start Your Quest</a>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-orbit">
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-center">🕳️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-main">
+
+<!-- ═══════════════════ QUEST MAP ═══════════════════ -->
+<div class="quest-map fade-up">
+  <div class="quest-map-title"><i class="fa-solid fa-map me-2"></i> Quest Map</div>
+  <div class="quest-grid">
+    <a href="#s1"  class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> What is Missing Value Imputation?</a>
+    <a href="#s2"  class="quest-item"><span class="quest-num" style="background:rgba(37,99,235,0.15);color:var(--neon-blue);">L1</span> Types of Missingness &amp; Detection</a>
+    <a href="#s3"  class="quest-item"><span class="quest-num" style="background:rgba(8,145,178,0.15);color:var(--neon-cyan);">L2</span> Numerical Imputation — SimpleImputer</a>
+    <a href="#s5"  class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> Categorical Imputation — SimpleImputer</a>
+    <a href="#s6"  class="quest-item"><span class="quest-num" style="background:rgba(124,58,237,0.15);color:var(--neon-purple);">L3</span> Categorical — Constant &amp; Custom Fill</a>
+    <a href="#s7"  class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Most Frequent Imputation</a>
+    <a href="#s8"  class="quest-item"><span class="quest-num" style="background:rgba(22,163,74,0.15);color:var(--neon-green);">L4</span> Most Frequent — When to Use &amp; Pitfalls</a>
+    <a href="#s10" class="quest-item"><span class="quest-num" style="background:rgba(194,65,12,0.15);color:var(--neon-orange);">L5</span> Forward Fill (ffill) — Time Series</a>
+    <a href="#s11" class="quest-item"><span class="quest-num" style="background:rgba(194,65,12,0.15);color:var(--neon-orange);">L5</span> Backward Fill (bfill) &amp; Quiz</a>
+    <a href="#s9"  class="quest-item"><span class="quest-num" style="background:rgba(219,39,119,0.15);color:var(--neon-pink);">🏆</span> Final Summary &amp; Roadmap</a>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 1-A : WHAT IS MISSING VALUE IMPUTATION
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-blue fade-up" id="s1">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-blue"><i class="fa-solid fa-circle-question"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Boss Topic</div>
+      <div class="lv-title">What is Missing Value Imputation?</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-blue">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Core Definition</div>
+    <strong>Missing Value Imputation</strong> = missing ya null data ko kisi <span class="hl">estimated ya calculated value</span> se replace karne ki process.<br><br>
+    Real-world analogy: Tumhara friend ek exam mein absent tha — uska marks <em>missing</em> hai. Uske average se estimate karo → yahi imputation hai! Gap ko smartly bharo — delete mat karo!
+  </div>
+
+  <div class="callout cb-orange">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Missing Values kyun hote hain?</div>
+    <div class="row g-2 mt-1">
+      <div class="col-md-6">
+        🧾 <strong>Survey skip:</strong> User ne optional field nahi bhara<br>
+        🌐 <strong>System error:</strong> Sensor ne data record nahi kiya<br>
+        🏥 <strong>Patient refused:</strong> Medical test nahi diya
+      </div>
+      <div class="col-md-6">
+        📦 <strong>Data pipeline:</strong> CSV merge mein rows missing<br>
+        🕰️ <strong>Historical data:</strong> Purane records incomplete hain<br>
+        🔒 <strong>Privacy:</strong> User ne income field chhodi
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Missing Values ko ignore kyun nahi kar sakte?</div>
+    <strong>Scikit-learn ka har ML model NaN se crash karta hai!</strong><br>
+    <em style="color:var(--muted)">ValueError: Input X contains NaN. Impute missing values before fitting.</em><br><br>
+    Agar simply rows drop karo → <span class="hl-red">data loss</span>, biased model, aur chota training set.<br>
+    Solution: <strong>Imputation</strong> — missing values ko intelligently fill karo!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.5rem;"><i class="fa-solid fa-sitemap me-2" style="color:var(--neon-blue)"></i>Imputation Strategies — Overview</h5>
+
+  <div class="row g-3">
+    <div class="col-md-3 col-sm-6">
+      <div class="ach-card ac-blue">
+        <span class="ach-icon">🔢</span>
+        <div class="ach-title">Mean / Median / Mode</div>
+        <div class="ach-desc">Numerical data ke liye sabse common. SimpleImputer se ek line mein done!</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="ach-card ac-purple">
+        <span class="ach-icon">🔤</span>
+        <div class="ach-title">Most Frequent</div>
+        <div class="ach-desc">Categorical data ke liye best. Sabse common category se fill karo.</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="ach-card ac-cyan">
+        <span class="ach-icon">🏷️</span>
+        <div class="ach-title">Constant Fill</div>
+        <div class="ach-desc">"Unknown", "Missing", 0 ya -1 se fill karo. Categorical mein useful.</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="ach-card ac-green">
+        <span class="ach-icon">🔗</span>
+        <div class="ach-title">Advanced (Coming Soon)</div>
+        <div class="ach-desc">KNN Imputer, MICE — doosre features se predict karo. Next quest mein!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box" data-quiz="1" data-correct="c" data-xp="25">
+    <div class="quiz-q">🤔 Scikit-learn mein missing values (NaN) ke saath directly model train karne ki koshish karo toh kya hoga?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Scikit-learn NaN ko automatically handle nahi karta — ye feature pandas ya numpy mein hai, sklearn mein nahi."><span class="opt-letter">A</span>Model automatically NaN ko ignore kar dega</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. Scikit-learn NaN ko 0 se replace nahi karta — ye aapka kaam hai! Bina imputation ke model crash ho jaata hai."><span class="opt-letter">B</span>NaN ko automatically 0 se replace kar dega</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Bilkul sahi! Scikit-learn ValueError throw karta hai: 'Input X contains NaN'. Model train hone se pehle imputation zaroori hai — ye ek hard requirement hai!"><span class="opt-letter">C</span>ValueError raise hoga — model train nahi hoga</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. Scikit-learn NaN wali rows automatically drop nahi karta. Ye user ki responsibility hai — isliye imputation seekhna zaroori hai."><span class="opt-letter">D</span>NaN wali rows automatically drop ho jaayengi</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 1-B: TYPES OF MISSINGNESS ── -->
+<div class="level-card lvl-blue fade-up" id="s2">
+  <div class="corner-deco">LEVEL 1</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 1 · Skill Unlock</div>
+      <div class="lv-title">Types of Missingness &amp; Detection in Python</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Teen Types of Missing Data</div>
+    Strategy choose karne se pehle — <strong>kyun missing hai</strong>, ye samajhna zaroori hai!
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-md-4">
+      <div class="dim-card" style="border: 1.5px solid rgba(37,99,235,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue); font-size:1.8rem;">🎲</div>
+        <div class="dim-name" style="color:var(--neon-blue);">MCAR</div>
+        <div class="dim-code">Missing Completely At Random</div>
+        <div class="dim-desc">Missing hone ka koi pattern nahi — purely random. Kisi bhi imputation method se theek ho jaata hai.</div>
+        <div class="dim-example" style="border-color:rgba(37,99,235,0.2); color:var(--muted);">
+          Example: Survey mein 5% log randomly form submit nahi kar paaye — network issue tha
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border: 1.5px solid rgba(180,83,9,0.3);">
+        <div class="dim-rank" style="color:var(--neon-yellow); font-size:1.8rem;">📐</div>
+        <div class="dim-name" style="color:var(--neon-yellow);">MAR</div>
+        <div class="dim-code">Missing At Random</div>
+        <div class="dim-desc">Missing hone ka relation doosre observed variables se hai. Imputation possible but careful strategy chahiye.</div>
+        <div class="dim-example" style="border-color:rgba(180,83,9,0.2); color:var(--muted);">
+          Example: Women income zyada report nahi karti — Gender variable se related
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border: 1.5px solid rgba(220,38,38,0.3);">
+        <div class="dim-rank" style="color:var(--neon-red); font-size:1.8rem;">⚠️</div>
+        <div class="dim-name" style="color:var(--neon-red);">MNAR</div>
+        <div class="dim-code">Missing Not At Random</div>
+        <div class="dim-desc">Missing hone ka reason value khud hai. Sabse tricky — simple imputation se bias aa sakta hai.</div>
+        <div class="dim-example" style="border-color:rgba(220,38,38,0.2); color:var(--muted);">
+          Example: Rich log income nahi batate — missing value IS the signal!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-solid fa-magnifying-glass-chart"></i> Missing Values Detect karo — Python Code</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — Detection</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ─── Inline dataset: Student exam records ───
+data = {
+    'Name':       ['Aarav', 'Priya', 'Ravi', 'Sneha', 'Karan', 'Divya', 'Mohit', 'Ananya'],
+    'Age':        [22,      np.nan,  25,      23,      np.nan,  21,      24,      np.nan ],
+    'Score':      [85,      90,      np.nan,  78,      88,      np.nan,  72,      95     ],
+    'City':       ['Mumbai','Delhi', np.nan,  'Surat', 'Mumbai',np.nan, 'Delhi', 'Pune' ],
+    'Attendance': [90,      85,      80,      np.nan,  92,      88,      np.nan,  95     ],
+}
+df = pd.DataFrame(data)
+
+# ─── 1. Basic detection ───
+print("Missing count per column:")
+print(df.isnull().sum())
+# Age: 3, Score: 2, City: 2, Attendance: 2
+
+print("\nMissing % per column:")
+missing_pct = df.isnull().sum() / len(df) * 100
+print(missing_pct[missing_pct > 0].sort_values(ascending=False))
+# Age: 37.5%, Score: 25.0%, City: 25.0%, Attendance: 25.0%
+
+# ─── 2. Heatmap of missing values ───
+plt.figure(figsize=(10, 4))
+sns.heatmap(df.isnull(), yticklabels=False,
+            cbar=False, cmap='viridis')
+plt.title('Missing Values Heatmap — Yellow = NaN')
+plt.tight_layout()
+plt.show()
+
+# ─── 3. Bar chart of missing % ───
+missing_pct[missing_pct > 0].plot(kind='bar', color='#dc2626')
+plt.title('Missing Values % per Column')
+plt.ylabel('Missing %')
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+# ─── 4. Quick check: any missing? ───
+print("\nAny NaN present?", df.isnull().values.any())   # True
+print("Total NaN cells:", df.isnull().sum().sum())        # 9</code></pre>
+        <div class="code-output">🎯 Rule of Thumb:<br>
+&lt; 5% missing → Drop or Simple Imputation<br>
+5–30% missing → Mean / Median / Most Frequent Imputation<br>
+&gt; 30% missing → Consider dropping column or advanced methods</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 2-A : NUMERICAL IMPUTATION — SIMPLEIMPUTER
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-cyan fade-up" id="s3">
+  <div class="corner-deco">LEVEL 2</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-hashtag"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 2 · Boss Topic</div>
+      <div class="lv-title">Handling Missing Numerical Data — SimpleImputer</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-cyan">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> SimpleImputer kya hai?</div>
+    <strong>SimpleImputer</strong> (from <span class="inline-code">sklearn.impute</span>) = numerical missing values ko <span class="hl">ek calculated statistic</span> se fill karne ka tool.<br><br>
+    Ye scikit-learn ka official imputer hai jo <strong>Pipelines ke saath seamlessly kaam karta hai</strong> — train/test data ko correctly handle karta hai bina data leakage ke!
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Mean vs Median — Kab Kya Use Karein?</div>
+    <span class="stat-pill sp-blue">Mean</span> = Normal distribution mein best. Outliers se affected hota hai!<br><br>
+    <span class="stat-pill sp-green">Median</span> = Skewed data ya outliers hone par best choice. Robust to extremes.<br><br>
+    🏠 <em>Mumbai property prices: ek ₹50 crore villa → mean distort ho jaayega → <strong>Median</strong> use karo!</em><br>
+    🏏 <em>IPL runs per match: roughly normal → <strong>Mean</strong> theek rahega.</em>
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.5rem;"><i class="fa-brands fa-python me-2" style="color:var(--neon-cyan)"></i>SimpleImputer — Numerical Strategies</h5>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="dim-card" style="border:1.5px solid rgba(37,99,235,0.3);">
+        <div class="dim-rank" style="color:var(--neon-blue);">μ</div>
+        <div class="dim-name" style="color:var(--neon-blue);">strategy="mean"</div>
+        <div class="dim-code">NaN → Column Average</div>
+        <div class="dim-desc">Har NaN ko us column ke <strong>mean</strong> se replace karo. Fast aur simple.</div>
+        <div class="dim-example" style="border-color:rgba(37,99,235,0.2);color:var(--muted);">
+          ✅ Normally distributed data<br>
+          ✅ Outliers nahi hain<br>
+          ❌ Skewed data mein use mat karo
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border:1.5px solid rgba(22,163,74,0.3);">
+        <div class="dim-rank" style="color:var(--neon-green);">M̃</div>
+        <div class="dim-name" style="color:var(--neon-green);">strategy="median"</div>
+        <div class="dim-code">NaN → Middle Value</div>
+        <div class="dim-desc">Har NaN ko us column ke <strong>median</strong> se replace karo. Outlier-resistant!</div>
+        <div class="dim-example" style="border-color:rgba(22,163,74,0.2);color:var(--muted);">
+          ✅ Skewed distributions<br>
+          ✅ Outliers present hain<br>
+          ✅ Salary, Price, Age columns
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dim-card" style="border:1.5px solid rgba(124,58,237,0.3);">
+        <div class="dim-rank" style="color:var(--neon-purple);">Mo</div>
+        <div class="dim-name" style="color:var(--neon-purple);">strategy="most_frequent"</div>
+        <div class="dim-code">NaN → Most Common Value</div>
+        <div class="dim-desc">Numerical mein bhi use ho sakta hai — but mostly categorical ke liye jaana jaata hai.</div>
+        <div class="dim-example" style="border-color:rgba(124,58,237,0.2);color:var(--muted);">
+          ✅ Discrete numeric (ratings: 1–5)<br>
+          ✅ Integer columns<br>
+          ❌ Continuous data mein avoid karo
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-solid fa-code"></i> SimpleImputer — Mean &amp; Median, Step by Step</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
+
+# ─── Sample data with NaNs ───
+df = pd.DataFrame({
+    'age':    [25, np.nan, 30, np.nan, 45, 28, np.nan],
+    'salary': [50000, 60000, np.nan, 75000, np.nan, 55000, 80000],
+    'score':  [np.nan, 85, 90, np.nan, 78, 92, 88]
+})
+
+print("Before Imputation:")
+print(df)
+print("\nMissing values:\n", df.isnull().sum())
+
+# ─── Mean Imputer ───
+mean_imputer = SimpleImputer(strategy='mean')
+
+# fit_transform on numerical columns
+df_mean = pd.DataFrame(
+    mean_imputer.fit_transform(df),
+    columns=df.columns
+)
+print("\nAfter MEAN Imputation:")
+print(df_mean)
+
+# ─── Median Imputer ───
+median_imputer = SimpleImputer(strategy='median')
+df_median = pd.DataFrame(
+    median_imputer.fit_transform(df),
+    columns=df.columns
+)
+print("\nAfter MEDIAN Imputation:")
+print(df_median)
+
+# ─── Check what value was learned ───
+print("\nMean values learned:", mean_imputer.statistics_)
+# [mean_age, mean_salary, mean_score]</code></pre>
+        <div class="code-output">🔑 imputer.statistics_ = imputer ne kya value seekhi hai training data se. Test data pe bhi yahi value use hogi — no data leakage!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz-box" data-quiz="2" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 Mumbai property prices (highly skewed, outliers hain) mein missing values fill karne ke liye kaunsa strategy best hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Mean skewed data mein outliers se bahut zyada affect hota hai. Ek ₹50 crore villa poori column ka mean badha dega — imputed value galat hogi."><span class="opt-letter">A</span>strategy="mean"</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Sahi! Median outliers se affect nahi hota. Skewed distributions (jaise property prices) mein Median the best choice hai — ye middle value represent karta hai, extreme values se independent!"><span class="opt-letter">B</span>strategy="median"</div>
+      <div class="quiz-opt" data-ans="c" data-explain="most_frequent numerical continuous data ke liye suitable nahi hai. Property price ek continuous variable hai — mode ka zyada matlab nahi yahan."><span class="opt-letter">C</span>strategy="most_frequent"</div>
+      <div class="quiz-opt" data-ans="d" data-explain="constant se fill karna (jaise 0) property prices ke liye meaningless hoga. 0 price ka matlab koi property nahi — imputation ka goal meaningful estimate dena hai."><span class="opt-letter">D</span>strategy="constant", fill_value=0</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 3-A : CATEGORICAL IMPUTATION — SIMPLEIMPUTER
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-purple fade-up" id="s5">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-purple"><i class="fa-solid fa-tags"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Boss Topic</div>
+      <div class="lv-title">Handling Missing Categorical Data — SimpleImputer</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-purple">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Categorical Imputation kyun alag hai?</div>
+    Categorical variables mein <strong>mean ya median ka koi matlab nahi</strong> — "Mumbai" ka average kaise nikalein?<br><br>
+    Categorical ke liye do main strategies hain:<br>
+    <span class="stat-pill sp-purple">most_frequent</span> = Sabse common category se fill karo<br>
+    <span class="stat-pill sp-cyan">constant</span> = Ek fixed value se fill karo (jaise "Unknown", "Missing")
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check"></i> most_frequent — Kab use karein?</div>
+        ✅ Ek dominant category exist karti ho<br>
+        ✅ Missing values MCAR ya MAR type ke hon<br>
+        ✅ Distribution bahut unequal nahi ho<br>
+        ✅ Missing % &lt; 20% ho<br><br>
+        <em style="color:var(--dim);">🏙️ Example: City column mein 60% records = "Mumbai" → most_frequent perfect hai!</em>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-circle-info"></i> constant — Kab use karein?</div>
+        ✅ Missing ka apna matlab ho (MNAR type)<br>
+        ✅ "Missing" ko ek separate category banana ho<br>
+        ✅ Model ko NaN ka pattern seekhna ho<br>
+        ✅ Audit trail chahiye (pata rahe kya fill hua)<br><br>
+        <em style="color:var(--dim);">🔒 Example: Income field missing → "Not Disclosed" category as signal!</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-solid fa-code"></i> Categorical SimpleImputer — most_frequent &amp; constant</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
+
+# ─── Sample data ───
+df = pd.DataFrame({
+    'city':     ['Mumbai', 'Delhi', np.nan, 'Mumbai', np.nan, 'Surat'],
+    'gender':   ['Male', np.nan, 'Female', 'Male', 'Female', np.nan],
+    'category': [np.nan, 'Electronics', 'Clothing', np.nan, 'Electronics', 'Food']
+})
+
+print("Before Imputation:")
+print(df)
+
+# ─── Strategy 1: most_frequent ───
+freq_imputer = SimpleImputer(strategy='most_frequent')
+df_freq = pd.DataFrame(
+    freq_imputer.fit_transform(df),
+    columns=df.columns
+)
+print("\nAfter MOST FREQUENT Imputation:")
+print(df_freq)
+print("\nMost frequent values learned:", freq_imputer.statistics_)
+# ['Mumbai', 'Male', 'Electronics']
+
+# ─── Strategy 2: constant ───
+const_imputer = SimpleImputer(strategy='constant',
+                               fill_value='Unknown')
+df_const = pd.DataFrame(
+    const_imputer.fit_transform(df),
+    columns=df.columns
+)
+print("\nAfter CONSTANT Imputation ('Unknown'):")
+print(df_const)</code></pre>
+        <div class="code-output">📌 freq_imputer.statistics_ = ['Mumbai', 'Male', 'Electronics'] — training data se ye seekha. Test data mein bhi inhi values se fill hoga, chahe test data mein "Delhi" zyada ho!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 3 -->
+  <div class="quiz-box" data-quiz="3" data-correct="d" data-xp="25">
+    <div class="quiz-q">🤔 Ek insurance dataset mein "Occupation" column ke missing values ko fill karna hai. Missing hone ka reason ye hai ki <em>high-risk occupations</em> wale log field blank chhod dete hain. Kaunsi strategy best hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Mean categorical data ke liye kaam hi nahi karta. Occupation ek text column hai — mean calculate nahi ho sakta."><span class="opt-letter">A</span>strategy="mean"</div>
+      <div class="quiz-opt" data-ans="b" data-explain="most_frequent yahan galat hogi. Agar most common occupation se fill karein toh high-risk occupations ka signal kho jaayega — ye MNAR case hai!"><span class="opt-letter">B</span>strategy="most_frequent"</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Rows drop karna data loss hai — aur important pattern bhi kho jaayega. MNAR data mein missing pattern khud ek feature hai!"><span class="opt-letter">C</span>Missing rows drop kar do</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Bilkul sahi! Ye MNAR case hai — missing hone ka matlab khud high-risk occupation ho sakti hai. 'Unknown' ya 'Not_Disclosed' se fill karo taaki model ye pattern seekh sake. Missingness itself = a feature!"><span class="opt-letter">D</span>strategy="constant", fill_value="Unknown"</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 3-B: CONSTANT & CUSTOM FILL ── -->
+<div class="level-card lvl-purple fade-up" id="s6">
+  <div class="corner-deco">LEVEL 3</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-fill-drip"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 3 · Skill Unlock</div>
+      <div class="lv-title">Categorical — Constant Fill &amp; Custom Strategies</div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-tech">
+    <div class="ex-head"><i class="fa-solid fa-wrench"></i> pandas fillna() — Multiple Strategies in Practice</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Inline dataset: E-commerce orders (Flipkart style) ───
+data = {
+    'order_id':     [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+    'city':         ['Mumbai', 'Delhi', np.nan, 'Mumbai', np.nan,
+                     'Surat',  'Delhi', 'Mumbai', np.nan, 'Pune'],
+    'gender':       ['Male', np.nan, 'Female', 'Male', 'Female',
+                     np.nan, 'Male', np.nan,   'Female', 'Male'],
+    'product_type': ['Electronics', 'Clothing', 'Electronics', np.nan,
+                     'Clothing', 'Food', np.nan, 'Electronics',
+                     'Clothing', 'Food'],
+    'occupation':   [np.nan, 'Engineer', np.nan, 'Doctor', 'Teacher',
+                     np.nan, 'Engineer', 'Teacher', np.nan, 'Doctor'],
+    'rating':       [4.5, 3.8, np.nan, 4.0, 4.2, np.nan,
+                     3.5, 4.8, 4.1, np.nan],
+    'payment_mode': ['UPI', 'Card', 'UPI', np.nan, 'UPI',
+                     'COD', 'UPI', np.nan, 'Card', 'UPI'],
+}
+df = pd.DataFrame(data)
+
+print("Dataset shape:", df.shape)
+print("Missing values before:\n", df.isnull().sum())
+
+# ─── pandas fillna() — most common beginner approach ───
+
+# Method 1: Specific value se fill karo (constant)
+df['city'].fillna('Unknown', inplace=True)
+df['gender'].fillna('Not Specified', inplace=True)
+df['occupation'].fillna('Not Disclosed', inplace=True)
+
+# Method 2: Mode (most frequent) se fill karo
+df['payment_mode'].fillna(df['payment_mode'].mode()[0], inplace=True)
+
+# Method 3: Multiple columns ek saath — dict se
+df.fillna({
+    'product_type': 'General',
+    'rating':       df['rating'].median()   # Numerical bhi mix kar sakte ho!
+}, inplace=True)
+
+print("\nMissing values after:\n", df.isnull().sum())
+# All zeros!
+print("\nCleaned dataset:")
+print(df)</code></pre>
+        <div class="code-output">💡 pandas fillna() = sabse simple aur fast way! Beginners ke liye ye hi best starting point hai. Method 1: constant value, Method 2: mode(), Method 3: dict se ek saath fill!</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 4-A : MOST FREQUENT IMPUTATION
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-green fade-up" id="s7">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-green"><i class="fa-solid fa-chart-bar"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Boss Topic</div>
+      <div class="lv-title">Most Frequent Imputation — Missing Category Imputation</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-green">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> Most Frequent Imputation kya hai?</div>
+    <strong>Most Frequent Imputation</strong> = missing values ko us column ki <span class="hl">sabse zyada baar appear hone wali value (mode)</span> se replace karna.<br><br>
+    Ye categorical data ke liye <strong>default go-to strategy</strong> hai aur numerical discrete data (ratings, counts) ke liye bhi kaam karta hai.<br>
+    Real analogy: Tumhara class register mein attendance missing hai — safe assumption yahi hai ki student <em>present</em> tha (most common value)!
+  </div>
+
+  <div class="glow-div"></div>
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin-bottom:1.5rem;"><i class="fa-solid fa-gears me-2" style="color:var(--neon-green)"></i>Most Frequent — Internals &amp; Deep Dive</h5>
+
+  <div class="step-timeline">
+    <div class="step-item" data-step="1">
+      <div class="step-label">🔍 Training Phase — Mode Seekhna (fit)</div>
+      <div class="step-body">
+        Training data ke har selected column mein <strong>mode (most frequent value)</strong> calculate hoti hai.<br>
+        Ye value <span class="inline-code">imputer.statistics_</span> mein store ho jaati hai.<br>
+        <em style="color:var(--neon-green);">City column: ['Mumbai', 'Delhi', 'Mumbai', 'Surat', 'Mumbai'] → Mode = 'Mumbai'</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-label">🔄 Transformation Phase — Fill karna (transform)</div>
+      <div class="step-body">
+        Jab bhi NaN milta hai, <strong>statistics_ mein stored mode value se replace</strong> ho jaata hai.<br>
+        fit() ek baar karo → statistics_ mein mode store hogi → transform() jab bhi zaroorat ho tab call karo.<br>
+        <em style="color:var(--neon-green);">['Chennai', NaN, 'Delhi'] → NaN = 'Mumbai' (fit ke time seekha tha)</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="3">
+      <div class="step-label">⚠️ Tie-Breaking — Do values same frequency pe?</div>
+      <div class="step-body">
+        Agar do ya zyada values ki same frequency ho, <strong>pehle wali (alphabetically/position wise) choose hoti hai</strong>.<br>
+        <em style="color:var(--dim);">['Mumbai'×3, 'Delhi'×3] → alphabetical order mein 'Delhi' win karega!</em>
+      </div>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-label">📊 Bias Risk — High Missing % pe sambhalo</div>
+      <div class="step-body">
+        Agar 40% values missing hain aur sab 'Mumbai' se fill ho jaayein → distribution artificially peaked ho jaayegi!<br>
+        <em style="color:var(--dim);">Solution: Missing Indicator column add karo (agle quest mein!)</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-solid fa-code"></i> Most Frequent — Complete Example with Titanic Data</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
+
+# ─── Inline dataset: Passenger booking records ───
+data = {
+    'Pclass':   [1, 3, 2, 3, 1, 3, 2, 3, 1, 3, 2, 3, 3, 1, 2,
+                 3, 3, 1, 2, 3],
+    'Sex':      ['male','female','male','male','female','male',
+                 'female','male','male','female','male','male',
+                 'female','female','male','male','female','male',
+                 'female','male'],
+    'Embarked': ['S', 'C', 'S', 'S', np.nan, 'S', 'Q', 'S', 'C',
+                 'S', 'S', np.nan, 'S', 'C', 'S', 'S', 'Q', 'C',
+                 'S', 'S'],
+    'Survived': [1, 1, 0, 0, 1, 0, 1, 0, 1, 0,
+                 0, 0, 1, 1, 0, 0, 1, 1, 1, 0],
+}
+df = pd.DataFrame(data)
+
+# ─── Step 1: Missing values check ───
+print("Missing values before:")
+print(df[['Pclass', 'Sex', 'Embarked']].isnull().sum())
+# Embarked: 2 missing
+
+# ─── Step 2: Most Frequent Imputation ───
+cols = ['Pclass', 'Sex', 'Embarked']
+
+mf_imputer = SimpleImputer(strategy='most_frequent')
+df_imp = pd.DataFrame(
+    mf_imputer.fit_transform(df[cols]),
+    columns=cols
+)
+
+# ─── Step 3: What did the imputer learn? ───
+print("\nLearned most frequent values:", mf_imputer.statistics_)
+# [3, 'male', 'S']  ← Pclass=3, Sex=male, Embarked=S
+
+# ─── Step 4: Verify — no NaN remaining ───
+print("\nMissing after imputation:")
+print(df_imp.isnull().sum())   # All zeros!
+
+# ─── Step 5: Before vs After — Embarked column ───
+print("\nEmbarked before:")
+print(df['Embarked'].value_counts(dropna=False))
+#  S     16,  C    3,  Q    2,  NaN  2
+
+print("\nEmbarked after:")
+print(df_imp['Embarked'].value_counts())
+#  S     18,  C    3,  Q    2   ← 2 NaN replaced with 'S' (most frequent)</code></pre>
+        <div class="code-output">🚢 Embarked mein sirf 2 NaN hain → most_frequent se fill kiya! statistics_ attribute batata hai imputer ne kya seekha. Value counts se verify karo ki fill sahi hua!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 4 -->
+  <div class="quiz-box" data-quiz="4" data-correct="a" data-xp="25">
+    <div class="quiz-q">🤔 Most Frequent Imputer ka <span class="inline-code">fit()</span> method kya karta hai?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Bilkul sahi! fit() training data se har selected column ki mode (most frequent value) calculate karta hai aur statistics_ attribute mein store karta hai. transform() baad mein usi stored value se NaN fill karta hai."><span class="opt-letter">A</span>Training data se har column ki mode calculate karke statistics_ mein store karta hai</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Nahi. NaN fill karna transform() ka kaam hai, fit() ka nahi. fit() sirf 'seekhta' hai — fill nahi karta."><span class="opt-letter">B</span>Missing values ko fill karta hai</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Galat. Mean calculate karna mean strategy ka kaam hai. most_frequent strategy mein fit() mode calculate karta hai, mean nahi."><span class="opt-letter">C</span>Har column ka mean calculate karta hai</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. fit() columns drop nahi karta — ye sirf statistics seekhta hai. Columns sirf tab drop hoti hain jab explicitly kaho."><span class="opt-letter">D</span>Missing values wali columns ko dataset se remove karta hai</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- ── LEVEL 4-B: WHEN TO USE & PITFALLS ── -->
+<div class="level-card lvl-green fade-up" id="s8">
+  <div class="corner-deco">LEVEL 4</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-yellow"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 4 · Skill Unlock</div>
+      <div class="lv-title">Most Frequent — When to Use, Pitfalls &amp; Alternatives</div>
+    </div>
+  </div>
+
+  <div class="callout cb-yellow">
+    <div class="ct"><i class="fa-solid fa-scale-balanced"></i> Most Frequent — Quick Decision Guide</div>
+    <div class="table-responsive mt-2">
+      <table class="gtbl">
+        <thead><tr><th>Condition</th><th>Use most_frequent?</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>Missing &lt; 5%</td><td><span class="stat-pill sp-green">✅ Yes</span></td><td>Minimal distortion, quick fix</td></tr>
+          <tr><td>One dominant category (60%+)</td><td><span class="stat-pill sp-green">✅ Yes</span></td><td>Imputed value likely correct</td></tr>
+          <tr><td>MCAR type missingness</td><td><span class="stat-pill sp-green">✅ Yes</span></td><td>No systematic bias introduced</td></tr>
+          <tr><td>Missing 20–40%</td><td><span class="stat-pill sp-yellow">⚠️ Careful</span></td><td>Add Missing Indicator column too</td></tr>
+          <tr><td>Missing &gt; 40%</td><td><span class="stat-pill sp-red">❌ Avoid</span></td><td>Distribution severely distorted</td></tr>
+          <tr><td>MNAR type missingness</td><td><span class="stat-pill sp-red">❌ Avoid</span></td><td>Use constant="Unknown" instead</td></tr>
+          <tr><td>Balanced category distribution</td><td><span class="stat-pill sp-orange">⚠️ Risky</span></td><td>Mode win by small margin — unreliable</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="ex-card ex-warn">
+    <div class="ex-head"><i class="fa-solid fa-bug"></i> Common Pitfall — Distribution Distortion Visualize karo</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python — Pitfall Demo</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.impute import SimpleImputer
+
+# ─── Simulated data: 40% missing ───
+np.random.seed(42)
+n = 1000
+cities = np.random.choice(['Mumbai', 'Delhi', 'Bangalore', 'Chennai'],
+                           size=n, p=[0.3, 0.3, 0.2, 0.2])
+
+# 40% random missing inject karo
+mask = np.random.random(n) < 0.40
+cities_missing = cities.astype(object)
+cities_missing[mask] = np.nan
+
+df = pd.DataFrame({'city': cities_missing})
+print(f"Missing: {df['city'].isnull().mean()*100:.1f}%")
+
+# ─── Before imputation distribution ───
+before = df['city'].value_counts(normalize=True, dropna=True)
+print("\nOriginal (non-null) distribution:")
+print(before)
+
+# ─── Apply most_frequent imputation ───
+imp = SimpleImputer(strategy='most_frequent')
+df['city_imputed'] = imp.fit_transform(df[['city']])
+
+# ─── After imputation distribution ───
+after = df['city_imputed'].value_counts(normalize=True)
+print("\nAfter most_frequent imputation:")
+print(after)
+# Mumbai goes from ~30% to ~52% — artificially inflated!
+
+# ─── Visualize ───
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+before.plot(kind='bar', ax=ax1, color='#2563eb', title='Before (non-null only)', rot=0)
+after.plot(kind='bar', ax=ax2, color='#dc2626', title='After most_frequent (40% was missing)', rot=0)
+plt.tight_layout()
+plt.show()</code></pre>
+        <div class="code-output">⚠️ 40% missing + most_frequent = Mumbai 30% → 52%! Ye artificial spike ML model ko confuse kar sakta hai. 5-10% missing mein distortion negligible hota hai.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check-double"></i> Most Frequent ke Advantages</div>
+        ✅ Simple aur fast — ek line code<br>
+        ✅ No hyperparameters tune karne nahin<br>
+        ✅ sklearn Pipeline ke saath perfect<br>
+        ✅ Interpretable — koi black box nahi<br>
+        ✅ Works for both Categorical &amp; Numerical<br>
+        ✅ Industry standard baseline method
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> Most Frequent ke Limitations</div>
+        ❌ Mode ka dominance artificially badhta hai<br>
+        ❌ High missing % pe distribution biased<br>
+        ❌ Variable relationships ignore karta hai<br>
+        ❌ MNAR data ke liye appropriate nahi<br>
+        ❌ Multimodal data mein unreliable<br>
+        ❌ Variance underestimate ho jaati hai
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 5-A : FORWARD FILL (ffill)
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-orange fade-up" id="s10">
+  <div class="corner-deco">LEVEL 5</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-orange"><i class="fa-solid fa-forward"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 5 · Boss Topic</div>
+      <div class="lv-title">Forward Fill / Backward Fill — Time Series Imputation</div>
+      <div class="lv-xp"><i class="fa-solid fa-star"></i> +30 XP on scroll</div>
+    </div>
+  </div>
+
+  <div class="callout cb-orange">
+    <div class="ct"><i class="fa-solid fa-lightbulb"></i> ffill / bfill kya hai aur kab use karein?</div>
+    Ye method missing values ko <strong>neighbouring values</strong> se fill karta hai — mean ya mode nahi!<br><br>
+    Time-based data mein zyada useful hai jahan <strong>consecutive values ka connection hota hai</strong>:<br>
+    <span class="stat-pill sp-orange">Stock Prices</span>&nbsp;
+    <span class="stat-pill sp-orange">Weather Data</span>&nbsp;
+    <span class="stat-pill sp-orange">Sensor Readings</span>&nbsp;
+    <span class="stat-pill sp-orange">Sales Over Time</span>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-arrow-right"></i> Forward Fill (ffill)</div>
+        Missing value ko <strong>pehle wali (previous) available value</strong> se fill karo.<br><br>
+        <strong>Example:</strong><br>
+        Mon → 100 &nbsp; Tue → <span style="color:var(--neon-red)">NaN</span> &nbsp; Wed → <span style="color:var(--neon-red)">NaN</span> &nbsp; Thu → 150<br><br>
+        After ffill:<br>
+        Mon → 100 &nbsp; Tue → <span style="color:var(--neon-green)">100</span> &nbsp; Wed → <span style="color:var(--neon-green)">100</span> &nbsp; Thu → 150<br><br>
+        <em style="color:var(--dim);">Kyunki pehle wali known value 100 thi, toh use aage propagate kiya!</em>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-cyan h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-arrow-left"></i> Backward Fill (bfill)</div>
+        Missing value ko <strong>agle (next) available value</strong> se fill karo.<br><br>
+        <strong>Example:</strong><br>
+        Mon → 100 &nbsp; Tue → <span style="color:var(--neon-red)">NaN</span> &nbsp; Wed → <span style="color:var(--neon-red)">NaN</span> &nbsp; Thu → 150<br><br>
+        After bfill:<br>
+        Mon → 100 &nbsp; Tue → <span style="color:var(--neon-green)">150</span> &nbsp; Wed → <span style="color:var(--neon-green)">150</span> &nbsp; Thu → 150<br><br>
+        <em style="color:var(--dim);">Kyunki agle known value 150 thi, toh use peeche propagate kiya!</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <!-- ffill Table Example -->
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin:1.5rem 0 0.8rem;">
+    <i class="fa-solid fa-table me-2" style="color:var(--neon-orange)"></i>Step-by-Step: Forward Fill
+  </h5>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="callout cb-orange" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-database"></i> Original Data</div>
+        <table class="gtbl mt-1">
+          <thead><tr><th>Day</th><th>Sales</th></tr></thead>
+          <tbody>
+            <tr><td>Mon</td><td>100</td></tr>
+            <tr><td>Tue</td><td style="color:var(--neon-red);font-weight:700;">NaN</td></tr>
+            <tr><td>Wed</td><td style="color:var(--neon-red);font-weight:700;">NaN</td></tr>
+            <tr><td>Thu</td><td>150</td></tr>
+            <tr><td>Fri</td><td>200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="callout cb-blue" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-arrow-right"></i> After Forward Fill</div>
+        <table class="gtbl mt-1">
+          <thead><tr><th>Day</th><th>Sales</th></tr></thead>
+          <tbody>
+            <tr><td>Mon</td><td>100</td></tr>
+            <tr><td>Tue</td><td style="color:var(--neon-green);font-weight:700;">100 ✅</td></tr>
+            <tr><td>Wed</td><td style="color:var(--neon-green);font-weight:700;">100 ✅</td></tr>
+            <tr><td>Thu</td><td>150</td></tr>
+            <tr><td>Fri</td><td>200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="callout cb-cyan" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-arrow-left"></i> After Backward Fill</div>
+        <table class="gtbl mt-1">
+          <thead><tr><th>Day</th><th>Sales</th></tr></thead>
+          <tbody>
+            <tr><td>Mon</td><td>100</td></tr>
+            <tr><td>Tue</td><td style="color:var(--neon-green);font-weight:700;">150 ✅</td></tr>
+            <tr><td>Wed</td><td style="color:var(--neon-green);font-weight:700;">150 ✅</td></tr>
+            <tr><td>Thu</td><td>150</td></tr>
+            <tr><td>Fri</td><td>200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ffill Python Code -->
+  <div class="ex-card ex-story mt-4">
+    <div class="ex-head"><i class="fa-solid fa-code"></i> Forward Fill — Python Code with Explanation</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Sample Time Series Data ───
+data = {
+    "Sales": [100, np.nan, np.nan, 150, 200]
+}
+df = pd.DataFrame(data)
+
+print("Original Data")
+print(df)
+#    Sales
+# 0  100.0
+# 1    NaN
+# 2    NaN
+# 3  150.0
+# 4  200.0
+
+# ─── Forward Fill ───
+df_ffill = df.fillna(method="ffill")
+
+print("
+After Forward Fill")
+print(df_ffill)
+#    Sales
+# 0  100.0
+# 1  100.0   ← previous value se fill hua
+# 2  100.0   ← previous value se fill hua
+# 3  150.0
+# 4  200.0</code></pre>
+        <div class="code-output">📌 fillna(method="ffill") → pehle available value ko aage propagate karta hai. Agar pehli row hi NaN ho toh woh NaN rahegi — koi "previous" value nahi hai!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explanation table -->
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin:1.5rem 0 0.8rem;">
+    <i class="fa-solid fa-table-list me-2" style="color:var(--neon-orange)"></i>Code Explanation
+  </h5>
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Code</th><th>Matlab (Meaning)</th></tr></thead>
+      <tbody>
+        <tr><td><span class="inline-code">fillna()</span></td><td>Missing values fill karne ka pandas function</td></tr>
+        <tr><td><span class="inline-code">method="ffill"</span></td><td>Forward Fill — pehli wali value se fill karo</td></tr>
+        <tr><td><span class="inline-code">df_ffill</span></td><td>Original df change nahi hoga — nayi copy banti hai</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     LEVEL 5-B : BACKWARD FILL + QUIZ
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-orange fade-up" id="s11">
+  <div class="corner-deco">LEVEL 5</div>
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-cyan"><i class="fa-solid fa-backward"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">Level 5 · Skill Unlock</div>
+      <div class="lv-title">Backward Fill (bfill), When to Use &amp; Comparison</div>
+    </div>
+  </div>
+
+  <!-- bfill Python Code -->
+  <div class="ex-card ex-story">
+    <div class="ex-head"><i class="fa-solid fa-code"></i> Backward Fill — Python Code with Explanation</div>
+    <div class="ex-body">
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang">🐍 Python</span><div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div></div>
+        <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# ─── Same Time Series Data ───
+data = {
+    "Sales": [100, np.nan, np.nan, 150, 200]
+}
+df = pd.DataFrame(data)
+
+# ─── Backward Fill ───
+df_bfill = df.fillna(method="bfill")
+
+print("After Backward Fill")
+print(df_bfill)
+#    Sales
+# 0  100.0
+# 1  150.0   ← next available value se fill hua
+# 2  150.0   ← next available value se fill hua
+# 3  150.0
+# 4  200.0</code></pre>
+        <div class="code-output">📌 fillna(method="bfill") → agle available value ko peeche propagate karta hai. Agar aakhri row NaN ho toh woh NaN rahegi — koi "next" value nahi hai!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explanation table -->
+  <div class="table-responsive mt-3">
+    <table class="gtbl">
+      <thead><tr><th>Code</th><th>Matlab (Meaning)</th></tr></thead>
+      <tbody>
+        <tr><td><span class="inline-code">fillna()</span></td><td>Missing values fill karne ka pandas function</td></tr>
+        <tr><td><span class="inline-code">method="bfill"</span></td><td>Backward Fill — agle wali value se fill karo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <!-- Complete Summary Table -->
+  <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text);margin:1.5rem 0 0.8rem;">
+    <i class="fa-solid fa-scale-balanced me-2" style="color:var(--neon-orange)"></i>Simple Summary — Sabhi Methods Ek Saath
+  </h5>
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Method</th><th>Used For</th><th>How It Works</th><th>pandas Code</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Mean Imputation</strong></td>
+          <td><span class="stat-pill sp-blue">Numerical</span></td>
+          <td>Average value se replace karo</td>
+          <td><span class="inline-code">strategy="mean"</span></td>
+        </tr>
+        <tr>
+          <td><strong>Most Frequent</strong></td>
+          <td><span class="stat-pill sp-purple">Categorical</span></td>
+          <td>Sabse common category se replace karo</td>
+          <td><span class="inline-code">strategy="most_frequent"</span></td>
+        </tr>
+        <tr>
+          <td><strong>Forward Fill</strong></td>
+          <td><span class="stat-pill sp-orange">Time Series</span></td>
+          <td>Pehle wali value use karo</td>
+          <td><span class="inline-code">fillna(method="ffill")</span></td>
+        </tr>
+        <tr>
+          <td><strong>Backward Fill</strong></td>
+          <td><span class="stat-pill sp-orange">Time Series</span></td>
+          <td>Agle wali value use karo</td>
+          <td><span class="inline-code">fillna(method="bfill")</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- When to use callouts -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-check-double"></i> ffill / bfill ke Advantages</div>
+        ✅ Time series ke liye most natural method<br>
+        ✅ Temporal pattern preserve karta hai<br>
+        ✅ Simple — ek line of code<br>
+        ✅ Sensor/Stock data ke liye industry standard<br>
+        ✅ No statistics calculate karne ki zaroorat<br>
+        ✅ pandas mein built-in — koi import nahi
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-pink h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-triangle-exclamation"></i> ffill / bfill ki Limitations</div>
+        ❌ Sirf time series ke liye appropriate hai<br>
+        ❌ Random data mein meaningless fill hoga<br>
+        ❌ Agar kai consecutive NaN hon toh stale value propagate hogi<br>
+        ❌ bfill future data use karta hai — forecasting mein data leakage!<br>
+        ❌ pehli/aakhri row NaN ho toh unfilled rahegi
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ 5 -->
+  <div class="quiz-box" data-quiz="5" data-correct="b" data-xp="25">
+    <div class="quiz-q">🤔 Ek stock market dataset mein Monday = ₹500, Tuesday = NaN, Wednesday = NaN, Thursday = ₹520 hai. Forward Fill (ffill) karne ke baad Tuesday aur Wednesday ki value kya hogi?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-ans="a" data-explain="Galat. Backward fill mein NaN values ko next available value se fill karte hain — toh ye ₹520 hoti. Forward fill mein PREVIOUS value use hoti hai."><span class="opt-letter">A</span>₹520 (Thursday ki value)</div>
+      <div class="quiz-opt" data-ans="b" data-explain="Bilkul sahi! Forward Fill mein missing values ko pehle wali known value se fill karte hain. Monday = ₹500 hai, toh Tuesday aur Wednesday dono ₹500 se fill honge. Previous value → aage propagate!"><span class="opt-letter">B</span>₹500 (Monday ki value)</div>
+      <div class="quiz-opt" data-ans="c" data-explain="Galat. ffill mean nahi calculate karta. Mean imputation alag method hai — (500+520)/2 = ₹510. ffill sirf previous value use karta hai."><span class="opt-letter">C</span>₹510 (Monday aur Thursday ka average)</div>
+      <div class="quiz-opt" data-ans="d" data-explain="Nahi. ffill NaN values ko NaN nahi rehne deta — ye unhe fill karta hai. Sirf tab NaN rahega jab koi bhi previous value hi na ho (jaise pehli row NaN ho)."><span class="opt-letter">D</span>NaN hi rahega</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+
+<!-- ██████████████████████████████████████████████████
+     FINAL: SUMMARY + ROADMAP
+█████████████████████████████████████████████████████ -->
+<div class="level-card lvl-pink fade-up" id="s9" style="background:linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.04), #ffffff);">
+  <div class="lv-header">
+    <div class="lv-icon-wrap ico-pink"><i class="fa-solid fa-trophy"></i></div>
+    <div class="lv-meta">
+      <div class="lv-eyebrow">🏆 Quest Complete!</div>
+      <div class="lv-title">Final Summary &amp; Your Imputation Roadmap</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="gtbl">
+      <thead><tr><th>Topic</th><th>Core Idea</th><th>Key Tool</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>Missing Value Imputation</strong></td><td>NaN ko smartly fill karo, delete mat karo</td><td>SimpleImputer, fillna()</td><td>Har DS / ML project</td></tr>
+        <tr><td><span class="stat-pill sp-blue">L1</span> <strong>Types of Missingness</strong></td><td>MCAR / MAR / MNAR — pattern samjho</td><td>isnull(), heatmap</td><td>Strategy selection</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>Numerical — Mean</strong></td><td>Normal data ke liye, outlier nahi hone chahiye</td><td>strategy="mean"</td><td>IPL runs, test scores</td></tr>
+        <tr><td><span class="stat-pill sp-cyan">L2</span> <strong>Numerical — Median</strong></td><td>Skewed data ya outliers hone par use karo</td><td>strategy="median"</td><td>Salary, property prices</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>Categorical — most_frequent</strong></td><td>Sabse common category se fill karo</td><td>strategy="most_frequent"</td><td>City, Gender, Category</td></tr>
+        <tr><td><span class="stat-pill sp-purple">L3</span> <strong>Categorical — constant</strong></td><td>"Unknown" se fill — MNAR ke liye</td><td>strategy="constant"</td><td>Occupation, Income range</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Most Frequent Deep Dive</strong></td><td>fit() → mode seekho, transform() → fill karo</td><td>imputer.statistics_</td><td>&lt; 20% missing data</td></tr>
+        <tr><td><span class="stat-pill sp-green">L4</span> <strong>Pitfalls &amp; Best Practices</strong></td><td>High missing % mein distribution distorts</td><td>value_counts() se verify karo</td><td>Quality check</td></tr>
+        <tr><td><span class="stat-pill sp-orange">L5</span> <strong>Forward Fill (ffill)</strong></td><td>Pehle wali value se fill karo</td><td>fillna(method="ffill")</td><td>Stock, sensor, weather data</td></tr>
+        <tr><td><span class="stat-pill sp-orange">L5</span> <strong>Backward Fill (bfill)</strong></td><td>Agle wali value se fill karo</td><td>fillna(method="bfill")</td><td>Time series, sequential data</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="glow-div"></div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    A["🕳️ Missing Values Detected"] --> B{What type?}
+    B --> C["🔢 Numerical"]
+    B --> D["🔤 Categorical"]
+    B --> T["⏩ Time Series"]
+    C --> E{Outliers present?}
+    E -->|No| F["strategy=mean"]
+    E -->|Yes| G["strategy=median"]
+    D --> H{Why missing?}
+    H -->|MCAR / MAR| I["strategy=most_frequent"]
+    H -->|MNAR| J["strategy=constant\nfill_value='Unknown'"]
+    T --> P{Direction?}
+    P -->|Use previous| Q["fillna(method=ffill)"]
+    P -->|Use next| R["fillna(method=bfill)"]
+    F --> K["✅ Data Cleaned & Ready!"]
+    G --> K
+    I --> K
+    J --> K
+    Q --> K
+    R --> K
+    K --> L["🚀 ML Model Ready!"]
+    style A fill:#fee2e2,stroke:#dc2626,color:#991b1b,rx:12
+    style B fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95,rx:12
+    style C fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style D fill:#ede9fe,stroke:#7c3aed,color:#4c1d95,rx:10
+    style T fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style E fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style F fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,rx:10
+    style G fill:#d1fae5,stroke:#16a34a,color:#14532d,rx:10
+    style H fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style I fill:#d1fae5,stroke:#16a34a,color:#14532d,rx:10
+    style J fill:#fce7f3,stroke:#db2777,color:#831843,rx:10
+    style P fill:#fef9c3,stroke:#b45309,color:#713f12,rx:10
+    style Q fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style R fill:#ffedd5,stroke:#c2410c,color:#7c2d12,rx:10
+    style K fill:#fef9c3,stroke:#b45309,color:#713f12,rx:12
+
+    style L fill:#dcfce7,stroke:#16a34a,color:#14532d,rx:12
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <div class="callout cb-blue h-100" style="margin:0;">
+        <div class="ct"><i class="fa-brands fa-python"></i> Key Tools — Zaroor Seekho</div>
+        <strong style="color:var(--neon-blue)">SimpleImputer</strong> — sklearn ka official imputer<br>
+        <strong style="color:var(--neon-green)">pandas fillna()</strong> — quick EDA ke liye<br>
+        <strong style="color:var(--neon-yellow)">isnull() + heatmap</strong> — missing pattern visualize karo
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="callout cb-green h-100" style="margin:0;">
+        <div class="ct"><i class="fa-solid fa-road"></i> Aage Kya Seekhein? (Next Quest!)</div>
+        🔮 <strong>Missing Indicator</strong> — missingness ko feature banaao<br>
+        🎲 <strong>Random Sample Imputation</strong> — distribution preserve karo<br>
+        🤝 <strong>KNN Imputer</strong> — similar rows se fill karo<br>
+        🔗 <strong>MICE Algorithm</strong> — iterative multivariate imputation<br>
+        📊 <strong>missingno library</strong> — missing patterns visualize karo
+      </div>
+    </div>
+  </div>
+
+  <div class="callout cb-pink mt-3">
+    <div class="ct"><i class="fa-solid fa-heart"></i> Final Message</div>
+    <strong>Missing Value Imputation</strong> = Data ka "gap filler" — delete mat karo, fill karo smartly!<br>
+    → <strong>Numerical Mean/Median</strong> = Normal data ke liye mean, skewed ke liye median — outliers se daro!<br>
+    → <strong>Categorical most_frequent</strong> = MCAR/MAR data ke liye solid baseline — quick aur effective!<br>
+    → <strong>Constant "Unknown"</strong> = MNAR data ke liye — missing hona khud ek signal hai!<br>
+    → <strong>Forward/Backward Fill</strong> = Time series ka best dost — sequential data ke liye natural choice!<br><br>
+    <strong style="color:var(--neon-pink)">Imputation master kar liya toh koi bhi dirty dataset tumhe nahi dara sakta — Data Cleaning Pro ban gaye tum! 🧹🚀</strong>
+  </div>
+</div>
+
+</div><!-- /container-main -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="gfooter">
+  <div class="container-main">
+    <div class="gfooter-logo"><i class="fa-solid fa-fill-drip me-2"></i>Python Missing Values Quest</div>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0.5rem;">Missing Value Imputation · Numerical · Categorical · Most Frequent · Forward Fill · Backward Fill | Gamified Tutorial</p>
+    <p style="color:var(--dim); font-size:0.82rem;">Made with <i class="fa-solid fa-heart" style="color:var(--neon-pink)"></i> for Hindi-speaking Data Science learners across India 🇮🇳</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════ MODAL ═══════════════════ -->
+<canvas id="confettiCanvas"></canvas>
+<div class="modal-overlay" id="finalModal">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" title="Close">✕</button>
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">Quest Complete!</div>
+    <div class="modal-subtitle" id="modalSubtitle">Tumne saare 5 quizzes complete kar liye!</div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num" id="ringNum">0/4</div>
+          <div class="ring-label">Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="grade-card" id="gradeCard">
+      <div class="grade-letter" id="gradeLetter">S</div>
+      <div class="grade-msg" id="gradeMsg">Exceptional!</div>
+    </div>
+    <div class="modal-xp-row">
+      <span class="mxp-label">⚡ Total XP Earned from Quizzes</span>
+      <span class="mxp-val" id="modalXpVal">0 XP</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-retry"    id="modalRetry">   <i class="fa-solid fa-rotate-right"></i> Retry All</button>
+      <button class="modal-btn-continue" id="modalContinue"><i class="fa-solid fa-trophy"></i> Awesome, Continue!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ═══ FINAL MODAL ═══ */
+function showFinalModal() {
+  const total = quizTotal, correct = quizCorrect;
+  const pct   = total > 0 ? correct / total : 0;
+  const quizXP = correct * 25;
+  const grades = [
+    { min: 1.0,  cls: 'grade-s', letter: 'S 🌟', msg: 'Zabardast! Sab 5/5 correct! Imputation Grandmaster! 🧹' },
+    { min: 0.75, cls: 'grade-a', letter: 'A 🎯', msg: 'Bahut badhiya! Almost perfect performance!' },
+    { min: 0.5,  cls: 'grade-b', letter: 'B 📘', msg: 'Accha kiya! Kuch topics dobara review karo.' },
+    { min: 0.25, cls: 'grade-c', letter: 'C 💪', msg: 'Theek hai! Concepts ko aur practice karo.' },
+    { min: 0.0,  cls: 'grade-d', letter: 'D 📚', msg: 'Aur mehnat karo! Tutorial dobara padho.' },
+  ];
+  const g = grades.find(gr => pct >= gr.min);
+  document.getElementById('ringNum').textContent    = correct + '/' + total;
+  document.getElementById('modalXpVal').textContent = quizXP + ' XP';
+  const gradeCard = document.getElementById('gradeCard');
+  gradeCard.className = 'grade-card ' + g.cls;
+  document.getElementById('gradeLetter').textContent = g.letter;
+  document.getElementById('gradeMsg').textContent    = g.msg;
+  if (pct === 1.0) {
+    document.getElementById('modalTrophy').textContent   = '🏆';
+    document.getElementById('modalTitle').textContent    = '🎊 Perfect Score!';
+    document.getElementById('modalSubtitle').textContent = 'Wah! Saare ' + total + '/' + total + ' sahi! Imputation + Time Series Grandmaster!';
+  } else if (pct >= 0.5) {
+    document.getElementById('modalTrophy').textContent   = '🎯';
+    document.getElementById('modalTitle').textContent    = 'Quest Complete!';
+    document.getElementById('modalSubtitle').textContent = correct + ' out of ' + total + ' correct. Kafi accha kiya!';
+  } else {
+    document.getElementById('modalTrophy').textContent   = '📚';
+    document.getElementById('modalTitle').textContent    = 'Keep Trying!';
+    document.getElementById('modalSubtitle').textContent = 'Tutorial dobara padho aur retry karo!';
+  }
+  const circumference = 327, offset = circumference * (1 - pct);
+  const ringColors = { 'grade-s':'#b45309','grade-a':'#16a34a','grade-b':'#2563eb','grade-c':'#7c3aed','grade-d':'#dc2626' };
+  const ringEl = document.getElementById('ringFill');
+  ringEl.style.stroke = ringColors[g.cls] || '#2563eb';
+  ringEl.style.transition = 'none'; ringEl.style.strokeDashoffset = '327';
+  setTimeout(() => {
+    ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+    ringEl.style.strokeDashoffset = offset;
+  }, 80);
+  document.getElementById('finalModal').classList.add('open');
+  if (pct >= 0.5) launchConfetti(pct);
+}
+
+function launchConfetti(pct) {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const count  = Math.floor(80 + pct * 140);
+  const colors = ['#2563eb','#7c3aed','#db2777','#16a34a','#b45309','#0891b2','#f59e0b'];
+  const pieces = Array.from({ length: count }, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * -canvas.height * 0.6,
+    w: Math.random() * 10 + 5, h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx: (Math.random() - 0.5) * 4, vy: Math.random() * 4 + 2,
+    rot: Math.random() * 360, vrot: (Math.random() - 0.5) * 9, alpha: 1,
+  }));
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+    pieces.forEach(p => {
+      if (p.y > canvas.height + 20) return; alive = true;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if (p.y > canvas.height * 0.65) p.alpha -= 0.02;
+      p.alpha = Math.max(0, p.alpha);
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    });
+    frame++;
+    if (alive && frame < 260) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  })();
+}
+
+function initQuizzes() {
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      const n = opt.cloneNode(true); opt.parentNode.replaceChild(n, opt);
+    });
+    const correct = box.dataset.correct;
+    const qxp     = parseInt(box.dataset.xp) || 25;
+    let answered   = false;
+    box.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return; answered = true;
+        const isCorrect = opt.dataset.ans === correct;
+        const fb        = box.querySelector('.quiz-feedback');
+        box.querySelectorAll('.quiz-opt').forEach(o => {
+          o.classList.add('answered-opt');
+          const exDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+          if (o.dataset.ans === correct) { o.classList.add('correct'); if (exDiv) exDiv.classList.add('show-correct'); }
+          else if (o === opt && !isCorrect) { o.classList.add('wrong'); if (exDiv) exDiv.classList.add('show-wrong'); }
+          else { o.classList.add('dimmed'); }
+        });
+        if (isCorrect) {
+          quizCorrect++;
+          fb.className = 'quiz-feedback show win';
+          fb.innerHTML = '<span style="font-size:1.3rem">🎉</span>&nbsp;Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+          addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+        } else {
+          fb.className = 'quiz-feedback show lose';
+          fb.innerHTML = '<span style="font-size:1.3rem">💡</span>&nbsp;Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+          showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+        }
+        const doneCount = Array.from(document.querySelectorAll('.quiz-box'))
+          .filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+        if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+      });
+    });
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, theme: 'base',
+  themeVariables: {
+    primaryColor: '#dbeafe', primaryTextColor: '#1e3a8a',
+    primaryBorderColor: '#2563eb', lineColor: '#94a3b8',
+    secondaryColor: '#d1fae5', tertiaryColor: '#ede9fe',
+    fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 24 }
+});
+
+/* ═══ XP SYSTEM ═══ */
+let xp = 0, scrollXpEarned = 0;
+const XP_MAX = 275;   // 5×30 scroll + 5×25 quiz = 275
+const earnedBadges = new Set();
+
+function addXP(amount, badgeId) {
+  if (badgeId) scrollXpEarned = Math.min(scrollXpEarned + amount, 150);
+  xp = Math.min(xp + amount, XP_MAX);
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  if (badgeId && !earnedBadges.has(badgeId)) {
+    earnedBadges.add(badgeId);
+    const el = document.getElementById(badgeId);
+    if (el) el.classList.add('earned');
+  }
+  if (xp >= XP_MAX) showToast('🏆', 'QUEST COMPLETE! 🎊', 'Imputation Grandmaster! 275/275 XP!', '#b45309');
+}
+
+function showToast(icon, title, msg, color) {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'gtoast';
+  t.innerHTML = `<span class="gtoast-icon">${icon}</span><div><div style="font-weight:800;color:${color};font-size:0.9rem;">${title}</div><div style="color:#6b7280;font-size:0.8rem;font-weight:400;">${msg}</div></div>`;
+  container.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══ QUIZ SYSTEM ═══ */
+let quizTotal = 0, quizCorrect = 0;
+
+document.querySelectorAll('.quiz-box').forEach(box => {
+  quizTotal++;
+  const correct = box.dataset.correct;
+  const qxp     = parseInt(box.dataset.xp) || 25;
+  let answered   = false;
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    const explain = opt.dataset.explain || '';
+    if (explain) {
+      const div = document.createElement('div');
+      div.className = 'quiz-explain';
+      div.dataset.forAns = opt.dataset.ans;
+      div.textContent = explain;
+      opt.parentNode.insertBefore(div, opt.nextSibling);
+    }
+  });
+
+  box.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return; answered = true;
+      const ans = opt.dataset.ans, fb = box.querySelector('.quiz-feedback');
+      const isCorrect = ans === correct;
+      box.querySelectorAll('.quiz-opt').forEach(o => {
+        o.classList.add('answered-opt');
+        const explainDiv = box.querySelector('.quiz-explain[data-for-ans="' + o.dataset.ans + '"]');
+        if (o.dataset.ans === correct) {
+          o.classList.add('correct'); if (explainDiv) explainDiv.classList.add('show-correct');
+        } else if (o === opt && !isCorrect) {
+          o.classList.add('wrong');   if (explainDiv) explainDiv.classList.add('show-wrong');
+        } else {
+          o.classList.add('dimmed');
+          if (o.dataset.ans === correct && explainDiv) explainDiv.classList.add('show-reveal');
+        }
+      });
+      if (isCorrect) {
+        quizCorrect++;
+        fb.className = 'quiz-feedback show win';
+        fb.innerHTML = '<span style="font-size:1.3rem">🎉</span> Zabardast! Sahi jawab! <strong>+' + qxp + ' XP</strong> earned!';
+        addXP(qxp); showToast('⚡', '+' + qxp + ' XP!', 'Bilkul sahi jawab!', '#16a34a');
+      } else {
+        fb.className = 'quiz-feedback show lose';
+        fb.innerHTML = '<span style="font-size:1.3rem">💡</span> Galat! Sahi jawab highlight ho gaya — concept dobara padho!';
+        showToast('💡', 'Galat!', 'Sahi jawab dekho aur concept review karo.', '#dc2626');
+      }
+      const doneCount = Array.from(document.querySelectorAll('.quiz-box'))
+        .filter(b => b.querySelector('.quiz-opt.answered-opt')).length;
+      if (doneCount === quizTotal) setTimeout(showFinalModal, 1200);
+    });
+  });
+});
+
+/* ═══ FADE-UP OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+/* ═══ XP ON SCROLL ═══ */
+const sectionXP = {
+  's1': { xp: 30, badge: 'badge1', msg: '🕳️ Null Hunter badge unlocked!' },
+  's3': { xp: 30, badge: 'badge2', msg: '🔢 Num Fixer badge unlocked!' },
+  's5': { xp: 30, badge: 'badge3', msg: '🔤 Cat Fixer badge unlocked!' },
+  's7': { xp: 30, badge: 'badge4', msg: '🏆 Imputer Pro badge unlocked!' },
+  's10': { xp: 30, badge: 'badge5', msg: '⏩ Time Fixer badge unlocked!' },
+};
+const xpObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (sectionXP[id] && !earnedBadges.has(sectionXP[id].badge)) {
+        const { xp: sx, badge, msg } = sectionXP[id];
+        addXP(sx, badge); showToast('🏅', 'Badge Unlocked!', msg, '#7c3aed');
+      }
+      xpObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+['s1','s3','s5','s7','s10'].forEach(id => {
+  const el = document.getElementById(id); if (el) xpObserver.observe(el);
+});
+
+/* ═══ SMOOTH SCROLL ═══ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+/* ═══ MODAL BUTTONS ═══ */
+function closeModal() { document.getElementById('finalModal').classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalContinue').addEventListener('click', closeModal);
+document.getElementById('modalRetry').addEventListener('click', () => {
+  closeModal();
+  quizCorrect = 0;
+  xp = scrollXpEarned;
+  document.getElementById('xpFill').style.width  = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpScore').textContent = xp + ' / ' + XP_MAX + ' XP';
+  document.querySelectorAll('.quiz-box').forEach(box => {
+    box.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('correct','wrong','dimmed','answered-opt'));
+    box.querySelectorAll('.quiz-explain').forEach(ex => ex.classList.remove('show-correct','show-wrong','show-reveal'));
+    const fb = box.querySelector('.quiz-feedback');
+    if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  });
+  initQuizzes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.getElementById('finalModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+</body>
+</html>
